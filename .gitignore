@@ -1,0 +1,21 @@
+# Dependencias y build del frontend
+node_modules/
+dist/
+
+# Build del núcleo Rust (Tauri)
+src-tauri/target/
+src-tauri/gen/
+
+# Variables de entorno (solo VITE_ públicas; nada sensible)
+.env
+.env.local
+*.local
+
+# Firma del binario / certificados
+*.pfx
+*.p12
+
+# Logs / SO
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,22 @@
+[package]
+name = "plant-app-vpn"
+version = "0.1.0"
+description = "IES Monitor Plant - App VPN (nucleo Rust)"
+authors = ["IES Internacional"]
+license = "UNLICENSED"
+edition = "2021"
+rust-version = "1.77"
+default-run = "plant-app-vpn"
+
+# El binario de la app. `lib.rs` expone `run()`; `main.rs` solo lo invoca (permite reuso en móvil a futuro).
+[lib]
+name = "plant_app_vpn_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.0.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0.0", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

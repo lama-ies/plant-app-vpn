@@ -1,0 +1,106 @@
+/* Sistema de diseño base de plant-app-vpn (tema "sala de control / agua profunda", consistente con el
+   portal). Tokens de color/tipografía. Sin fuentes externas. Las pantallas se construyen en Fase 6.6. */
+
+:root {
+  --fondo: #0a171e;
+  --fondo-2: #0e212b;
+  --superficie: #12262f;
+  --superficie-alta: #163039;
+  --linea: #22414d;
+
+  --texto: #e2eef2;
+  --texto-tenue: #86a3af;
+
+  --agua: #34c6ce;
+  --ok: #43c08a;
+  --advertencia: #f2a93b;
+  --falla: #f0616b;
+  --offline: #7f97a1;
+
+  --r-card: 14px;
+
+  --fuente-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fuente-datos: ui-monospace, 'SFMono-Regular', 'Cascadia Code', Consolas, monospace;
+
+  color-scheme: dark;
+  font-family: var(--fuente-ui);
+  color: var(--texto);
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--fondo);
+  color: var(--texto);
+}
+
+h1,
+h2 {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.selector-idioma {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--texto-tenue);
+}
+
+.selector-idioma select {
+  background: var(--superficie);
+  color: var(--texto);
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  font: inherit;
+}
+
+.selector-idioma select:focus-visible {
+  outline: 2px solid var(--agua);
+  outline-offset: 1px;
+}
+
+/* Placeholder de arranque (se reemplaza por el login/app shell en Fase 6.6). */
+.arranque {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  padding: 2rem;
+}
+
+.arranque__marca {
+  font-size: 1.4rem;
+  font-weight: 650;
+}
+
+.arranque__marca .acento {
+  color: var(--agua);
+}
+
+.arranque__sub {
+  color: var(--texto-tenue);
+}

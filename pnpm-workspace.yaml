@@ -1,0 +1,3 @@
+# Config de pnpm (pnpm 11 lee estos ajustes desde aquí). Autoriza el build nativo de esbuild (lo usa Vite).
+allowBuilds:
+  esbuild: true
