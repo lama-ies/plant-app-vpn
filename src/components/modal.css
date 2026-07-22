@@ -1,0 +1,75 @@
+/* Modal reutilizable: overlay oscuro + panel centrado con los mismos tokens del tema. */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(3, 10, 14, 0.66);
+  backdrop-filter: blur(3px);
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: min(88vh, 760px);
+  display: flex;
+  flex-direction: column;
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-card);
+  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.8);
+}
+
+.modal__cab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  border-bottom: 1px solid var(--linea);
+}
+
+.modal__titulo {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.modal__cerrar {
+  display: inline-flex;
+  background: none;
+  border: 0;
+  color: var(--texto-tenue);
+  padding: 0.25rem;
+  border-radius: 8px;
+}
+
+.modal__cerrar:hover {
+  color: var(--texto);
+}
+
+.modal__cerrar:focus-visible {
+  outline: 2px solid var(--agua);
+  outline-offset: 1px;
+}
+
+.modal__cuerpo {
+  padding: 1.15rem;
+  overflow-y: auto;
+}
+
+.form-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.form-modal__pie {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}

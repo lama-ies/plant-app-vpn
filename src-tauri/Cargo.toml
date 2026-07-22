@@ -20,3 +20,8 @@ tauri-build = { version = "2.0.0", features = [] }
 tauri = { version = "2.0.0", features = [] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+tokio = { version = "1", features = ["full"] }
+async-trait = "0.1"
+# SSH puro en Rust (sin libssh2/OpenSSL nativo) — terminal SSH (6.2.2) y transporte de SFTP (6.2.3).
+russh = "0.45"
+russh-sftp = "2.0"

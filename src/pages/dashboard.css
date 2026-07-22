@@ -1,0 +1,42 @@
+/* Tablero: barra superior simple + tarjeta de bienvenida. Las tarjetas de equipo (filtros por zona/cliente/
+   PC, estado de conexión VPN) se construyen en 6.6.2-6.6.4 una vez exista el listado real de equipos. */
+
+.panel {
+  min-height: calc(100vh - 96px);
+  padding: 1.5rem 1.25rem 2.5rem;
+}
+
+.panel__titulo {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--texto-tenue);
+  margin-bottom: 0.9rem;
+}
+
+.bienvenida {
+  max-width: 640px;
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-card);
+  padding: 1.5rem 1.6rem;
+}
+
+.bienvenida__titulo {
+  font-size: 1.2rem;
+  font-weight: 650;
+  margin: 0 0 0.4rem;
+}
+
+.bienvenida__sub {
+  color: var(--texto-tenue);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 0 0 1.1rem;
+}
+
+.bienvenida__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}

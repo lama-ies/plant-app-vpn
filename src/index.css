@@ -82,25 +82,145 @@ button {
   outline-offset: 1px;
 }
 
-/* Placeholder de arranque (se reemplaza por el login/app shell en Fase 6.6). */
-.arranque {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  gap: 0.5rem;
-  padding: 2rem;
+/* --- Primitivas genéricas de formulario/panel (auth, editor de perfil, modales) --------------------- */
+
+.vacio {
+  color: var(--texto-tenue);
 }
 
-.arranque__marca {
-  font-size: 1.4rem;
-  font-weight: 650;
+.boton-tenue {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--superficie);
+  color: var(--texto);
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.85rem;
+  text-decoration: none;
 }
 
-.arranque__marca .acento {
+.boton-tenue:hover:not(:disabled) {
+  border-color: var(--agua);
   color: var(--agua);
 }
 
-.arranque__sub {
+.boton-tenue:focus-visible {
+  outline: 2px solid var(--agua);
+  outline-offset: 1px;
+}
+
+.boton-tenue:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.icono-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--fondo-2);
   color: var(--texto-tenue);
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 0.4rem;
+}
+
+.icono-boton:hover:not(:disabled) {
+  border-color: var(--agua);
+  color: var(--agua);
+}
+
+.icono-boton:focus-visible {
+  outline: 2px solid var(--agua);
+  outline-offset: 1px;
+}
+
+.icono-boton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.icono-boton--peligro:hover:not(:disabled) {
+  border-color: var(--falla);
+  color: var(--falla);
+}
+
+/* Campo con etiqueta (login, editor de perfil, modales). */
+.auth-card__sub {
+  color: var(--texto-tenue);
+  font-size: 0.9rem;
+  margin: 0 0 1.25rem;
+  line-height: 1.45;
+}
+
+.auth-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--texto-tenue);
+}
+
+.auth-campo input,
+.auth-campo select,
+.auth-campo textarea {
+  background: var(--fondo-2);
+  color: var(--texto);
+  border: 1px solid var(--linea);
+  border-radius: 9px;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.auth-campo input:focus-visible,
+.auth-campo select:focus-visible,
+.auth-campo textarea:focus-visible {
+  outline: 2px solid var(--agua);
+  outline-offset: 1px;
+  border-color: var(--agua);
+}
+
+.auth-boton {
+  margin-top: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--agua);
+  color: #04141a;
+  border: 1px solid var(--agua);
+  border-radius: 9px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.auth-boton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--agua) 88%, white);
+}
+
+.auth-boton:focus-visible {
+  outline: 2px solid var(--agua);
+  outline-offset: 2px;
+}
+
+.auth-boton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.auth-error {
+  margin: 0;
+  color: var(--falla);
+  font-size: 0.85rem;
+}
+
+.auth-ok {
+  margin: 0;
+  color: var(--ok);
+  font-size: 0.9rem;
+  line-height: 1.45;
 }

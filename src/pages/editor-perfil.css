@@ -1,0 +1,221 @@
+/* Editor de perfil de dispositivo: formulario largo por secciones (equipo, variables, alarmas, dashboard,
+   diagrama, gráficas, acciones). Reutiliza las primitivas de index.css (auth-campo/auth-boton/etc.) y
+   agrega los patrones propios de listas editables (fila + agregar) y selección tipo chip (dashboard). */
+
+.editor {
+  min-height: calc(100vh - 96px);
+  padding: 1.5rem 1.25rem 3rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.editor__titulo {
+  font-size: 1.3rem;
+  font-weight: 650;
+  margin: 0 0 0.3rem;
+}
+
+.editor__sub {
+  color: var(--texto-tenue);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 1.25rem;
+  max-width: 70ch;
+}
+
+/* --- Barra de origen (elegir/cargar el perfil a editar) -------------------------------------------- */
+.editor__origen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.8rem;
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-card);
+  padding: 1rem 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.editor__origen .auth-campo {
+  min-width: 180px;
+}
+
+.editor__origen-acciones {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+/* --- Secciones -------------------------------------------------------------------------------------- */
+.seccion {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-card);
+  padding: 1.15rem 1.25rem;
+  margin-bottom: 1.1rem;
+}
+
+.seccion__titulo {
+  font-size: 1rem;
+  font-weight: 650;
+  margin: 0 0 0.2rem;
+}
+
+.seccion__ayuda {
+  color: var(--texto-tenue);
+  font-size: 0.82rem;
+  margin: 0 0 0.9rem;
+}
+
+.rejilla-campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.85rem;
+}
+
+/* --- Filas de listas editables (variables, alarmas, nodos, conexiones, gráficas) -------------------- */
+.fila {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) auto;
+  align-items: end;
+  gap: 0.6rem;
+  background: var(--fondo-2);
+  border: 1px solid var(--linea);
+  border-radius: 10px;
+  padding: 0.75rem 0.85rem;
+  margin-bottom: 0.6rem;
+}
+
+.fila .auth-campo {
+  font-size: 0.78rem;
+}
+
+.fila__quitar {
+  align-self: center;
+}
+
+.agregar-fila {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  background: none;
+  border: 1px dashed var(--linea);
+  color: var(--texto-tenue);
+  border-radius: 10px;
+  padding: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.agregar-fila:hover {
+  border-color: var(--agua);
+  color: var(--agua);
+}
+
+.agregar-fila:focus-visible {
+  outline: 2px solid var(--agua);
+  outline-offset: 1px;
+}
+
+.lista-vacia {
+  color: var(--texto-tenue);
+  font-size: 0.85rem;
+  margin: 0 0 0.6rem;
+}
+
+/* Fila compuesta: para elementos con datos adicionales anidados (alarmas: descripción/ayuda por idioma;
+   nodos/gráficas: selección de variables). El bloque superior es una fila flexible; el extra cuelga debajo. */
+.fila-compuesta {
+  background: var(--fondo-2);
+  border: 1px solid var(--linea);
+  border-radius: 10px;
+  padding: 0.85rem 0.95rem;
+  margin-bottom: 0.7rem;
+}
+
+.fila-compuesta__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.6rem;
+}
+
+.fila-compuesta__top .auth-campo {
+  flex: 1 1 140px;
+  font-size: 0.78rem;
+}
+
+.fila-compuesta__quitar {
+  margin-left: auto;
+}
+
+.fila-compuesta__extra {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px dashed var(--linea);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.fila-compuesta__idiomas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.5rem;
+}
+
+.fila-compuesta__idiomas .auth-campo {
+  font-size: 0.78rem;
+}
+
+/* --- Selección tipo chip (dashboard: hasta 6 variables) --------------------------------------------- */
+.casillas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.casilla {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--fondo-2);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-chip);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.casilla input {
+  accent-color: var(--agua);
+}
+
+.subtitulo-lista {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--texto-tenue);
+  margin: 1rem 0 0.6rem;
+}
+
+.subtitulo-lista:first-child {
+  margin-top: 0;
+}
+
+/* --- Validación y acciones finales ------------------------------------------------------------------ */
+.validacion {
+  margin: 0 0 0.9rem;
+  padding-left: 1.2rem;
+  color: var(--falla);
+  font-size: 0.88rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.editor__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}

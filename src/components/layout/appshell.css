@@ -1,0 +1,19 @@
+/* Marco autenticado: topbar arriba + contenido debajo. */
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell__cuerpo {
+  flex: 1;
+}
+
+/* Pantalla de carga mientras se resuelve la sesión. */
+.cargando-pantalla {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  color: var(--texto-tenue);
+}

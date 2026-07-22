@@ -1,0 +1,91 @@
+/* Barra superior de navegación. Mismos tokens que el resto de la app (index.css). */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--fondo-2) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--linea);
+}
+
+.topbar__fila {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.7rem 1.25rem;
+}
+
+.topbar__marca {
+  margin-right: auto;
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.topbar__acento {
+  color: var(--agua);
+}
+
+.topbar__acciones {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.topbar__usuario {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.25;
+}
+
+.topbar__correo {
+  color: var(--texto-tenue);
+  font-size: 0.82rem;
+}
+
+.topbar__rol {
+  color: var(--agua);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.topbar__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 1.25rem;
+  border-top: 1px solid var(--linea);
+  overflow-x: auto;
+}
+
+.topbar__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem;
+  color: var(--texto-tenue);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+
+.topbar__tab:hover {
+  color: var(--texto);
+}
+
+.topbar__tab.active {
+  color: var(--agua);
+  border-bottom-color: var(--agua);
+}
+
+.topbar__tab:focus-visible {
+  outline: 2px solid var(--agua);
+  outline-offset: -2px;
+  border-radius: 4px;
+}

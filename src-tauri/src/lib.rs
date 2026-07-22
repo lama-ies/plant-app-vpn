@@ -1,22 +1,39 @@
 // Núcleo Rust de plant-app-vpn (Tauri v2). Aquí vive la lógica sensible/de SO que NO debe estar en el
-// frontend web: control de la NIC/túnel WireGuard en Windows, PTY de la terminal SSH y transferencia SFTP
-// (Fase 6.2). El frontend solo invoca comandos de esta allowlist; nunca ejecuta shell arbitrario.
+// frontend web: control de la NIC/túnel WireGuard en Windows (`wireguard.rs`), terminal SSH embebida
+// (`ssh.rs`) y transferencia de archivos por SFTP (`sftp.rs`) — Fase 6.2. El frontend solo invoca estos
+// comandos (allowlist); nunca ejecuta shell arbitrario. Ver plant-arquitectura/07-app-vpn.md.
 //
-// Este arranque (6.1) solo expone `ping`, para confirmar el puente frontend↔Rust. Los comandos reales se
-// agregan en la Fase 6.2. Un comando definido en lib.rs NO debe ser `pub`. Ver 07-app-vpn.md.
+// NOTA DE VERIFICACIÓN: sin toolchain Rust en el equipo de desarrollo, este módulo no se compiló en esta
+// sesión. Se valida con `cargo check`/`cargo build` en Fase 9.
 
-/// Comando de prueba del puente: el frontend lo invoca con invoke('ping') y recibe "pong".
+mod sftp;
+mod ssh;
+mod wireguard;
+
+/// Comando de prueba del puente frontend↔Rust (se mantiene como healthcheck del núcleo).
 #[tauri::command]
 fn ping() -> String {
     "pong".to_string()
 }
 
-/// Arranca la app Tauri. Se llama desde main.rs (y a futuro desde el entrypoint móvil).
+/// Arranca la app Tauri. Se llama desde main.rs.
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        // TODO(Fase 6.2): registrar aquí los comandos reales (wireguard, ssh_pty, sftp).
-        .invoke_handler(tauri::generate_handler![ping])
+        .manage(ssh::EstadoSsh::default())
+        .invoke_handler(tauri::generate_handler![
+            ping,
+            wireguard::vpn_conectar,
+            wireguard::vpn_desconectar,
+            wireguard::vpn_estado,
+            ssh::ssh_conectar,
+            ssh::ssh_enviar,
+            ssh::ssh_redimensionar,
+            ssh::ssh_cerrar,
+            sftp::sftp_listar,
+            sftp::sftp_subir,
+            sftp::sftp_descargar,
+        ])
         .run(tauri::generate_context!())
         .expect("error al arrancar plant-app-vpn");
 }

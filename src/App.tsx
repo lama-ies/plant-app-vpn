@@ -1,19 +1,23 @@
-// Componente raíz de plant-app-vpn (arranque). Por ahora solo una pantalla de bienvenida con marca +
-// selector de idioma, que confirma que el frontend compila y el i18n funciona. El login (pool Staff),
-// el app shell y las pantallas (dashboard, editor de perfil, terminal SSH, etc.) se construyen en la
-// Fase 6.4–6.6. Ver plant-arquitectura/plan-de-trabajo.md.
-import { useTranslation } from 'react-i18next';
-import { SelectorIdioma } from './components/SelectorIdioma';
+// Componente raíz: enrutado de la app. La ruta pública es /login; las privadas cuelgan de <AppShell>
+// (topbar + puerta de sesión + Outlet). Ver plant-arquitectura/07-app-vpn.md y plan-de-trabajo.md Fase 6.6.
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { Login } from './pages/Login';
+import { Dashboard } from './pages/Dashboard';
+import { EditorPerfil } from './pages/EditorPerfil';
+import { AppShell } from './components/layout/AppShell';
 
 export function App() {
-  const { t } = useTranslation();
   return (
-    <main className="arranque">
-      <SelectorIdioma />
-      <div className="arranque__marca">
-        IES <span className="acento">Monitor Plant</span>
-      </div>
-      <p className="arranque__sub">{t('app.subtitulo')}</p>
-    </main>
+    <Routes>
+      {/* Pública (sin sesión). */}
+      <Route path="/login" element={<Login />} />
+
+      {/* Privadas: cuelgan del marco autenticado (gate de sesión + topbar). */}
+      <Route element={<AppShell />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/editor-perfil" element={<EditorPerfil />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Route>
+    </Routes>
   );
 }
