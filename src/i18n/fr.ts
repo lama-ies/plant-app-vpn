@@ -265,6 +265,11 @@ export const fr = {
       errorGuardar: "Impossible d'enregistrer le profil.",
       errorExportar: "Impossible d'exporter le profil.",
       errorImportar: "Impossible d'importer le fichier.",
+      desplegar: "Déployer vers l'équipement",
+      desplegarAyuda: "Envoie ce profil pour de vrai vers l'équipement/PC réel — différent de l'enregistrer comme modèle.",
+      desplegando: 'Déploiement...',
+      desplegadoOk: 'Déployé avec succès (version {{version}}).',
+      errorSinPc: "Cet équipement n'a pas encore de PC assigné — assignez-en un dans Nouvel équipement avant de déployer.",
     },
     tipoPlanta: {
       osmosis: 'Osmose inverse',

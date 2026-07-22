@@ -3,14 +3,16 @@
 // de lectura/control, catálogo de alarmas, dashboard, diagrama y gráficas — reutilizable como plantilla BASE
 // por tipo de planta o PERSONALIZADA para un equipo puntual. Incluye validar/exportar/importar en Excel.
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
-import { AlertTriangle, CheckCircle2, Download, Plus, Save, Trash2, Upload } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Download, Plus, Save, Trash2, Upload, UploadCloud } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import {
+  desplegarPerfil,
   exportarPerfilExcel,
   guardarPerfilBase,
   guardarPerfilEquipo,
   importarPerfilExcel,
+  obtenerEquipo,
   obtenerPerfilBase,
   obtenerPerfilEquipo,
 } from '../lib/api';
@@ -77,6 +79,7 @@ export function EditorPerfil() {
   const [exportando, setExportando] = useState(false);
   const [importando, setImportando] = useState(false);
   const [guardando, setGuardando] = useState(false);
+  const [desplegando, setDesplegando] = useState(false);
 
   const clavesDisponibles = useMemo(() => {
     if (!perfil) return [] as string[];
@@ -186,6 +189,31 @@ export function EditorPerfil() {
       setErrorAccion(codigoAMensaje(t, e));
     } finally {
       setGuardando(false);
+    }
+  }
+
+  // Distinto de guardar('equipo'): eso solo guarda la plantilla del editor. Desplegar la empuja de verdad
+  // al equipo/PC real (Plant_Config -> shadow IoT que consume plant-plc) — dos pasos separados a propósito
+  // (decisión del usuario), para no desplegar por accidente algo que todavía se está editando.
+  async function desplegar() {
+    if (!perfil || !perfil.equipoId) return;
+    limpiarAvisos();
+    const errores = validarPerfil(perfil);
+    setErroresValidacion(errores);
+    if (errores.length > 0) return;
+    setDesplegando(true);
+    try {
+      const { equipo } = await obtenerEquipo(perfil.equipoId);
+      if (!equipo.pcId) {
+        setErrorAccion(t('editorPerfil.errorSinPc'));
+        return;
+      }
+      const { versionConfig } = await desplegarPerfil(equipo.pcId, perfil.equipoId, perfil);
+      setMensajeOk(t('editorPerfil.desplegadoOk', { version: versionConfig }));
+    } catch (e) {
+      setErrorAccion(codigoAMensaje(t, e));
+    } finally {
+      setDesplegando(false);
     }
   }
 
@@ -534,6 +562,16 @@ export function EditorPerfil() {
               >
                 <Save size={16} aria-hidden />
                 {guardando ? t('editorPerfil.guardando') : t('editorPerfil.guardarPersonalizada')}
+              </button>
+              <button
+                type="button"
+                className="auth-boton"
+                onClick={() => void desplegar()}
+                disabled={desplegando || !perfil.equipoId}
+                title={t('editorPerfil.desplegarAyuda')}
+              >
+                <UploadCloud size={16} aria-hidden />
+                {desplegando ? t('editorPerfil.desplegando') : t('editorPerfil.desplegar')}
               </button>
             </div>
           </section>

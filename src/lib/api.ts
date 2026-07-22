@@ -203,6 +203,11 @@ export function listarEquipos(familiaId: string) {
   return peticion<{ equipos: EquipoApi[] }>('GET', '/app-vpn/equipos', { query: { familiaId } });
 }
 
+/** Trae un equipo puntual — usado para resolver su `pcId` antes de desplegar su perfil. */
+export function obtenerEquipo(equipoId: string) {
+  return peticion<{ equipo: EquipoApi }>('GET', '/app-vpn/equipos', { query: { equipoId } });
+}
+
 /** Alta de un equipo nuevo (sin equipoId) o actualización de metadata (con equipoId). */
 export function guardarEquipo(datos: {
   equipoId?: string;
@@ -397,6 +402,19 @@ export function guardarPerfilEquipo(equipoId: string, perfil: PerfilDispositivo)
   return peticion<{ equipoId: string; guardado: string }>('PUT', '/app-vpn/perfiles', {
     cuerpo: { equipoId, perfil },
   });
+}
+
+// --- Despliegue real a la PC (Plant_Config) — EditorPerfil.tsx, botón "Desplegar", rol Administrador -----
+// Distinto de guardarPerfilEquipo: eso solo guarda la plantilla del editor. Esto la empuja de verdad al
+// shadow IoT que consume plant-plc — dos pasos separados, decisión del usuario (2026-07-22).
+
+export interface RespuestaDesplegarPerfil {
+  equipoId: string;
+  versionConfig: number;
+}
+
+export function desplegarPerfil(pcId: string, equipoId: string, perfil: PerfilDispositivo) {
+  return peticion<RespuestaDesplegarPerfil>('POST', '/app-vpn/config', { cuerpo: { pcId, equipoId, perfil } });
 }
 
 // --- Import/export de perfil en Excel (Plant_PerfilExcel) --------------------------------------------

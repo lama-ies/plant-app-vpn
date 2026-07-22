@@ -265,6 +265,11 @@ export const pt = {
       errorGuardar: 'Não foi possível salvar o perfil.',
       errorExportar: 'Não foi possível exportar o perfil.',
       errorImportar: 'Não foi possível importar o arquivo.',
+      desplegar: 'Implantar no equipamento',
+      desplegarAyuda: 'Envia esse perfil de verdade para o equipamento/PC real — diferente de salvá-lo como modelo.',
+      desplegando: 'Implantando...',
+      desplegadoOk: 'Implantado com sucesso (versão {{version}}).',
+      errorSinPc: 'Esse equipamento ainda não tem uma PC atribuída — atribua uma em Novo equipamento antes de implantar.',
     },
     tipoPlanta: {
       osmosis: 'Osmose reversa',

@@ -266,6 +266,11 @@ export const es = {
       errorGuardar: 'No se pudo guardar el perfil.',
       errorExportar: 'No se pudo exportar el perfil.',
       errorImportar: 'No se pudo importar el archivo.',
+      desplegar: 'Desplegar al equipo',
+      desplegarAyuda: 'Envía este perfil de verdad al equipo/PC real — distinto de guardarlo como plantilla.',
+      desplegando: 'Desplegando...',
+      desplegadoOk: 'Desplegado correctamente (versión {{version}}).',
+      errorSinPc: 'Este equipo todavía no tiene una PC asignada — asígnale una en Alta de equipo antes de desplegar.',
     },
     tipoPlanta: {
       osmosis: 'Ósmosis inversa',

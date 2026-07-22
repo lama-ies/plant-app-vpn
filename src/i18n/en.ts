@@ -265,6 +265,11 @@ export const en = {
       errorGuardar: 'Could not save the profile.',
       errorExportar: 'Could not export the profile.',
       errorImportar: 'Could not import the file.',
+      desplegar: 'Deploy to equipment',
+      desplegarAyuda: 'Sends this profile for real to the actual equipment/PC — different from saving it as a template.',
+      desplegando: 'Deploying...',
+      desplegadoOk: 'Deployed successfully (version {{version}}).',
+      errorSinPc: 'This equipment has no PC assigned yet — assign one in New equipment before deploying.',
     },
     tipoPlanta: {
       osmosis: 'Reverse osmosis',
