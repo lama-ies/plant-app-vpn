@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Capacidades de la ventana principal de plant-app-vpn. Los comandos de wireguard/ssh/sftp son funciones Rust propias (#[tauri::command]) y quedan disponibles automáticamente al registrarse en invoke_handler; no requieren un permiso de plugin aparte. Este archivo se revisa en Fase 9 si se agrega algún plugin oficial (ej. shell/fs) que sí requiera permisos explícitos.",
+  "description": "Capacidades de la ventana principal de plant-app-vpn. Los comandos de wireguard/ssh/sftp son funciones Rust propias (#[tauri::command]) y quedan disponibles automáticamente al registrarse en invoke_handler; no requieren un permiso de plugin aparte. `dialog:default` (2026-07-22) habilita el diálogo nativo de abrir/guardar archivo que usa TransferenciaArchivos.tsx (SFTP) para elegir la ruta LOCAL real — un <input type=\"file\"> del navegador no expone una ruta de sistema de archivos real, y sftp_subir/sftp_descargar (sftp.rs) la necesitan.",
   "windows": ["main"],
-  "permissions": ["core:default"]
+  "permissions": ["core:default", "dialog:default"]
 }

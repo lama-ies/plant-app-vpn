@@ -62,6 +62,7 @@ pub struct EstadoSsh {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ParametrosConexionSsh {
     /// Id que el frontend elige para esta terminal (correlaciona los eventos de datos/cierre).
     pub sesion_id: String,

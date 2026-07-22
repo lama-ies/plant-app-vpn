@@ -18,6 +18,9 @@ tauri-build = { version = "2.0.0", features = [] }
 
 [dependencies]
 tauri = { version = "2.0.0", features = [] }
+# Diálogo nativo de abrir/guardar archivo (TransferenciaArchivos.tsx necesita una ruta LOCAL real, que un
+# <input type="file"> del navegador no expone).
+tauri-plugin-dialog = "2"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tokio = { version = "1", features = ["full"] }
@@ -25,3 +28,6 @@ async-trait = "0.1"
 # SSH puro en Rust (sin libssh2/OpenSSL nativo) — terminal SSH (6.2.2) y transporte de SFTP (6.2.3).
 russh = "0.45"
 russh-sftp = "2.0"
+# Generación del par de llaves WireGuard del cliente (Curve25519) — el frontend nunca ve la privada.
+x25519-dalek = { version = "2", features = ["static_secrets", "getrandom"] }
+base64 = "0.22"

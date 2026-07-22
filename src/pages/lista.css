@@ -1,0 +1,59 @@
+/* Estilos compartidos de las pantallas de lista simple (PanelErrores, Auditoria): fila con datos +
+   metadatos, sin tarjetas anidadas. */
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fila-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 10px;
+  padding: 0.8rem 0.95rem;
+}
+
+.fila-lista__cab {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.fila-lista__principal {
+  font-size: 0.9rem;
+  font-weight: 550;
+}
+
+.fila-lista__meta {
+  font-size: 0.75rem;
+  color: var(--texto-tenue);
+  font-family: var(--fuente-datos);
+}
+
+.fila-lista__detalle {
+  font-size: 0.82rem;
+  color: var(--texto-tenue);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.panel-acciones {
+  display: flex;
+  align-items: end;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.panel-acciones .auth-campo {
+  min-width: 220px;
+}

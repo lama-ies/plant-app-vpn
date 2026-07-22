@@ -20,9 +20,11 @@ fn ping() -> String {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .manage(ssh::EstadoSsh::default())
         .invoke_handler(tauri::generate_handler![
             ping,
+            wireguard::vpn_generar_par,
             wireguard::vpn_conectar,
             wireguard::vpn_desconectar,
             wireguard::vpn_estado,

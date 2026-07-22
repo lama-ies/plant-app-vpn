@@ -1,7 +1,7 @@
 // Barra superior de navegación. Nav declarada como data-array + filtrada por permisos (rol Staff). A la
 // derecha: idioma, correo+rol del usuario y cerrar sesión. Ver plant-arquitectura/07-app-vpn.md.
 import type { ReactNode } from 'react';
-import { FileCog, LayoutDashboard, LogOut } from 'lucide-react';
+import { ClipboardList, FileCog, LayoutDashboard, LayoutTemplate, LogOut, MapPin, ShieldAlert, UserPlus, Users } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../auth/contexto';
@@ -21,6 +21,12 @@ interface ItemNav {
 const ITEMS: ItemNav[] = [
   { clave: 'dashboard', a: '/dashboard', etiqueta: 'nav.dashboard', icono: <LayoutDashboard size={16} aria-hidden />, perm: null },
   { clave: 'editorPerfil', a: '/editor-perfil', etiqueta: 'nav.editorPerfil', icono: <FileCog size={16} aria-hidden />, perm: 'canEditorPerfil' },
+  { clave: 'altaCliente', a: '/alta-cliente', etiqueta: 'nav.altaCliente', icono: <UserPlus size={16} aria-hidden />, perm: 'canAltaCliente' },
+  { clave: 'gestionZonas', a: '/gestion-zonas', etiqueta: 'nav.gestionZonas', icono: <MapPin size={16} aria-hidden />, perm: 'canGestionZonas' },
+  { clave: 'gestionGerentes', a: '/gestion-gerentes', etiqueta: 'nav.gestionGerentes', icono: <Users size={16} aria-hidden />, perm: 'canGestionZonas' },
+  { clave: 'gestionPlantillas', a: '/gestion-plantillas', etiqueta: 'nav.gestionPlantillas', icono: <LayoutTemplate size={16} aria-hidden />, perm: 'canGestionPlantillas' },
+  { clave: 'auditoria', a: '/auditoria', etiqueta: 'nav.auditoria', icono: <ClipboardList size={16} aria-hidden />, perm: 'canAuditoria' },
+  { clave: 'panelErrores', a: '/panel-errores', etiqueta: 'nav.panelErrores', icono: <ShieldAlert size={16} aria-hidden />, perm: 'canPanelErrores' },
 ];
 
 export function Topbar() {

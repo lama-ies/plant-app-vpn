@@ -1,6 +1,6 @@
 // Acceso a la sesión vía AWS Amplify (pool Staff). Cognito solo autentica; el perfil de sesión (rol/zonas)
-// lo resuelve el backend (`staffLogin`, pendiente — ver lib/api.ts) a partir del email del JWT.
-import { fetchAuthSession, getCurrentUser, signIn, signOut } from 'aws-amplify/auth';
+// lo resuelve el backend (`staffLogin`, real — ver lib/api.ts) a partir del email del JWT.
+import { fetchAuthSession, getCurrentUser, signIn, signOut, signUp } from 'aws-amplify/auth';
 import { staffLogin } from '../lib/api';
 import type { Identidad } from './tipos';
 
@@ -47,5 +47,24 @@ export async function cerrarSesion(): Promise<void> {
     await signOut();
   } catch {
     // ignorar
+  }
+}
+
+/**
+ * Registra al invitado Staff en Cognito con la contraseña que eligió (usuario UNCONFIRMED). Mismo patrón
+ * que el portal: el pool usa email como ALIAS, así que el `username` es un UUID aleatorio y el correo va
+ * como atributo. El backend (`Plant_StaffConsumeActivation`) confirma la cuenta al consumir el código.
+ * Idempotente ante "usuario ya existe" (reintento de activación).
+ */
+export async function registrarActivacionStaff(email: string, contrasena: string): Promise<void> {
+  try {
+    await signOut();
+  } catch {
+    // sin sesión previa
+  }
+  try {
+    await signUp({ username: crypto.randomUUID(), password: contrasena, options: { userAttributes: { email } } });
+  } catch (e) {
+    if ((e as { name?: string })?.name !== 'UsernameExistsException') throw e;
   }
 }

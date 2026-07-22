@@ -33,6 +33,7 @@ impl Handler for ManejadorSsh {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ParametrosSftp {
     pub host: String,
     pub puerto: u16,
@@ -44,6 +45,7 @@ pub struct ParametrosSftp {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct EntradaRemota {
     pub nombre: String,
     pub es_directorio: bool,

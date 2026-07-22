@@ -1,0 +1,118 @@
+/* Terminal SSH embebida: formulario de conexión (usuario/contraseña del sistema operativo del sitio, NO
+   Cognito) + el contenedor de xterm.js. La IP y la huella del host llegan solas (Plant_PCs); nunca se
+   piden acá. */
+
+.terminal-ssh {
+  min-height: calc(100vh - 96px);
+  padding: 1.5rem 1.25rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.terminal-ssh__cab {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.terminal-ssh__titulo {
+  font-size: 1.1rem;
+  font-weight: 650;
+}
+
+.terminal-ssh__host {
+  font-family: var(--fuente-datos);
+  color: var(--texto-tenue);
+  font-size: 0.85rem;
+}
+
+.terminal-ssh__login {
+  max-width: 420px;
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-card);
+  padding: 1.25rem 1.4rem;
+}
+
+.terminal-ssh__login-fila {
+  display: flex;
+  gap: 0.7rem;
+}
+
+.terminal-ssh__login-fila > * {
+  flex: 1;
+}
+
+.terminal-ssh__contenedor {
+  flex: 1;
+  min-height: 420px;
+  background: #0c1418;
+  border: 1px solid var(--linea);
+  border-radius: var(--r-card);
+  padding: 0.6rem;
+  overflow: hidden;
+}
+
+.terminal-ssh__aviso {
+  font-size: 0.8rem;
+  color: var(--advertencia);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* --- Transferencia de archivos (SFTP) --------------------------------------------------------------- */
+
+.sftp__ruta {
+  display: flex;
+  align-items: end;
+  gap: 0.6rem;
+}
+
+.sftp__ruta .auth-campo {
+  flex: 1;
+}
+
+.sftp-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.sftp-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 0.55rem 0.8rem;
+}
+
+.sftp-fila__nombre {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.sftp-fila__nombre--carpeta {
+  background: none;
+  border: 0;
+  color: var(--texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sftp-fila__tamano {
+  font-family: var(--fuente-datos);
+  font-size: 0.78rem;
+  color: var(--texto-tenue);
+  white-space: nowrap;
+}

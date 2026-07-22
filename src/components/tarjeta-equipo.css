@@ -1,0 +1,55 @@
+/* Tarjeta de equipo: estado de conexión VPN + acciones (conectar/desconectar, terminal SSH). */
+
+.tarjeta-equipo {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-card);
+  padding: 1rem 1.1rem;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.tarjeta-equipo__cab {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.tarjeta-equipo__nombre {
+  font-weight: 600;
+}
+
+.tarjeta-equipo__id {
+  font-family: var(--fuente-datos);
+  font-size: 0.75rem;
+  color: var(--texto-tenue);
+}
+
+.tarjeta-equipo__estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--texto-tenue);
+}
+
+.tarjeta-equipo__punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--offline);
+}
+
+.tarjeta-equipo__punto--activo {
+  background: var(--ok);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 22%, transparent);
+}
+
+.tarjeta-equipo__acciones {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}

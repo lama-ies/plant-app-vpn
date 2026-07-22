@@ -1,7 +1,7 @@
 // Página de inicio de sesión. Autentica contra Cognito (pool STAFF, independiente del portal) vía useAuth;
 // al lograrlo redirige al tablero. La validación de credenciales/rol la hace Cognito + el backend, no la UI.
 import { useState, type FormEvent } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../auth/contexto';
 import { SelectorIdioma } from '../components/SelectorIdioma';
@@ -83,6 +83,12 @@ export function Login() {
               {enviando ? t('login.entrando') : t('login.entrar')}
             </button>
           </form>
+
+          <div className="auth-pie">
+            <Link className="auth-link" to="/activar-staff">
+              {t('activarStaff.titulo')}
+            </Link>
+          </div>
         </section>
       </div>
     </main>

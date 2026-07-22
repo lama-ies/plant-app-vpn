@@ -9,12 +9,38 @@
 //! NOTA DE VERIFICACIÓN: este archivo no se compiló en esta sesión (no hay toolchain Rust instalado en
 //! el equipo de desarrollo). Se valida con `cargo check`/`cargo build` y contra WireGuard real en Fase 9.
 
+use base64::prelude::{Engine as _, BASE64_STANDARD};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::process::Command;
+use x25519_dalek::{PublicKey, StaticSecret};
+
+/// Par de llaves WireGuard (Curve25519, base64 estándar — mismo formato que `wg genkey`/`wg pubkey`).
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ParLlavesWireGuard {
+    pub public_key: String,
+    pub private_key: String,
+}
+
+/// Genera un par de llaves WireGuard nuevo para esta sesión de la app (nunca se persiste ni se reutiliza
+/// entre conexiones — cada "Establecer conexión" pide un peer temporal nuevo a `Plant_AccesoVPN`, con su
+/// propio par). Windows no expone `wg genkey`, así que se genera con Curve25519 puro en Rust.
+#[tauri::command]
+pub fn vpn_generar_par() -> ParLlavesWireGuard {
+    let privada = StaticSecret::random();
+    let publica = PublicKey::from(&privada);
+    ParLlavesWireGuard {
+        public_key: BASE64_STANDARD.encode(publica.as_bytes()),
+        private_key: BASE64_STANDARD.encode(privada.to_bytes()),
+    }
+}
 
 /// Datos para levantar un túnel hacia UN vpn-plc (los mismos que devuelve `Plant_AccesoVPN`).
+/// `rename_all = "camelCase"` para que el frontend TS pueda pasar las claves tal cual las devuelve la API
+/// (`direccionCliente`, etc.) sin tener que traducirlas a snake_case a mano.
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ConfiguracionPeer {
     /// Nombre del túnel/servicio (ej. derivado de `sesionId`); identifica el servicio de Windows.
     pub nombre_tunel: String,
