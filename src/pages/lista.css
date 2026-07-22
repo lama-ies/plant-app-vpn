@@ -31,6 +31,9 @@
 .fila-lista__principal {
   font-size: 0.9rem;
   font-weight: 550;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .fila-lista__meta {
@@ -56,4 +59,50 @@
 
 .panel-acciones .auth-campo {
   min-width: 220px;
+}
+
+/* Casilla (checkbox) dentro de un panel-acciones: etiqueta al lado, no arriba (AltaEquipo "usar base"). */
+.auth-campo--casilla {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: auto;
+}
+
+/* Segundo título dentro de un mismo panel (ej. GestionPlantillas: base + personalizadas). */
+.panel__titulo--secundario {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Fila de lista que además es un selector (Filtros.tsx: elegir una Familia) — toda la fila es un botón. */
+.fila-lista--clicable {
+  padding: 0;
+}
+
+.fila-lista__boton {
+  all: unset;
+  display: block;
+  width: 100%;
+  padding: 0.8rem 0.95rem;
+  cursor: pointer;
+  border-radius: inherit;
+}
+
+.fila-lista__boton:focus-visible {
+  outline: 2px solid var(--agua);
+  outline-offset: -2px;
+}
+
+.fila-lista--activa {
+  border-color: var(--agua);
+}
+
+/* Grilla de tarjetas de equipo (Filtros.tsx: PCs de la familia elegida). */
+.tarjetas-equipo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.75rem;
 }

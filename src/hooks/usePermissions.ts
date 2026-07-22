@@ -20,6 +20,7 @@ export interface Permisos {
   canTransferirArchivos: boolean;
   // Administración: solo Administrador.
   canAltaCliente: boolean;
+  canAltaEquipo: boolean;
   canEditorPerfil: boolean;
   canGestionPlantillas: boolean;
   canGestionZonas: boolean;
@@ -41,6 +42,7 @@ export function usePermissions(): Permisos {
       canSsh: esAdministrador,
       canTransferirArchivos: esAdministrador,
       canAltaCliente: esAdministrador,
+      canAltaEquipo: esAdministrador,
       canEditorPerfil: esAdministrador,
       canGestionPlantillas: esAdministrador,
       canGestionZonas: esAdministrador,

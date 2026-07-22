@@ -40,21 +40,3 @@
   flex-wrap: wrap;
   gap: 0.6rem;
 }
-
-.buscar-pc {
-  margin-top: 1.1rem;
-}
-
-.buscar-pc__fila {
-  display: flex;
-  align-items: end;
-  gap: 0.6rem;
-}
-
-.buscar-pc__fila .auth-campo {
-  flex: 1;
-}
-
-.buscar-pc__resultado {
-  margin-top: 1rem;
-}

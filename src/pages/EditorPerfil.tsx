@@ -2,9 +2,10 @@
 // mantener el perfil canónico de una planta (11-perfiles-dispositivo.md) — identidad del equipo, variables
 // de lectura/control, catálogo de alarmas, dashboard, diagrama y gráficas — reutilizable como plantilla BASE
 // por tipo de planta o PERSONALIZADA para un equipo puntual. Incluye validar/exportar/importar en Excel.
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { AlertTriangle, CheckCircle2, Download, Plus, Save, Trash2, Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import {
   exportarPerfilExcel,
   guardarPerfilBase,
@@ -54,10 +55,18 @@ function quitarDeLista<T>(lista: T[], idx: number): T[] {
 export function EditorPerfil() {
   const { t } = useTranslation();
 
+  // Si se llega desde AltaEquipo.tsx / GestionPlantillas.tsx con "?equipoId=", precarga ese origen y
+  // dispara la carga automáticamente (una sola vez, ver efecto más abajo) — evita que el administrador
+  // tenga que volver a pegar el equipoId a mano tras darlo de alta.
+  const [searchParams] = useSearchParams();
+  const equipoIdDesdeUrlRef = useRef(searchParams.get('equipoId'));
+
   // --- Origen del perfil a editar (plantilla base de un tipo de planta, o perfil de un equipo) --------
-  const [origenTipo, setOrigenTipo] = useState<'base' | 'equipo'>('base');
+  const [origenTipo, setOrigenTipo] = useState<'base' | 'equipo'>(() =>
+    equipoIdDesdeUrlRef.current ? 'equipo' : 'base',
+  );
   const [tipoPlantaSel, setTipoPlantaSel] = useState<TipoPlanta>('osmosis');
-  const [equipoIdSel, setEquipoIdSel] = useState('');
+  const [equipoIdSel, setEquipoIdSel] = useState(() => equipoIdDesdeUrlRef.current ?? '');
   const [cargando, setCargando] = useState(false);
   const [errorCarga, setErrorCarga] = useState<string | null>(null);
 
@@ -82,8 +91,12 @@ export function EditorPerfil() {
     setErrorAccion(null);
   }
 
-  async function cargar() {
-    limpiarAvisos();
+  const cargar = useCallback(async () => {
+    // Se repiten los 3 setState de limpiarAvisos (en vez de llamarla) para que este callback no dependa
+    // de una función que se recrea en cada render — así useCallback puede memoizarlo con deps exactas.
+    setErroresValidacion(null);
+    setMensajeOk(null);
+    setErrorAccion(null);
     setErrorCarga(null);
     setCargando(true);
     try {
@@ -99,7 +112,16 @@ export function EditorPerfil() {
     } finally {
       setCargando(false);
     }
-  }
+  }, [origenTipo, tipoPlantaSel, equipoIdSel, t]);
+
+  // Auto-carga única al llegar con "?equipoId=" en la URL (ver ref más arriba). Se limpia el ref después
+  // de dispararla para que no se repita si el administrador luego cambia de origen manualmente.
+  useEffect(() => {
+    if (equipoIdDesdeUrlRef.current) {
+      equipoIdDesdeUrlRef.current = null;
+      void cargar();
+    }
+  }, [cargar]);
 
   function nuevo() {
     limpiarAvisos();

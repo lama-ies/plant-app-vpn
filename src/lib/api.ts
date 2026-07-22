@@ -2,7 +2,7 @@
 // esta app: /app-vpn/*. El token (ID token de Cognito, pool Staff) lo obtiene Amplify y se adjunta como
 // Authorization. Un 401 fuerza el cierre de sesión (idempotente). Ver plant-arquitectura/07-app-vpn.md.
 import { fetchAuthSession, signOut } from 'aws-amplify/auth';
-import type { PerfilDispositivo } from '../perfiles/tipos';
+import type { ModeloPLC, PerfilDispositivo, TipoPlanta } from '../perfiles/tipos';
 
 const BASE = '/api';
 
@@ -183,6 +183,41 @@ export function guardarPc(datos: {
   return peticion<{ pc: PcApi }>('PUT', '/app-vpn/pcs', { cuerpo: datos });
 }
 
+// --- Equipos/plantas (Plant_Equipos) — AltaEquipo.tsx / GestionPlantillas.tsx, rol Administrador ---------
+
+export interface EquipoApi {
+  equipoId: string;
+  familiaId: string;
+  zonaId: string | null;
+  pcId: string | null;
+  nombre: string;
+  tipoPlanta: TipoPlanta;
+  modeloPLC: ModeloPLC;
+  ip: string;
+  puerto: number;
+  creadoEn: string;
+}
+
+/** Lista los equipos (plantas) de un cliente. */
+export function listarEquipos(familiaId: string) {
+  return peticion<{ equipos: EquipoApi[] }>('GET', '/app-vpn/equipos', { query: { familiaId } });
+}
+
+/** Alta de un equipo nuevo (sin equipoId) o actualización de metadata (con equipoId). */
+export function guardarEquipo(datos: {
+  equipoId?: string;
+  familiaId: string;
+  zonaId?: string;
+  pcId?: string;
+  nombre: string;
+  tipoPlanta: TipoPlanta;
+  modeloPLC: ModeloPLC;
+  ip: string;
+  puerto: number;
+}) {
+  return peticion<{ equipo: EquipoApi }>('PUT', '/app-vpn/equipos', { cuerpo: datos });
+}
+
 // --- Acceso VPN (Plant_AccesoVPN) — TarjetaEquipo.tsx: "Establecer conexión" -----------------------------
 
 export interface RespuestaAccesoVpn {
@@ -202,6 +237,22 @@ export interface RespuestaAccesoVpn {
 /** Pide acceso temporal a un `vpn-plc` (peer nuevo, TTL, ancho de banda por rol). */
 export function solicitarAccesoVpn(pcId: string, publicKey: string) {
   return peticion<RespuestaAccesoVpn>('POST', '/acceso-vpn', { cuerpo: { pcId, publicKey } });
+}
+
+// --- Listado de familias (Plant_ListFamilias) — Filtros.tsx, rol Administrador (Staff) --------------------
+
+export interface FamiliaApi {
+  familiaId: string;
+  numeroCliente: string;
+  nombre: string;
+  familyType: 'cliente' | 'so';
+  pais: string | null;
+  direccion: string | null;
+}
+
+/** Lista las Familias (clientes o S&O), opcionalmente filtradas por tipo. El filtro por texto es local. */
+export function listarFamilias(tipo?: 'cliente' | 'so') {
+  return peticion<{ familias: FamiliaApi[] }>('GET', '/staff/familias', { query: { tipo } });
 }
 
 // --- Alta de cliente (Plant_InviteFamilia) — AltaCliente.tsx, rol Administrador --------------------------
