@@ -77,6 +77,18 @@ export const es = {
       creadoOk: '"{{nombre}}" creado correctamente.',
       irAEditor: 'Configurar perfil',
       sinEquipos: 'Esta familia todavía no tiene equipos.',
+      pcNueva: 'Registrar PC nueva',
+      pcCancelar: 'Cancelar registro de PC',
+      pcNombre: 'Nombre de la PC',
+      pcUbicacion: 'Ubicación (opcional)',
+      pcWireguard: 'Llave pública WireGuard',
+      pcWireguardPlaceholder: 'La loguea plant-vpn-plc al primer arranque',
+      pcHuellaSsh: 'Huella SSH del host (opcional)',
+      pcHuellaSshPlaceholder: 'SHA256:... (ssh-keyscan o log de plant-vpn-plc)',
+      pcHuellaSshAyuda:
+        'Sin esta huella, la terminal SSH y la transferencia de archivos rechazan la conexión: se puede completar después editando la PC, pero sin ella no hay forma de verificar la identidad del servidor.',
+      pcCrear: 'Registrar PC',
+      pcCreando: 'Registrando...',
     },
     altaCliente: {
       titulo: 'Alta de cliente',

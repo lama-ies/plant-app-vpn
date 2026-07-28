@@ -4,11 +4,15 @@
 //!
 //! SEGURIDAD: `ManejadorSsh::check_server_key` pinea contra la huella SHA-256 del host registrada en
 //! `Plant_PCs` (misma idea que su llave pública de WireGuard), pasada por el frontend en
-//! `ParametrosConexionSsh.llave_host_esperada`. **Mientras el onboarding en `Plant_PCs` que la registra no
-//! exista (Fase 9), ese campo llega en `None` y la conexión se acepta sin pinear** — placeholder explícito,
-//! no silencioso, para no bloquear el resto del desarrollo. En cuanto el frontend empiece a enviar la
-//! huella esperada, la verificación queda cerrada automáticamente (sin tocar este archivo otra vez). NO usar
-//! contra una red no confiable mientras `llave_host_esperada` siga en `None`.
+//! `ParametrosConexionSsh.llave_host_esperada`. Si coincide con la huella real, acepta; si no coincide, o
+//! si la PC todavía no tiene huella registrada (`None`), **rechaza** — nunca se acepta una llave de host
+//! sin verificarla contra un valor conocido. (Fix de seguridad: antes, `None` hacía `Ok(true)` y aceptaba
+//! cualquier llave sin comprobar nada, lo que dejaba toda conexión SSH abierta a MITM, porque el
+//! onboarding que llena `sshHostKeyFingerprint` en `Plant_PCs` no existía todavía y esa rama era la única
+//! que se ejercía en la práctica.) El onboarding ya existe (alta de PC en `AltaEquipo.tsx` ->
+//! `Plant_PCs.sshHostKeyFingerprint`); sin esa huella, `ssh_conectar` corta temprano con un mensaje claro
+//! antes de intentar el handshake — ver el guard al inicio de `ssh_conectar`. NO reintroducir un modo
+//! "aceptar la primera llave que se vea" (TOFU) aquí: sin huella conocida, simplemente no se conecta.
 //!
 //! NOTA DE VERIFICACIÓN: sin toolchain Rust en este equipo, este archivo no se compiló. La superficie
 //! exacta de la API de `russh` (nombres de tipos/métodos) se ajusta al compilar en Fase 9 contra la
@@ -24,8 +28,10 @@ use std::sync::Arc;
 use tauri::{AppHandle, Emitter, State};
 use tokio::sync::Mutex;
 
-/// Manejador SSH: si trae una huella esperada, rechaza cualquier otra llave de host (pineo real). Sin
-/// huella (todavía no hay registro en `Plant_PCs`), acepta cualquiera — ver el TODO de seguridad arriba.
+/// Manejador SSH: pinea la llave de host contra la huella esperada. Sin huella conocida (`None`) rechaza
+/// por defecto — ver cabecera del archivo. El rechazo con mensaje explicativo para el técnico ocurre antes
+/// de llegar aquí, en el guard de `ssh_conectar`; esta rama es la defensa en profundidad del propio
+/// manejador (nunca debe aceptar una llave de host sin verificarla, sin importar quién lo invoque).
 struct ManejadorSsh {
     llave_host_esperada: Option<String>,
 }
@@ -43,7 +49,8 @@ impl Handler for ManejadorSsh {
                 let huella = clave_servidor.fingerprint(HashAlg::Sha256).to_string();
                 Ok(&huella == esperada)
             }
-            None => Ok(true), // TODO(seguridad, Fase 9): sin huella registrada aún en Plant_PCs.
+            // Fix de seguridad: antes era `Ok(true)` (acepta cualquier llave sin verificar -> MITM).
+            None => Ok(false),
         }
     }
 }
@@ -72,8 +79,9 @@ pub struct ParametrosConexionSsh {
     pub usuario: String,
     // TODO: soportar autenticación por llave pública además de contraseña.
     pub contrasena: String,
-    /// Huella SHA-256 del host (`SHA256:...`) registrada en `Plant_PCs`; `None` mientras ese registro no
-    /// exista todavía (Fase 9). Ver el TODO de seguridad en la cabecera del archivo.
+    /// Huella SHA-256 del host (`SHA256:...`) registrada en `Plant_PCs`. Si viene en `None` (la PC nunca
+    /// se onboardeó con su huella SSH), `ssh_conectar` rechaza la conexión antes de intentar nada — ver
+    /// el guard al inicio de esa función y la cabecera del archivo.
     pub llave_host_esperada: Option<String>,
 }
 
@@ -84,6 +92,18 @@ pub async fn ssh_conectar(
     estado: State<'_, EstadoSsh>,
     params: ParametrosConexionSsh,
 ) -> Result<(), String> {
+    // Sin huella de host conocida no hay nada que pinear: en vez de aceptar cualquier llave (el bug de
+    // seguridad que tenía `check_server_key`), se corta aquí con un mensaje claro para el técnico. La
+    // huella se registra una sola vez, en el onboarding de la PC (Plant_PCs.sshHostKeyFingerprint,
+    // capturado desde AltaEquipo.tsx durante la instalación física).
+    if params.llave_host_esperada.is_none() {
+        return Err(
+            "Esta PC no tiene huella SSH registrada: no se puede verificar la identidad del servidor. \
+             Contacta a onboarding para registrar su huella SSH en Plant_PCs antes de conectar."
+                .into(),
+        );
+    }
+
     let direccion = format!("{}:{}", params.host, params.puerto);
     let flujo = tokio::net::TcpStream::connect(&direccion)
         .await

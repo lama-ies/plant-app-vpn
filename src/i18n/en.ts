@@ -76,6 +76,18 @@ export const en = {
       creadoOk: '"{{nombre}}" created successfully.',
       irAEditor: 'Configure profile',
       sinEquipos: 'This family has no equipment yet.',
+      pcNueva: 'Register new PC',
+      pcCancelar: 'Cancel PC registration',
+      pcNombre: 'PC name',
+      pcUbicacion: 'Location (optional)',
+      pcWireguard: 'WireGuard public key',
+      pcWireguardPlaceholder: 'Logged by plant-vpn-plc on first boot',
+      pcHuellaSsh: 'Host SSH fingerprint (optional)',
+      pcHuellaSshPlaceholder: 'SHA256:... (ssh-keyscan or plant-vpn-plc log)',
+      pcHuellaSshAyuda:
+        "Without this fingerprint, the SSH terminal and file transfer reject the connection: it can be filled in later by editing the PC, but without it there is no way to verify the server's identity.",
+      pcCrear: 'Register PC',
+      pcCreando: 'Registering...',
     },
     altaCliente: {
       titulo: 'New client',

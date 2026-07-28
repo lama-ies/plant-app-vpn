@@ -5,11 +5,12 @@
 // opcionalmente, siembra su perfil personalizado a partir de la plantilla base del tipo de planta antes
 // de mandar al Administrador a terminarlo de configurar en EditorPerfil.tsx.
 import { useCallback, useState, type FormEvent } from 'react';
-import { AlertTriangle, CheckCircle2, FileCog, Plus } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, FileCog, HardDrive, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   guardarEquipo,
+  guardarPc,
   guardarPerfilEquipo,
   listarEquipos,
   listarPcs,
@@ -47,6 +48,19 @@ export function AltaEquipo() {
   const [creando, setCreando] = useState(false);
   const [ultimoCreado, setUltimoCreado] = useState<EquipoApi | null>(null);
 
+  // --- Alta de PC de sitio (onboarding físico): registra en Plant_PCs la PC recién instalada antes de
+  // poder asignársela a un equipo arriba. La huella SSH la trae el técnico desde el primer log de arranque
+  // de plant-vpn-plc (o de un `ssh-keyscan` a la IP de la PC) — sin ella, ssh.rs/sftp.rs rechazan cualquier
+  // conexión (fix de seguridad: ya no aceptan una llave de host sin verificarla contra algo conocido).
+  const [mostrarAltaPc, setMostrarAltaPc] = useState(false);
+  const [nombrePc, setNombrePc] = useState('');
+  const [ubicacionPc, setUbicacionPc] = useState('');
+  const [zonaIdPc, setZonaIdPc] = useState('');
+  const [wireguardPublicKeyPc, setWireguardPublicKeyPc] = useState('');
+  const [sshHostKeyFingerprintPc, setSshHostKeyFingerprintPc] = useState('');
+  const [creandoPc, setCreandoPc] = useState(false);
+  const [errorPc, setErrorPc] = useState<string | null>(null);
+
   const cargar = useCallback(
     async (id: string) => {
       setCargando(true);
@@ -69,6 +83,36 @@ export function AltaEquipo() {
   function buscar(e: FormEvent) {
     e.preventDefault();
     if (familiaId.trim()) void cargar(familiaId.trim());
+  }
+
+  /** Da de alta la PC de sitio en Plant_PCs y la deja preseleccionada para el equipo que se está creando. */
+  async function altaPc(e: FormEvent) {
+    e.preventDefault();
+    if (!nombrePc.trim() || !wireguardPublicKeyPc.trim()) return;
+    setCreandoPc(true);
+    setErrorPc(null);
+    try {
+      const { pc } = await guardarPc({
+        familiaId: familiaId.trim(),
+        nombre: nombrePc.trim(),
+        ubicacion: ubicacionPc.trim() || undefined,
+        zonaId: zonaIdPc || undefined,
+        wireguardPublicKey: wireguardPublicKeyPc.trim(),
+        sshHostKeyFingerprint: sshHostKeyFingerprintPc.trim() || undefined,
+      });
+      setPcs((previas) => [...previas, pc]);
+      setPcId(pc.pcId);
+      setNombrePc('');
+      setUbicacionPc('');
+      setZonaIdPc('');
+      setWireguardPublicKeyPc('');
+      setSshHostKeyFingerprintPc('');
+      setMostrarAltaPc(false);
+    } catch (err) {
+      setErrorPc(codigoAMensaje(t, err));
+    } finally {
+      setCreandoPc(false);
+    }
   }
 
   async function altaEquipo(e: FormEvent) {
@@ -140,6 +184,68 @@ export function AltaEquipo() {
 
       {equipos && (
         <>
+          {/* Alta de PC de sitio: onboarding físico único por PC (Plant_PCs). Separada del alta de equipo
+              porque una PC no es un equipo/planta — varios equipos pueden compartir la misma PC. */}
+          <div className="panel-acciones">
+            <button type="button" className="boton-tenue" onClick={() => setMostrarAltaPc((v) => !v)}>
+              <HardDrive size={16} aria-hidden />
+              {mostrarAltaPc ? t('altaEquipo.pcCancelar') : t('altaEquipo.pcNueva')}
+            </button>
+          </div>
+
+          {mostrarAltaPc && (
+            <form className="panel-acciones" onSubmit={altaPc}>
+              <label className="auth-campo">
+                {t('altaEquipo.pcNombre')}
+                <input type="text" value={nombrePc} onChange={(e) => setNombrePc(e.target.value)} required />
+              </label>
+              <label className="auth-campo">
+                {t('altaEquipo.pcUbicacion')}
+                <input type="text" value={ubicacionPc} onChange={(e) => setUbicacionPc(e.target.value)} />
+              </label>
+              <label className="auth-campo">
+                {t('altaEquipo.zona')}
+                <select value={zonaIdPc} onChange={(e) => setZonaIdPc(e.target.value)}>
+                  <option value="">{t('altaEquipo.sinZona')}</option>
+                  {zonas.map((z) => (
+                    <option key={z.zonaId} value={z.zonaId}>
+                      {z.nombre}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="auth-campo">
+                {t('altaEquipo.pcWireguard')}
+                <input
+                  type="text"
+                  value={wireguardPublicKeyPc}
+                  onChange={(e) => setWireguardPublicKeyPc(e.target.value)}
+                  placeholder={t('altaEquipo.pcWireguardPlaceholder')}
+                  required
+                />
+              </label>
+              <label className="auth-campo">
+                {t('altaEquipo.pcHuellaSsh')}
+                <input
+                  type="text"
+                  value={sshHostKeyFingerprintPc}
+                  onChange={(e) => setSshHostKeyFingerprintPc(e.target.value)}
+                  placeholder={t('altaEquipo.pcHuellaSshPlaceholder')}
+                />
+              </label>
+              <p className="editor__sub">{t('altaEquipo.pcHuellaSshAyuda')}</p>
+              {errorPc && (
+                <p className="auth-error" role="alert">
+                  <AlertTriangle size={15} aria-hidden /> {errorPc}
+                </p>
+              )}
+              <button type="submit" className="boton-tenue" disabled={creandoPc}>
+                <Plus size={16} aria-hidden />
+                {creandoPc ? t('altaEquipo.pcCreando') : t('altaEquipo.pcCrear')}
+              </button>
+            </form>
+          )}
+
           <form className="panel-acciones" onSubmit={altaEquipo}>
             <label className="auth-campo">
               {t('altaEquipo.nombre')}

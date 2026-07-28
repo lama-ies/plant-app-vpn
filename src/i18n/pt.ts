@@ -76,6 +76,18 @@ export const pt = {
       creadoOk: '"{{nombre}}" criado com sucesso.',
       irAEditor: 'Configurar perfil',
       sinEquipos: 'Essa família ainda não tem equipamentos.',
+      pcNueva: 'Cadastrar PC nova',
+      pcCancelar: 'Cancelar cadastro de PC',
+      pcNombre: 'Nome da PC',
+      pcUbicacion: 'Localização (opcional)',
+      pcWireguard: 'Chave pública WireGuard',
+      pcWireguardPlaceholder: 'Registrada pelo plant-vpn-plc na primeira inicialização',
+      pcHuellaSsh: 'Impressão digital SSH do host (opcional)',
+      pcHuellaSshPlaceholder: 'SHA256:... (ssh-keyscan ou log do plant-vpn-plc)',
+      pcHuellaSshAyuda:
+        'Sem essa impressão digital, o terminal SSH e a transferência de arquivos rejeitam a conexão: pode ser preenchida depois editando a PC, mas sem ela não há como verificar a identidade do servidor.',
+      pcCrear: 'Cadastrar PC',
+      pcCreando: 'Cadastrando...',
     },
     altaCliente: {
       titulo: 'Novo cliente',

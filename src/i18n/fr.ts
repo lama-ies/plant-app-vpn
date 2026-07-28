@@ -76,6 +76,18 @@ export const fr = {
       creadoOk: '« {{nombre}} » créé avec succès.',
       irAEditor: 'Configurer le profil',
       sinEquipos: "Cette famille n'a pas encore d'équipement.",
+      pcNueva: 'Enregistrer un nouveau PC',
+      pcCancelar: "Annuler l'enregistrement du PC",
+      pcNombre: 'Nom du PC',
+      pcUbicacion: 'Emplacement (facultatif)',
+      pcWireguard: 'Clé publique WireGuard',
+      pcWireguardPlaceholder: "Enregistrée par plant-vpn-plc au premier démarrage",
+      pcHuellaSsh: "Empreinte SSH de l'hôte (facultatif)",
+      pcHuellaSshPlaceholder: 'SHA256:... (ssh-keyscan ou journal de plant-vpn-plc)',
+      pcHuellaSshAyuda:
+        "Sans cette empreinte, le terminal SSH et le transfert de fichiers refusent la connexion : elle peut être ajoutée plus tard en modifiant le PC, mais sans elle il est impossible de vérifier l'identité du serveur.",
+      pcCrear: 'Enregistrer le PC',
+      pcCreando: 'Enregistrement...',
     },
     altaCliente: {
       titulo: 'Nouveau client',
