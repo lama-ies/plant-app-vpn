@@ -203,6 +203,95 @@
   margin-top: 0;
 }
 
+/* --- Paso 2 del editor de diagrama: enlace de sensores (Task 11/EnlaceSensores.tsx) ------------------ */
+.enlace-sensores {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.enlace-sensores__lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.enlace-sensores__punto {
+  background: var(--fondo-2);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-chip);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  color: var(--texto);
+  cursor: pointer;
+}
+
+.enlace-sensores__punto:hover {
+  border-color: var(--agua);
+}
+
+.enlace-sensores__panel {
+  background: var(--fondo-2);
+  border: 1px solid var(--linea);
+  border-radius: 10px;
+  padding: 0.85rem 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.enlace-sensores__panel h3 {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.enlace-sensores__panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--texto-tenue);
+}
+
+/* Resumen agrupado por equipo/tubería (lo ya enlazado) — reusa .fila-compuesta/.subtitulo-lista. */
+.enlace-sensores__resumen {
+  display: flex;
+  flex-direction: column;
+}
+
+.enlace-sensores__resumen .fila-compuesta h4 {
+  font-size: 0.8rem;
+  margin: 0 0 0.4rem;
+  color: var(--texto-tenue);
+}
+
+.fila-lectura {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--linea);
+}
+
+.fila-lectura:last-child {
+  border-bottom: 0;
+}
+
+.fila-lectura__etq {
+  font-size: 0.78rem;
+  color: var(--texto-tenue);
+}
+
+.fila-lectura__valor {
+  font-family: var(--fuente-datos);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 /* --- Validación y acciones finales ------------------------------------------------------------------ */
 .validacion {
   margin: 0 0 0.9rem;

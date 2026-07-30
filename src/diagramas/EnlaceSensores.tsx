@@ -55,7 +55,7 @@ export function EnlaceSensores({ diagrama, clavesDisponibles, onCambiar }: Props
 
   return (
     <div className="enlace-sensores">
-      <MotorDiagrama diagrama={diagrama} soloVistaPrevia />
+      <MotorDiagrama diagrama={diagrama} />
       <ul className="enlace-sensores__lista">
         {anclas.map((a) => (
           <li key={`${a.clase}-${a.id}`}>
@@ -84,6 +84,47 @@ export function EnlaceSensores({ diagrama, clavesDisponibles, onCambiar }: Props
           })}
         </div>
       )}
+
+      <ResumenSensoresAsignados diagrama={diagrama} />
+    </div>
+  );
+}
+
+/** Resumen de todo lo YA enlazado, agrupado por equipo/tubería — para revisar de un vistazo sin tener que
+ * abrir ancla por ancla. Muestra el tag asignado (no hay telemetría real en este editor, ver MotorDiagrama). */
+function ResumenSensoresAsignados({ diagrama }: { diagrama: DiagramaEquipo }) {
+  const { t } = useTranslation();
+  const porId = new Map(diagrama.nodos.map((n) => [n.id, n]));
+
+  const gruposNodo = diagrama.nodos
+    .filter((n) => n.sensores.length > 0)
+    .map((n) => ({ clave: n.id, etiqueta: n.etiqueta, sensores: n.sensores }));
+
+  const gruposConexion = diagrama.conexiones
+    .filter((c) => c.sensores.length > 0)
+    .map((c) => {
+      const desde = porId.get(c.desde)?.etiqueta ?? c.desde;
+      const hasta = porId.get(c.hasta)?.etiqueta ?? c.hasta;
+      return { clave: c.id, etiqueta: c.etiqueta || `${desde} → ${hasta}`, sensores: c.sensores };
+    });
+
+  const grupos = [...gruposNodo, ...gruposConexion];
+  if (grupos.length === 0) return null;
+
+  return (
+    <div className="enlace-sensores__resumen">
+      <p className="subtitulo-lista">{t('diagramaEditor.resumenTitulo')}</p>
+      {grupos.map((g) => (
+        <div className="fila-compuesta" key={g.clave}>
+          <h4>{g.etiqueta}</h4>
+          {g.sensores.map((s, i) => (
+            <div className="fila-lectura" key={i}>
+              <span className="fila-lectura__etq">{t(`diagramaEditor.sensor.${s.tipo}`)}</span>
+              <span className="fila-lectura__valor">{s.variable}</span>
+            </div>
+          ))}
+        </div>
+      ))}
     </div>
   );
 }

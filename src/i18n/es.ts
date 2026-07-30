@@ -308,6 +308,7 @@ export const es = {
       uvOpcional: 'Lámpara UV adicional',
       numDosificadoras: 'Número de dosificadoras (0-5)',
       continuarASensores: 'Continuar a enlace de sensores',
+      resumenTitulo: 'Resumen de sensores enlazados',
       volverATopologia: 'Volver a elegir la topología',
       sensorNinguno: 'Sin enlazar',
       sensor: {

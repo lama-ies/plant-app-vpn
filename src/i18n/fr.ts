@@ -307,6 +307,7 @@ export const fr = {
       uvOpcional: 'Lampe UV additionnelle',
       numDosificadoras: 'Nombre de pompes doseuses (0-5)',
       continuarASensores: "Continuer vers l'association des capteurs",
+      resumenTitulo: 'Résumé des capteurs associés',
       volverATopologia: 'Retour au choix de la topologie',
       sensorNinguno: 'Non lié',
       sensor: {

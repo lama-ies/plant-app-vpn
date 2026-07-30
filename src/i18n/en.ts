@@ -307,6 +307,7 @@ export const en = {
       uvOpcional: 'Additional UV lamp',
       numDosificadoras: 'Number of dosing pumps (0-5)',
       continuarASensores: 'Continue to sensor binding',
+      resumenTitulo: 'Linked sensors summary',
       volverATopologia: 'Back to choosing the layout',
       sensorNinguno: 'Not linked',
       sensor: {

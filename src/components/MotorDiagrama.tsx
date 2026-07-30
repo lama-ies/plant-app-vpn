@@ -1,7 +1,8 @@
-// Motor de render del diagrama mimético, portado de plant-portal-client para la vista previa del editor
-// (Task 11). Dibuja CUALQUIER DiagramaEquipo ya ensamblado — no conoce el catálogo de segmentos ni el
-// ensamblador. En este editor, sin telemetría real: solo pinta la FORMA y qué slots están enlazados (no
-// hay valores en vivo durante la edición, ver spec §6).
+// Motor de render del diagrama mimético, portado de plant-portal-client para la vista previa del editor.
+// Dibuja CUALQUIER DiagramaEquipo ya ensamblado — no conoce el catálogo de segmentos ni el ensamblador.
+// Este editor NUNCA tiene telemetría real (eso solo pasa en plant-portal-client): cada sensor muestra el
+// TAG (clave de variable) que le asignaste en el Paso 2, para poder confirmar visualmente el enlace — no
+// un valor en vivo. Ver spec §6.
 import type { CSSProperties } from 'react';
 import {
   ArrowRightToLine, Beaker, Cylinder, Droplet, Fan, Filter, Gauge, Wind, type LucideIcon,
@@ -30,11 +31,9 @@ function puntoBorde(desde: { x: number; y: number }, hasta: { x: number; y: numb
 
 interface Props {
   diagrama: DiagramaEquipo;
-  /** true en el editor: sin telemetría real, solo muestra la clave de la variable enlazada (no un valor). */
-  soloVistaPrevia?: boolean;
 }
 
-export function MotorDiagrama({ diagrama, soloVistaPrevia }: Props) {
+export function MotorDiagrama({ diagrama }: Props) {
   const porId = new Map(diagrama.nodos.map((n) => [n.id, n]));
 
   return (
@@ -54,7 +53,7 @@ export function MotorDiagrama({ diagrama, soloVistaPrevia }: Props) {
                 <foreignObject x={medio.x - 30} y={medio.y - 14} width={60} height={28}>
                   <div className="mimico-sensor-tuberia">
                     {c.sensores.map((s, i) => (
-                      <span key={i}>{soloVistaPrevia ? s.tipo : (s.variable ?? s.tipo)}</span>
+                      <span key={i}>{s.variable ?? s.tipo}</span>
                     ))}
                   </div>
                 </foreignObject>
@@ -66,14 +65,14 @@ export function MotorDiagrama({ diagrama, soloVistaPrevia }: Props) {
 
       {diagrama.nodos.map((n) => (
         <foreignObject key={n.id} x={n.x - CAJA / 2} y={n.y - ALTO_CAJA / 2} width={CAJA} height={ALTO_CAJA}>
-          <NodoIsla nodo={n} soloVistaPrevia={soloVistaPrevia} />
+          <NodoIsla nodo={n} />
         </foreignObject>
       ))}
     </svg>
   );
 }
 
-function NodoIsla({ nodo, soloVistaPrevia }: { nodo: NodoDiagrama; soloVistaPrevia?: boolean }) {
+function NodoIsla({ nodo }: { nodo: NodoDiagrama }) {
   const Icono = ICONO_NODO[nodo.tipo];
   return (
     <div
@@ -87,7 +86,7 @@ function NodoIsla({ nodo, soloVistaPrevia }: { nodo: NodoDiagrama; soloVistaPrev
       {nodo.sensores.length > 0 && (
         <span className="mimico-nodo__valores">
           {nodo.sensores.map((s, i) => (
-            <span className="mimico-nodo__valor" key={i}>{soloVistaPrevia ? s.tipo : (s.variable ?? s.tipo)}</span>
+            <span className="mimico-nodo__valor" key={i}>{s.variable ?? s.tipo}</span>
           ))}
         </span>
       )}
