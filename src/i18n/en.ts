@@ -310,6 +310,8 @@ export const en = {
       resumenTitulo: 'Linked sensors summary',
       volverATopologia: 'Back to choosing the layout',
       sensorNinguno: 'Not linked',
+      zoom: { acercar: 'Zoom in', alejar: 'Zoom out', centrar: 'Reset view' },
+      editarEtiqueta: 'Edit name',
       sensor: {
         flujo: 'Flow', presion: 'Pressure', conductividad: 'Conductivity', tds: 'TDS', orp: 'ORP',
         ph: 'PH', cloro: 'Chlorine', temperatura: 'Temperature', flujoOnOff: 'Flow On/Off',

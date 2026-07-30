@@ -6,17 +6,18 @@ function idsDeNodos(segmento: { nodos: { idLocal: string }[] }): string[] {
   return segmento.nodos.map((n) => n.idLocal);
 }
 
-test('A1 (pozo + bomba sumergible) es repetible 1-5 y no tiene entrada externa', () => {
+test('A1 (pozo + bomba sumergible + filtro multimedia) es repetible 1-5 y no tiene entrada externa', () => {
   assert.equal(SEGMENTO_A1.entradaIdLocal, null);
-  assert.equal(SEGMENTO_A1.salidaIdLocal, 'bombaSumergible');
+  assert.equal(SEGMENTO_A1.salidaIdLocal, 'filtroMultimedia');
   assert.deepEqual(SEGMENTO_A1.repetible, { min: 1, max: 5 });
-  assert.deepEqual(idsDeNodos(SEGMENTO_A1), ['pozo', 'bombaSumergible']);
+  assert.deepEqual(idsDeNodos(SEGMENTO_A1), ['pozo', 'bombaSumergible', 'filtroMultimedia']);
 });
 
-test('A2 (cisterna + bomba de realce) no es repetible y no tiene entrada externa', () => {
+test('A2 (cisterna + bomba de realce + filtro multimedia) no es repetible y no tiene entrada externa', () => {
   assert.equal(SEGMENTO_A2.entradaIdLocal, null);
-  assert.equal(SEGMENTO_A2.salidaIdLocal, 'bombaRealce');
+  assert.equal(SEGMENTO_A2.salidaIdLocal, 'filtroMultimedia');
   assert.equal(SEGMENTO_A2.repetible, undefined);
+  assert.deepEqual(idsDeNodos(SEGMENTO_A2), ['cisterna', 'bombaRealce', 'filtroMultimedia']);
 });
 
 test('A3 encadena pozo->bomba sumergible->cisterna->bomba realce->filtro multimedia', () => {
@@ -24,8 +25,13 @@ test('A3 encadena pozo->bomba sumergible->cisterna->bomba realce->filtro multime
     'pozo', 'bombaSumergible', 'cisterna', 'bombaRealce', 'filtroMultimedia',
   ]);
   assert.equal(SEGMENTO_A3.salidaIdLocal, 'filtroMultimedia');
-  // 4 conexiones para 5 nodos en cadena simple.
   assert.equal(SEGMENTO_A3.conexiones.length, 4);
+});
+
+test('A1/A2/A3: el Filtro Multimedia siempre cierra la alimentación (nunca lo trae el núcleo, ver spec §5)', () => {
+  for (const seg of [SEGMENTO_A1, SEGMENTO_A2, SEGMENTO_A3]) {
+    assert.equal(seg.salidaIdLocal, 'filtroMultimedia');
+  }
 });
 
 test('A4 (cloro + carbón activado) SÍ tiene entrada externa (va después de la alimentación)', () => {

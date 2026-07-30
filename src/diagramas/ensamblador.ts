@@ -1,9 +1,8 @@
 // Ensamblador puro: toma la secuencia de segmentos elegidos por el Administrador y produce el
-// DiagramaEquipo final (nodos+conexiones con ids/posiciones absolutas). Ver
-// plant-arquitectura/docs/superpowers/specs/2026-07-29-diagrama-planta-design.md §5.
+// DiagramaEquipo final (nodos+conexiones con ids/posiciones absolutas, ya proyectadas a isométrico). Ver
+// plant-arquitectura/docs/superpowers/specs/2026-07-30-diagrama-isometrico-design.md.
+import { gridAPantalla, type PuntoPantalla } from './proyeccionIso';
 import type { ConexionDiagrama, DiagramaEquipo, NodoDiagrama, SegmentoDiagrama } from './tipos';
-
-const STEP = 150;
 
 /** Un segmento elegido por el Administrador, con cuántas copias si es repetible (1 si no aplica). */
 export interface SegmentoElegido {
@@ -18,6 +17,12 @@ interface InstanciaSegmento {
   total: number;
 }
 
+interface PosicionGrid {
+  col: number;
+  fila: number;
+  elevacion: number;
+}
+
 /** Expande cada SegmentoElegido a sus copias individuales (1 copia si no es repetible). */
 function expandirCopias(secuencia: SegmentoElegido[]): InstanciaSegmento[] {
   const instancias: InstanciaSegmento[] = [];
@@ -28,16 +33,36 @@ function expandirCopias(secuencia: SegmentoElegido[]): InstanciaSegmento[] {
   return instancias;
 }
 
-/** Ensambla la secuencia completa en un DiagramaEquipo con posiciones/ids absolutos. */
+/** Descompone el desplazamiento entre dos posiciones de rejilla en los waypoints intermedios necesarios
+ * para que cada tramo dibujado sea un único eje isométrico válido (primero col, después fila; el cambio de
+ * elevación, si lo hay, siempre termina exactamente en `hasta`, sin waypoint propio). */
+function calcularRuta(desde: PosicionGrid, hasta: PosicionGrid): PuntoPantalla[] {
+  const puntosGrid: PosicionGrid[] = [
+    desde,
+    { col: hasta.col, fila: desde.fila, elevacion: desde.elevacion },
+    { col: hasta.col, fila: hasta.fila, elevacion: desde.elevacion },
+    hasta,
+  ];
+  const unicos = puntosGrid.filter((p, i) => {
+    if (i === 0) return true;
+    const prev = puntosGrid[i - 1];
+    return p.col !== prev.col || p.fila !== prev.fila || p.elevacion !== prev.elevacion;
+  });
+  const intermedios = unicos.slice(1, -1);
+  return intermedios.map((p) => gridAPantalla(p.col, p.fila, p.elevacion));
+}
+
+/** Ensambla la secuencia completa en un DiagramaEquipo con posiciones/ids absolutos, ya proyectados. */
 export function ensamblar(secuencia: SegmentoElegido[], numDosificadoras = 0): DiagramaEquipo {
   const nodos: NodoDiagrama[] = [];
-  const conexiones: ConexionDiagrama[] = [];
-  let xOffset = 0;
+  const conexionesCrudas: { id: string; desde: string; hasta: string; etiqueta?: string }[] = [];
+  const posiciones = new Map<string, PosicionGrid>();
+  let colOffset = 0;
   let salidasPendientes: string[] = [];
   let contadorConexion = 0;
 
-  // Segmentos que comparten el mismo xOffset (todas las copias de un SegmentoElegido repetible se colocan
-  // en la MISMA columna, apiladas verticalmente — no avanzan xOffset entre copias del mismo grupo).
+  // Segmentos que comparten el mismo colOffset (todas las copias de un SegmentoElegido repetible se
+  // colocan en la MISMA col/fila, apiladas en elevación — no avanzan colOffset entre copias del mismo grupo).
   let grupoActualSegmentoId: string | null = null;
 
   for (const { segmento, indice, total } of expandirCopias(secuencia)) {
@@ -49,28 +74,29 @@ export function ensamblar(secuencia: SegmentoElegido[], numDosificadoras = 0): D
       continue;
     }
 
-    const offsetVertical = total > 1 ? (indice - (total - 1) / 2) * 90 : 0;
+    // Copias de un mismo grupo repetible se apilan en ELEVACIÓN (nunca en fila — fila es para ramas
+    // reales del proceso, ver spec §3.1), así que comparten col/fila y por lo tanto el mismo x en pantalla.
+    const elevacionExtra = total > 1 ? indice - (total - 1) / 2 : 0;
+
     const idPorLocal = new Map<string, string>();
     for (const n of segmento.nodos) {
       const idGlobal = `${segmento.id}#${indice}#${n.idLocal}`;
       idPorLocal.set(n.idLocal, idGlobal);
-      nodos.push({
-        id: idGlobal,
-        tipo: n.tipo,
-        etiqueta: n.etiqueta,
-        x: n.x + xOffset,
-        y: n.y + offsetVertical,
-        sensores: [],
-        flotante: n.flotante,
-      });
+      const pos: PosicionGrid = {
+        col: n.col + colOffset,
+        fila: n.fila,
+        elevacion: (n.elevacion ?? 0) + elevacionExtra,
+      };
+      posiciones.set(idGlobal, pos);
+      const { x, y } = gridAPantalla(pos.col, pos.fila, pos.elevacion);
+      nodos.push({ id: idGlobal, tipo: n.tipo, etiqueta: n.etiqueta, x, y, sensores: [], flotante: n.flotante });
     }
     for (const c of segmento.conexiones) {
-      conexiones.push({
+      conexionesCrudas.push({
         id: `c${contadorConexion++}`,
         desde: idPorLocal.get(c.desde)!,
         hasta: idPorLocal.get(c.hasta)!,
         etiqueta: c.etiqueta,
-        sensores: [],
       });
     }
 
@@ -79,7 +105,7 @@ export function ensamblar(secuencia: SegmentoElegido[], numDosificadoras = 0): D
     if (segmento.entradaIdLocal !== null) {
       const entradaGlobal = idPorLocal.get(segmento.entradaIdLocal)!;
       for (const salidaPrevia of salidasPendientes) {
-        conexiones.push({ id: `c${contadorConexion++}`, desde: salidaPrevia, hasta: entradaGlobal, sensores: [] });
+        conexionesCrudas.push({ id: `c${contadorConexion++}`, desde: salidaPrevia, hasta: entradaGlobal });
       }
     }
 
@@ -91,33 +117,39 @@ export function ensamblar(secuencia: SegmentoElegido[], numDosificadoras = 0): D
       else salidasPendientes.push(nuevaSalida);
     }
 
-    // Avanza xOffset solo al terminar de procesar todas las copias del grupo (última copia = indice === total-1).
+    // Avanza colOffset solo al terminar de procesar todas las copias del grupo (última copia = indice === total-1).
     if (indice === total - 1) {
-      const maxX = Math.max(...segmento.nodos.map((n) => n.x));
-      xOffset += maxX + STEP;
+      const maxCol = Math.max(...segmento.nodos.map((n) => n.col));
+      colOffset += maxCol + 1;
     }
   }
 
   // Dosificadoras: flotantes, sin conexión, ancladas cerca del nodo que el núcleo haya marcado con
   // `anclaDosificadoras`. Se buscan DESPUÉS del loop principal porque el ancla puede pertenecer a
-  // cualquier segmento de la secuencia (hoy siempre un núcleo) y ya tiene su id/posición global resueltos.
+  // cualquier segmento de la secuencia (hoy siempre un núcleo) y ya tiene su posición global resuelta.
   const segmentoConAncla = secuencia.map((s) => s.segmento).find((s) => s.anclaDosificadoras);
   if (segmentoConAncla && numDosificadoras > 0) {
-    const idAncla = nodos.find((n) => n.id.includes(`#${segmentoConAncla.anclaDosificadoras}`));
-    if (idAncla) {
+    const ancla = nodos.find((n) => n.id.includes(`#${segmentoConAncla.anclaDosificadoras}`));
+    const posAncla = ancla ? posiciones.get(ancla.id) : undefined;
+    if (ancla && posAncla) {
       for (let i = 0; i < numDosificadoras; i++) {
-        nodos.push({
-          id: `dosificadora#${i}`,
-          tipo: 'dosificadora',
-          etiqueta: `Dosificadora ${i + 1}`,
-          x: idAncla.x - 60,
-          y: idAncla.y - 90 - i * 70,
-          sensores: [],
-          flotante: true,
-        });
+        const pos: PosicionGrid = { col: posAncla.col, fila: posAncla.fila - 1, elevacion: posAncla.elevacion + i };
+        const { x, y } = gridAPantalla(pos.col, pos.fila, pos.elevacion);
+        const idGlobal = `dosificadora#${i}`;
+        posiciones.set(idGlobal, pos);
+        nodos.push({ id: idGlobal, tipo: 'dosificadora', etiqueta: `Dosificadora ${i + 1}`, x, y, sensores: [], flotante: true });
       }
     }
   }
+
+  const conexiones: ConexionDiagrama[] = conexionesCrudas.map((c) => ({
+    id: c.id,
+    desde: c.desde,
+    hasta: c.hasta,
+    etiqueta: c.etiqueta,
+    sensores: [],
+    ruta: calcularRuta(posiciones.get(c.desde)!, posiciones.get(c.hasta)!),
+  }));
 
   const minX = nodos.length ? Math.min(...nodos.map((n) => n.x)) - 100 : 0;
   const maxX = nodos.length ? Math.max(...nodos.map((n) => n.x)) + 100 : 400;

@@ -310,6 +310,8 @@ export const pt = {
       resumenTitulo: 'Resumo dos sensores vinculados',
       volverATopologia: 'Voltar a escolher a topologia',
       sensorNinguno: 'Não vinculado',
+      zoom: { acercar: 'Aproximar', alejar: 'Afastar', centrar: 'Centralizar' },
+      editarEtiqueta: 'Editar nome',
       sensor: {
         flujo: 'Vazão', presion: 'Pressão', conductividad: 'Condutividade', tds: 'TDS', orp: 'ORP',
         ph: 'PH', cloro: 'Cloro', temperatura: 'Temperatura', flujoOnOff: 'Vazão On/Off',

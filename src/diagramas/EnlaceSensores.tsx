@@ -55,7 +55,13 @@ export function EnlaceSensores({ diagrama, clavesDisponibles, onCambiar }: Props
 
   return (
     <div className="enlace-sensores">
-      <MotorDiagrama diagrama={diagrama} />
+      <MotorDiagrama
+        diagrama={diagrama}
+        onEditarEtiqueta={(id, etiqueta) => onCambiar({
+          ...diagrama,
+          nodos: diagrama.nodos.map((n) => (n.id === id ? { ...n, etiqueta } : n)),
+        })}
+      />
       <ul className="enlace-sensores__lista">
         {anclas.map((a) => (
           <li key={`${a.clase}-${a.id}`}>

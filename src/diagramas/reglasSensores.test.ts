@@ -29,3 +29,13 @@ test('cualquier tubería: catálogo analógico completo + on/off', () => {
 test('un tipo de nodo sin catálogo propio (ej. tuberías/procesos genéricos) devuelve el catálogo de tubería', () => {
   assert.deepEqual(slotsPermitidos('filtroMultimedia'), slotsPermitidosConexion());
 });
+
+test('bombaSumergible y bombaRealce comparten el catálogo de bomba (lógicos + analógicos, rpm/hz independientes)', () => {
+  for (const tipo of ['bombaSumergible', 'bombaRealce'] as const) {
+    const slots = slotsPermitidos(tipo);
+    assert.ok(slots.includes('rpm'));
+    assert.ok(slots.includes('hz'));
+    assert.ok(slots.includes('onOffEquipo'));
+    assert.ok(slots.includes('falla'));
+  }
+});

@@ -311,6 +311,8 @@ export const es = {
       resumenTitulo: 'Resumen de sensores enlazados',
       volverATopologia: 'Volver a elegir la topología',
       sensorNinguno: 'Sin enlazar',
+      zoom: { acercar: 'Acercar', alejar: 'Alejar', centrar: 'Centrar vista' },
+      editarEtiqueta: 'Editar nombre',
       sensor: {
         flujo: 'Flujo', presion: 'Presión', conductividad: 'Conductividad', tds: 'TDS', orp: 'ORP',
         ph: 'PH', cloro: 'Cloro', temperatura: 'Temperatura', flujoOnOff: 'Flujo On/Off',

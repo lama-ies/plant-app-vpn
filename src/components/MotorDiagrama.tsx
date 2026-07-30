@@ -1,18 +1,24 @@
-// Motor de render del diagrama mimético, portado de plant-portal-client para la vista previa del editor.
-// Dibuja CUALQUIER DiagramaEquipo ya ensamblado — no conoce el catálogo de segmentos ni el ensamblador.
-// Este editor NUNCA tiene telemetría real (eso solo pasa en plant-portal-client): cada sensor muestra el
-// TAG (clave de variable) que le asignaste en el Paso 2, para poder confirmar visualmente el enlace — no
-// un valor en vivo. Ver spec §6.
-import type { CSSProperties } from 'react';
+// Motor de render del diagrama mimético (vista isométrica) — vista previa del editor. Dibuja CUALQUIER
+// DiagramaEquipo ya ensamblado: no conoce el catálogo de segmentos ni el ensamblador. Este editor NUNCA
+// tiene telemetría real: cada sensor muestra el TAG (variable asignada) para confirmar el enlace
+// visualmente, no un valor en vivo. Ver spec 2026-07-30-diagrama-isometrico-design.md §4.
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowRightToLine, Beaker, Cylinder, Droplet, Fan, Filter, Gauge, Wind, type LucideIcon,
 } from 'lucide-react';
 import type { DiagramaEquipo, NodoDiagrama, TipoNodoProceso } from '../diagramas/tipos';
+import { BloqueIsoGenerico } from './BloqueIsoGenerico';
+import { TuberiaIso, medioDeTuberia } from './TuberiaIso';
+import { LienzoZoomable } from './LienzoZoomable';
 import './motor-diagrama.css';
 
-const ICONO_NODO: Record<TipoNodoProceso, LucideIcon> = {
+// Fase 1: los 21 tipos usan el mismo bloque isométrico genérico con este ícono Lucide como placa frontal.
+// La Fase 2 reemplaza entradas una por una (ver spec §4.2), sin tocar el resto de este archivo.
+const ICONO_ISO: Record<TipoNodoProceso, LucideIcon> = {
   tanque: Cylinder, tanquePulmon: Cylinder, torreDesgasificadora: Cylinder,
-  bomba: Fan, bombaAltaPresion: Fan, bombaBooster: Fan, turbocharger: Fan, recuperadorPX: Fan, soplador: Wind,
+  bomba: Fan, bombaSumergible: Fan, bombaRealce: Fan, bombaAltaPresion: Fan, bombaBooster: Fan,
+  turbocharger: Fan, recuperadorPX: Fan, soplador: Wind,
   pozo: ArrowRightToLine, filtroMultimedia: Filter, valvulaActuadora: Gauge, filtroCanasta: Filter,
   filtroCarbono: Filter, filtroCarbonoActivado: Filter, membranaRO: Filter, inyeccionCloro: Droplet,
   lamparaUV: Beaker, dosificadora: Beaker, salidaDrenaje: ArrowRightToLine, lineaDistribucion: ArrowRightToLine,
@@ -20,69 +26,91 @@ const ICONO_NODO: Record<TipoNodoProceso, LucideIcon> = {
 
 const CAJA = 92;
 const ALTO_CAJA = 78;
-const ICONO_BOX = 56;
-
-function puntoBorde(desde: { x: number; y: number }, hasta: { x: number; y: number }, dist: number) {
-  const dx = hasta.x - desde.x;
-  const dy = hasta.y - desde.y;
-  const largo = Math.hypot(dx, dy) || 1;
-  return { x: desde.x + (dx / largo) * dist, y: desde.y + (dy / largo) * dist };
-}
 
 interface Props {
   diagrama: DiagramaEquipo;
+  onEditarEtiqueta?: (nodoId: string, nuevaEtiqueta: string) => void;
 }
 
-export function MotorDiagrama({ diagrama }: Props) {
+export function MotorDiagrama({ diagrama, onEditarEtiqueta }: Props) {
   const porId = new Map(diagrama.nodos.map((n) => [n.id, n]));
 
   return (
-    <svg viewBox={diagrama.viewBox} className="motor-diagrama">
-      <g aria-hidden>
-        {diagrama.conexiones.map((c) => {
-          const a = porId.get(c.desde);
-          const b = porId.get(c.hasta);
-          if (!a || !b) return null;
-          const inicio = puntoBorde(a, b, ICONO_BOX / 2 + 4);
-          const fin = puntoBorde(b, a, ICONO_BOX / 2 + 4);
-          const medio = { x: (inicio.x + fin.x) / 2, y: (inicio.y + fin.y) / 2 };
-          return (
-            <g key={c.id}>
-              <line x1={inicio.x} y1={inicio.y} x2={fin.x} y2={fin.y} className="motor-diagrama__tuberia" />
-              {c.sensores.length > 0 && (
-                <foreignObject x={medio.x - 30} y={medio.y - 14} width={60} height={28}>
-                  <div className="mimico-sensor-tuberia">
-                    {c.sensores.map((s, i) => (
-                      <span key={i}>{s.variable ?? s.tipo}</span>
-                    ))}
-                  </div>
-                </foreignObject>
-              )}
-            </g>
-          );
-        })}
-      </g>
+    <LienzoZoomable viewBoxBase={diagrama.viewBox}>
+      {(viewBoxActual) => (
+        <svg viewBox={viewBoxActual} className="motor-diagrama">
+          <g aria-hidden>
+            {diagrama.conexiones.map((c) => {
+              const a = porId.get(c.desde);
+              const b = porId.get(c.hasta);
+              if (!a || !b) return null;
+              const puntos = [{ x: a.x, y: a.y }, ...c.ruta, { x: b.x, y: b.y }];
+              const medio = medioDeTuberia(puntos);
+              return (
+                <g key={c.id}>
+                  <TuberiaIso puntos={puntos} />
+                  {c.sensores.length > 0 && (
+                    <foreignObject x={medio.x - 30} y={medio.y - 14} width={60} height={28}>
+                      <div className="mimico-sensor-tuberia">
+                        {c.sensores.map((s, i) => (
+                          <span key={i}>{s.variable ?? s.tipo}</span>
+                        ))}
+                      </div>
+                    </foreignObject>
+                  )}
+                </g>
+              );
+            })}
+          </g>
 
-      {diagrama.nodos.map((n) => (
-        <foreignObject key={n.id} x={n.x - CAJA / 2} y={n.y - ALTO_CAJA / 2} width={CAJA} height={ALTO_CAJA}>
-          <NodoIsla nodo={n} />
-        </foreignObject>
-      ))}
-    </svg>
+          {diagrama.nodos.map((n) => (
+            <foreignObject key={n.id} x={n.x - CAJA / 2} y={n.y - ALTO_CAJA / 2} width={CAJA} height={ALTO_CAJA}>
+              <NodoIsla nodo={n} Icono={ICONO_ISO[n.tipo]} onEditarEtiqueta={onEditarEtiqueta} />
+            </foreignObject>
+          ))}
+        </svg>
+      )}
+    </LienzoZoomable>
   );
 }
 
-function NodoIsla({ nodo }: { nodo: NodoDiagrama }) {
-  const Icono = ICONO_NODO[nodo.tipo];
+function NodoIsla({
+  nodo, Icono, onEditarEtiqueta,
+}: { nodo: NodoDiagrama; Icono: LucideIcon; onEditarEtiqueta?: (id: string, etiqueta: string) => void }) {
+  const { t } = useTranslation();
+  const [editando, setEditando] = useState(false);
+  const [valor, setValor] = useState(nodo.etiqueta);
+
+  function confirmar() {
+    setEditando(false);
+    const limpio = valor.trim();
+    if (onEditarEtiqueta && limpio && limpio !== nodo.etiqueta) onEditarEtiqueta(nodo.id, limpio);
+    else setValor(nodo.etiqueta);
+  }
+
   return (
-    <div
-      className={`mimico-nodo ${nodo.flotante ? 'mimico-nodo--flotante' : ''}`}
-      style={{ '--icono-box': `${ICONO_BOX}px` } as CSSProperties}
-    >
-      <span className="mimico-nodo__icono" aria-hidden>
-        <Icono size={24} aria-hidden />
-      </span>
-      <span className="mimico-nodo__etiqueta">{nodo.etiqueta}</span>
+    <div className={`mimico-nodo ${nodo.flotante ? 'mimico-nodo--flotante' : ''}`}>
+      <BloqueIsoGenerico Icono={Icono} flotante={nodo.flotante} />
+      {editando ? (
+        <input
+          className="mimico-nodo__etiqueta-input"
+          value={valor}
+          autoFocus
+          aria-label={t('diagramaEditor.editarEtiqueta')}
+          onChange={(e) => setValor(e.target.value)}
+          onBlur={confirmar}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') confirmar();
+            if (e.key === 'Escape') { setValor(nodo.etiqueta); setEditando(false); }
+          }}
+        />
+      ) : onEditarEtiqueta ? (
+        <button type="button" className="mimico-nodo__etiqueta mimico-nodo__etiqueta--editable" onClick={() => setEditando(true)}>
+          {nodo.etiqueta}
+        </button>
+      ) : (
+        <span className="mimico-nodo__etiqueta">{nodo.etiqueta}</span>
+      )}
       {nodo.sensores.length > 0 && (
         <span className="mimico-nodo__valores">
           {nodo.sensores.map((s, i) => (

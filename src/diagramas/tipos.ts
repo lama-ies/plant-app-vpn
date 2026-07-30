@@ -21,7 +21,7 @@ export interface SensorBinding {
 
 /** Tipo de nodo de proceso — determina el ícono que dibuja el motor de render. */
 export type TipoNodoProceso =
-  | 'tanque' | 'tanquePulmon' | 'torreDesgasificadora' | 'bomba' | 'pozo'
+  | 'tanque' | 'tanquePulmon' | 'torreDesgasificadora' | 'bomba' | 'bombaSumergible' | 'bombaRealce' | 'pozo'
   | 'filtroMultimedia' | 'valvulaActuadora' | 'filtroCanasta' | 'filtroCarbono' | 'filtroCarbonoActivado'
   | 'bombaAltaPresion' | 'membranaRO' | 'turbocharger' | 'recuperadorPX' | 'bombaBooster'
   | 'soplador' | 'inyeccionCloro' | 'lamparaUV' | 'dosificadora' | 'salidaDrenaje' | 'lineaDistribucion';
@@ -45,6 +45,9 @@ export interface ConexionDiagrama {
   hasta: string;
   etiqueta?: string;
   sensores: SensorBinding[];
+  /** Puntos intermedios (coordenadas ya proyectadas) entre `desde` y `hasta`. Vacío = tramo recto de un
+   * solo eje isométrico. Ver ensamblador.ts `calcularRuta` — nunca es una línea diagonal arbitraria. */
+  ruta: { x: number; y: number }[];
 }
 
 /** El diagrama completo ya ensamblado — esto es lo que viaja en `perfil.diagrama`. */
@@ -62,8 +65,12 @@ export interface NodoSegmento {
   idLocal: string;
   tipo: TipoNodoProceso;
   etiqueta: string;
-  x: number;
-  y: number;
+  col: number;
+  fila: number;
+  /** Desplazamiento de altura (eje isométrico vertical), relativo a col/fila. Default 0. Usado para
+   * nodos flotantes (dosificadoras, soplador) y para apilar copias de un mismo grupo repetible sin
+   * cambiar su fila (que queda reservada a ramas reales del proceso). */
+  elevacion?: number;
   flotante?: boolean;
 }
 

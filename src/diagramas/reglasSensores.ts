@@ -13,7 +13,7 @@ const SLOTS_TUBERIA: TipoSensor[] = [
 
 const TIPOS_TANQUE: Set<TipoNodoProceso> = new Set(['tanque', 'tanquePulmon', 'torreDesgasificadora']);
 const TIPOS_BOMBA: Set<TipoNodoProceso> = new Set([
-  'bomba', 'bombaAltaPresion', 'bombaBooster', 'turbocharger', 'recuperadorPX', 'soplador',
+  'bomba', 'bombaSumergible', 'bombaRealce', 'bombaAltaPresion', 'bombaBooster', 'turbocharger', 'recuperadorPX', 'soplador',
 ]);
 
 /** Slots permitidos en el icono de un nodo (tanque/bomba/dosificadora tienen catálogo propio; cualquier

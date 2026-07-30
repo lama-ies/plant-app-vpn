@@ -310,6 +310,8 @@ export const fr = {
       resumenTitulo: 'Résumé des capteurs associés',
       volverATopologia: 'Retour au choix de la topologie',
       sensorNinguno: 'Non lié',
+      zoom: { acercar: 'Zoomer', alejar: 'Dézoomer', centrar: 'Recentrer' },
+      editarEtiqueta: 'Modifier le nom',
       sensor: {
         flujo: 'Débit', presion: 'Pression', conductividad: 'Conductivité', tds: 'TDS', orp: 'ORP',
         ph: 'PH', cloro: 'Chlore', temperatura: 'Température', flujoOnOff: 'Débit On/Off',

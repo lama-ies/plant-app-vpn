@@ -1,44 +1,52 @@
 // Segmentos de alimentación/pretratamiento/grupo de bombas de presión para Ósmosis Inversa (y, C8, también
-// reusado por Hidroneumático — ver catalogo/hidroneumatico.ts). Contenido del proceso confirmado con el
-// usuario (dominio real de IES Internacional), ver el spec de diseño referenciado en la cabecera del plan.
+// reusado por Hidroneumático — ver catalogo/hidroneumatico.ts). Coordenadas de REJILLA (col/fila/
+// elevacion), no píxeles — ver spec 2026-07-30-diagrama-isometrico-design.md §3.1. El Filtro Multimedia
+// SIEMPRE cierra la alimentación (A1/A2/A3), nunca el núcleo (ver §5 del mismo spec — evita la duplicación
+// real que existía cuando se combinaba A3 con cualquier núcleo).
 import type { SegmentoDiagrama } from '../tipos';
 
-const STEP = 150;
-
-/** A1 — Pozo → Bomba sumergible. Repetible: 2+ pozos convergen a una sola línea (fan-in en el ensamblador). */
+/** A1 — Pozo → Bomba sumergible → Filtro multimedia. Repetible: 2+ pozos convergen a una sola línea. */
 export const SEGMENTO_A1: SegmentoDiagrama = {
   id: 'osmosis.alimentacion.A1',
   nodos: [
-    { idLocal: 'pozo', tipo: 'pozo', etiqueta: 'Pozo', x: 0, y: 0 },
-    { idLocal: 'bombaSumergible', tipo: 'bomba', etiqueta: 'Bomba sumergible', x: STEP, y: 0 },
+    { idLocal: 'pozo', tipo: 'pozo', etiqueta: 'Pozo', col: 0, fila: 0 },
+    { idLocal: 'bombaSumergible', tipo: 'bombaSumergible', etiqueta: 'Bomba sumergible', col: 1, fila: 0 },
+    { idLocal: 'filtroMultimedia', tipo: 'filtroMultimedia', etiqueta: 'Filtro multimedia', col: 2, fila: 0 },
   ],
-  conexiones: [{ desde: 'pozo', hasta: 'bombaSumergible' }],
+  conexiones: [
+    { desde: 'pozo', hasta: 'bombaSumergible' },
+    { desde: 'bombaSumergible', hasta: 'filtroMultimedia' },
+  ],
   entradaIdLocal: null,
-  salidaIdLocal: 'bombaSumergible',
+  salidaIdLocal: 'filtroMultimedia',
   repetible: { min: 1, max: 5 },
 };
 
-/** A2 — Cisterna → Bomba de realce. */
+/** A2 — Cisterna → Bomba de realce → Filtro multimedia. */
 export const SEGMENTO_A2: SegmentoDiagrama = {
   id: 'osmosis.alimentacion.A2',
   nodos: [
-    { idLocal: 'cisterna', tipo: 'tanque', etiqueta: 'Cisterna', x: 0, y: 0 },
-    { idLocal: 'bombaRealce', tipo: 'bomba', etiqueta: 'Bomba de realce', x: STEP, y: 0 },
+    { idLocal: 'cisterna', tipo: 'tanque', etiqueta: 'Cisterna', col: 0, fila: 0 },
+    { idLocal: 'bombaRealce', tipo: 'bombaRealce', etiqueta: 'Bomba de realce', col: 1, fila: 0 },
+    { idLocal: 'filtroMultimedia', tipo: 'filtroMultimedia', etiqueta: 'Filtro multimedia', col: 2, fila: 0 },
   ],
-  conexiones: [{ desde: 'cisterna', hasta: 'bombaRealce' }],
+  conexiones: [
+    { desde: 'cisterna', hasta: 'bombaRealce' },
+    { desde: 'bombaRealce', hasta: 'filtroMultimedia' },
+  ],
   entradaIdLocal: null,
-  salidaIdLocal: 'bombaRealce',
+  salidaIdLocal: 'filtroMultimedia',
 };
 
 /** A3 — Alimentación combinada: Pozo/Bomba sumergible → Cisterna/Bomba realce → Filtro multimedia. */
 export const SEGMENTO_A3: SegmentoDiagrama = {
   id: 'osmosis.alimentacion.A3',
   nodos: [
-    { idLocal: 'pozo', tipo: 'pozo', etiqueta: 'Pozo', x: 0, y: 0 },
-    { idLocal: 'bombaSumergible', tipo: 'bomba', etiqueta: 'Bomba sumergible', x: STEP, y: 0 },
-    { idLocal: 'cisterna', tipo: 'tanque', etiqueta: 'Cisterna', x: STEP * 2, y: 0 },
-    { idLocal: 'bombaRealce', tipo: 'bomba', etiqueta: 'Bomba de realce', x: STEP * 3, y: 0 },
-    { idLocal: 'filtroMultimedia', tipo: 'filtroMultimedia', etiqueta: 'Filtro multimedia', x: STEP * 4, y: 0 },
+    { idLocal: 'pozo', tipo: 'pozo', etiqueta: 'Pozo', col: 0, fila: 0 },
+    { idLocal: 'bombaSumergible', tipo: 'bombaSumergible', etiqueta: 'Bomba sumergible', col: 1, fila: 0 },
+    { idLocal: 'cisterna', tipo: 'tanque', etiqueta: 'Cisterna', col: 2, fila: 0 },
+    { idLocal: 'bombaRealce', tipo: 'bombaRealce', etiqueta: 'Bomba de realce', col: 3, fila: 0 },
+    { idLocal: 'filtroMultimedia', tipo: 'filtroMultimedia', etiqueta: 'Filtro multimedia', col: 4, fila: 0 },
   ],
   conexiones: [
     { desde: 'pozo', hasta: 'bombaSumergible' },
@@ -54,8 +62,8 @@ export const SEGMENTO_A3: SegmentoDiagrama = {
 export const SEGMENTO_A4: SegmentoDiagrama = {
   id: 'osmosis.pretratamiento.A4',
   nodos: [
-    { idLocal: 'inyeccionCloro', tipo: 'inyeccionCloro', etiqueta: 'Inyección de cloro', x: 0, y: 0 },
-    { idLocal: 'filtroCarbonoActivado', tipo: 'filtroCarbonoActivado', etiqueta: 'Filtro carbono activado', x: STEP, y: 0 },
+    { idLocal: 'inyeccionCloro', tipo: 'inyeccionCloro', etiqueta: 'Inyección de cloro', col: 0, fila: 0 },
+    { idLocal: 'filtroCarbonoActivado', tipo: 'filtroCarbonoActivado', etiqueta: 'Filtro carbono activado', col: 1, fila: 0 },
   ],
   conexiones: [{ desde: 'inyeccionCloro', hasta: 'filtroCarbonoActivado' }],
   entradaIdLocal: 'inyeccionCloro',
@@ -65,7 +73,7 @@ export const SEGMENTO_A4: SegmentoDiagrama = {
 /** A5 — Pretratamiento: Lámpara UV (alternativa a A4, mutuamente excluyentes). */
 export const SEGMENTO_A5: SegmentoDiagrama = {
   id: 'osmosis.pretratamiento.A5',
-  nodos: [{ idLocal: 'lamparaUV', tipo: 'lamparaUV', etiqueta: 'Lámpara UV', x: 0, y: 0 }],
+  nodos: [{ idLocal: 'lamparaUV', tipo: 'lamparaUV', etiqueta: 'Lámpara UV', col: 0, fila: 0 }],
   conexiones: [],
   entradaIdLocal: 'lamparaUV',
   salidaIdLocal: 'lamparaUV',
@@ -74,7 +82,7 @@ export const SEGMENTO_A5: SegmentoDiagrama = {
 /** C8 — Grupo de bombas de presión (equipo reusable, 1-5 bombas en paralelo; también lo usa Hidroneumático). */
 export const SEGMENTO_C8: SegmentoDiagrama = {
   id: 'comun.grupoBombasPresion',
-  nodos: [{ idLocal: 'bombaPresion', tipo: 'bomba', etiqueta: 'Bomba de presión', x: 0, y: 0 }],
+  nodos: [{ idLocal: 'bombaPresion', tipo: 'bomba', etiqueta: 'Bomba de presión', col: 0, fila: 0 }],
   conexiones: [],
   entradaIdLocal: 'bombaPresion',
   salidaIdLocal: 'bombaPresion',

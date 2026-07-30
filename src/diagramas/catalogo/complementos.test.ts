@@ -16,6 +16,7 @@ test('C1: tanque pulmón -> bomba de realce -> filtros de carbono (SIN cisterna 
   assert.deepEqual(ids, ['tanquePulmon', 'bombaRealce2', 'filtroCarbono']);
   assert.equal(SEGMENTO_C1.entradaIdLocal, 'tanquePulmon');
   assert.equal(SEGMENTO_C1.salidaIdLocal, 'filtroCarbono');
+  assert.equal(SEGMENTO_C1.nodos.find((n) => n.idLocal === 'bombaRealce2')!.tipo, 'bombaRealce');
 });
 
 test('C2: torre desgasificadora (+soplador flotante) -> tanque pulmón -> bomba de realce', () => {
@@ -26,6 +27,7 @@ test('C2: torre desgasificadora (+soplador flotante) -> tanque pulmón -> bomba 
   assert.equal(SEGMENTO_C2.salidaIdLocal, 'bombaRealce2');
   // El soplador no participa de la cadena de conexiones (es flotante).
   assert.ok(!SEGMENTO_C2.conexiones.some((c) => c.desde === 'soplador' || c.hasta === 'soplador'));
+  assert.equal(SEGMENTO_C2.nodos.find((n) => n.idLocal === 'bombaRealce2')!.tipo, 'bombaRealce');
 });
 
 test('UV opcional: un único nodo apilable, entrada = salida', () => {

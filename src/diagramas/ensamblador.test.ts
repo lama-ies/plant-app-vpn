@@ -8,14 +8,14 @@ import { SEGMENTO_COMPLEMENTO_NINGUNO, SEGMENTO_CISTERNA_FINAL, SEGMENTO_C2, SEG
 
 const SEG_A: SegmentoDiagrama = {
   id: 'test.a',
-  nodos: [{ idLocal: 'x', tipo: 'tanque', etiqueta: 'X', x: 0, y: 0 }],
+  nodos: [{ idLocal: 'x', tipo: 'tanque', etiqueta: 'X', col: 0, fila: 0 }],
   conexiones: [],
   entradaIdLocal: null,
   salidaIdLocal: 'x',
 };
 const SEG_B: SegmentoDiagrama = {
   id: 'test.b',
-  nodos: [{ idLocal: 'y', tipo: 'bomba', etiqueta: 'Y', x: 0, y: 0 }],
+  nodos: [{ idLocal: 'y', tipo: 'bomba', etiqueta: 'Y', col: 0, fila: 0 }],
   conexiones: [],
   entradaIdLocal: 'y',
   salidaIdLocal: 'y',
@@ -35,7 +35,7 @@ test('encadena 2 segmentos: 2 nodos, 1 conexión que los une, ids únicos', () =
 test('repetible: 3 copias de un segmento fuente (sin entrada) generan 3 nodos y 3 salidas pendientes', () => {
   const fuenteRepetible: SegmentoDiagrama = {
     id: 'test.fuente',
-    nodos: [{ idLocal: 'f', tipo: 'pozo', etiqueta: 'F', x: 0, y: 0 }],
+    nodos: [{ idLocal: 'f', tipo: 'pozo', etiqueta: 'F', col: 0, fila: 0 }],
     conexiones: [],
     entradaIdLocal: null,
     salidaIdLocal: 'f',
@@ -59,13 +59,13 @@ test('pass-through (segmento sin nodos): no agrega nada y no rompe el empalme si
   assert.equal(resultado.conexiones.length, 1); // A -> B directo, saltando el pass-through
 });
 
-test('dos grupos repetibles distintos en secuencia no confunden sus columnas (xOffset avanza entre grupos)', () => {
+test('dos grupos repetibles distintos en secuencia no confunden sus columnas (misma x dentro del grupo, distinta entre grupos)', () => {
   const grupo1: SegmentoDiagrama = {
-    id: 'test.g1', nodos: [{ idLocal: 'p', tipo: 'bomba', etiqueta: 'P', x: 0, y: 0 }],
+    id: 'test.g1', nodos: [{ idLocal: 'p', tipo: 'bomba', etiqueta: 'P', col: 0, fila: 0 }],
     conexiones: [], entradaIdLocal: 'p', salidaIdLocal: 'p', repetible: { min: 1, max: 5 },
   };
   const grupo2: SegmentoDiagrama = {
-    id: 'test.g2', nodos: [{ idLocal: 'q', tipo: 'bomba', etiqueta: 'Q', x: 0, y: 0 }],
+    id: 'test.g2', nodos: [{ idLocal: 'q', tipo: 'bomba', etiqueta: 'Q', col: 0, fila: 0 }],
     conexiones: [], entradaIdLocal: 'q', salidaIdLocal: 'q', repetible: { min: 1, max: 5 },
   };
   const resultado = ensamblar([
@@ -73,7 +73,7 @@ test('dos grupos repetibles distintos en secuencia no confunden sus columnas (xO
   ]);
   const xsGrupo1 = resultado.nodos.filter((n) => n.id.includes('test.g1')).map((n) => n.x);
   const xsGrupo2 = resultado.nodos.filter((n) => n.id.includes('test.g2')).map((n) => n.x);
-  // Cada grupo ocupa su propia columna (mismo x dentro del grupo, distinto x entre grupos).
+  // Las copias de un mismo grupo comparten col y fila (se apilan en elevación, no en fila): mismo x.
   assert.equal(new Set(xsGrupo1).size, 1);
   assert.equal(new Set(xsGrupo2).size, 1);
   assert.notEqual(xsGrupo1[0], xsGrupo2[0]);
@@ -86,11 +86,11 @@ test('humo: Ósmosis A1 + N1 + sin complemento + cisterna final ensambla sin err
     { segmento: SEGMENTO_COMPLEMENTO_NINGUNO },
     { segmento: SEGMENTO_CISTERNA_FINAL },
   ]);
-  // A1 (2 nodos) + N1 (6 nodos) + cisterna final (1 nodo) = 9 (el "ninguno" no agrega nada).
+  // A1 (3 nodos: pozo, bombaSumergible, filtroMultimedia) + N1 (5 nodos: valvulaActuadora, filtroCanasta,
+  // bombaAltaPresion, membranaRO, drenaje) + cisterna final (1 nodo) = 9.
   assert.equal(resultado.nodos.length, 9);
   const ids = resultado.nodos.map((n) => n.id);
   assert.equal(new Set(ids).size, ids.length); // todos únicos
-  // La cisterna final debe recibir una conexión desde algún lado (membranaRO de N1, vía pass-through).
   const idCisternaFinal = resultado.nodos.find((n) => n.id.includes('cisternaFinal'))!.id;
   assert.ok(resultado.conexiones.some((c) => c.hasta === idCisternaFinal));
 });
@@ -103,10 +103,23 @@ test('humo: Ósmosis A1(3 pozos) + N3(PX) + C2 + UV + cisterna final ensambla si
     { segmento: SEGMENTO_UV },
     { segmento: SEGMENTO_CISTERNA_FINAL },
   ]);
-  // 3 copias de A1 (2 nodos c/u = 6) + N3 (8 nodos) + C2 (4 nodos) + UV (1) + cisterna final (1) = 20.
-  assert.equal(resultado.nodos.length, 20);
+  // 3 copias de A1 (3 nodos c/u = 9) + N3 (7 nodos, sin filtroMultimedia) + C2 (4 nodos) + UV (1) +
+  // cisterna final (1) = 22.
+  assert.equal(resultado.nodos.length, 22);
   const ids = resultado.nodos.map((n) => n.id);
   assert.equal(new Set(ids).size, ids.length);
+});
+
+test('N3: filtroCanasta->recuperadorPX (cambia de fila y de col) se rutea con 1 waypoint intermedio', () => {
+  const resultado = ensamblar([{ segmento: SEGMENTO_N3 }]);
+  const con = resultado.conexiones.find((c) => c.desde.includes('#filtroCanasta') && c.hasta.includes('#recuperadorPX'))!;
+  assert.equal(con.ruta.length, 1);
+});
+
+test('N3: valvulaActuadora->filtroCanasta (misma fila) no necesita waypoints', () => {
+  const resultado = ensamblar([{ segmento: SEGMENTO_N3 }]);
+  const con = resultado.conexiones.find((c) => c.desde.includes('#valvulaActuadora') && c.hasta.includes('#filtroCanasta'))!;
+  assert.equal(con.ruta.length, 0);
 });
 
 test('dosificadoras: se insertan como nodos flotantes cerca del ancla del núcleo, sin conexiones', () => {

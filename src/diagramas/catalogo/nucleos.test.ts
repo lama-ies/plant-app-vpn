@@ -2,14 +2,20 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { SEGMENTO_N1, SEGMENTO_N2, SEGMENTO_N3 } from './nucleos';
 
-test('N1 estándar: entrada filtroMultimedia, salida membranaRO, ancla de dosificadoras en filtroCanasta', () => {
-  assert.equal(SEGMENTO_N1.entradaIdLocal, 'filtroMultimedia');
+test('N1 estándar: entrada valvulaActuadora, salida membranaRO, ancla de dosificadoras en filtroCanasta', () => {
+  assert.equal(SEGMENTO_N1.entradaIdLocal, 'valvulaActuadora');
   assert.equal(SEGMENTO_N1.salidaIdLocal, 'membranaRO');
   assert.equal(SEGMENTO_N1.anclaDosificadoras, 'filtroCanasta');
   const ids = SEGMENTO_N1.nodos.map((n) => n.idLocal);
-  assert.deepEqual(ids, ['filtroMultimedia', 'valvulaActuadora', 'filtroCanasta', 'bombaAltaPresion', 'membranaRO', 'drenaje']);
-  // Rechazo: Membranas -> Drenaje.
+  assert.deepEqual(ids, ['valvulaActuadora', 'filtroCanasta', 'bombaAltaPresion', 'membranaRO', 'drenaje']);
   assert.ok(SEGMENTO_N1.conexiones.some((c) => c.desde === 'membranaRO' && c.hasta === 'drenaje'));
+});
+
+test('N1/N2/N3 ya NO traen Filtro Multimedia propio (lo trae la alimentación, ver spec §5)', () => {
+  for (const seg of [SEGMENTO_N1, SEGMENTO_N2, SEGMENTO_N3]) {
+    assert.ok(!seg.nodos.some((n) => n.tipo === 'filtroMultimedia'), `${seg.id} no debe tener filtroMultimedia`);
+    assert.equal(seg.entradaIdLocal, 'valvulaActuadora');
+  }
 });
 
 test('N2 turbo: pasa por TurboCharger antes de Membranas, y el rechazo retorna al TurboCharger', () => {
@@ -29,6 +35,12 @@ test('N3 PX: Filtro Canasta se ramifica en paralelo (Bomba Alta Presión y Recup
   assert.deepEqual(new Set(haciaMembrana), new Set(['bombaAltaPresion', 'bombaBooster']));
   assert.ok(SEGMENTO_N3.conexiones.some((c) => c.desde === 'membranaRO' && c.hasta === 'recuperadorPX'));
   assert.ok(SEGMENTO_N3.conexiones.some((c) => c.desde === 'recuperadorPX' && c.hasta === 'drenaje'));
+});
+
+test('N3 PX: la rama de Bomba Alta Presión y la rama de Recuperador PX están en filas distintas (rama real a 90°)', () => {
+  const porId = new Map(SEGMENTO_N3.nodos.map((n) => [n.idLocal, n]));
+  assert.notEqual(porId.get('bombaAltaPresion')!.fila, porId.get('recuperadorPX')!.fila);
+  assert.equal(porId.get('bombaAltaPresion')!.col, porId.get('recuperadorPX')!.col);
 });
 
 test('todo idLocal referenciado en conexiones existe en la lista de nodos (invariante)', () => {

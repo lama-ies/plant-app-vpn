@@ -44,3 +44,73 @@
   border-radius: 4px;
   padding: 1px 4px;
 }
+.lienzo-zoomable {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+}
+.lienzo-zoomable:active {
+  cursor: grabbing;
+}
+.lienzo-zoomable__controles {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.lienzo-zoomable__controles button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--color-borde, #94a3b8);
+  background: var(--color-superficie, #1e293b);
+  color: inherit;
+  cursor: pointer;
+}
+.tuberia-iso__tramo {
+  fill: #33475a;
+}
+.tuberia-iso__codo {
+  fill: #263544;
+}
+.bloque-iso__cara-superior {
+  fill: #3a5068;
+}
+.bloque-iso__cara-izquierda {
+  fill: #141d29;
+}
+.bloque-iso__cara-derecha {
+  fill: var(--color-superficie, #1e293b);
+}
+.bloque-iso--flotante {
+  opacity: 0.85;
+}
+.bloque-iso__icono {
+  color: #e2e8f0;
+}
+.mimico-nodo__etiqueta--editable {
+  background: none;
+  border: none;
+  font-weight: 600;
+  cursor: text;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+  text-decoration: underline dotted;
+}
+.mimico-nodo__etiqueta-input {
+  font-weight: 600;
+  font-size: 11px;
+  text-align: center;
+  width: 100%;
+  background: var(--color-superficie, #1e293b);
+  border: 1px solid var(--color-borde, #94a3b8);
+  border-radius: 4px;
+  color: inherit;
+}
