@@ -19,22 +19,22 @@ import {
 import { codigoAMensaje } from '../lib/mensajesError';
 import {
   perfilVacio,
-  type ConexionDiagrama,
   type EntradaCatalogoAlarma,
   type GrupoEscritura,
   type Idioma,
   type ModeloPLC,
-  type NodoDiagrama,
   type PerfilDispositivo,
   type PlantillaGrafica,
   type TipoAlarma,
   type TipoDato,
-  type TipoNodoDiagrama,
   type TipoPlanta,
   type VariableControl,
   type VariableLectura,
 } from '../perfiles/tipos';
 import { validarPerfil } from '../perfiles/validacion';
+import { SelectorTopologia } from '../diagramas/SelectorTopologia';
+import { EnlaceSensores } from '../diagramas/EnlaceSensores';
+import { ensamblar, type SegmentoElegido } from '../diagramas/ensamblador';
 import './editor-perfil.css';
 
 const TIPOS_PLANTA: TipoPlanta[] = ['osmosis', 'ptar', 'hidroneumatico'];
@@ -42,9 +42,6 @@ const MODELOS_PLC: ModeloPLC[] = ['siemens_s7_1200', 'mitsubishi_fx5', 'delta_as
 const TIPOS_DATO: TipoDato[] = ['bool', 'int16', 'uint16', 'int32', 'uint32', 'float32', 'float64'];
 const GRUPOS_ESCRITURA: GrupoEscritura[] = ['portal_client', 'admin_app_vpn'];
 const TIPOS_ALARMA: TipoAlarma[] = ['falla', 'advertencia', 'sistema', 'helper'];
-const TIPOS_NODO: TipoNodoDiagrama[] = [
-  'tanque', 'bomba', 'filtro', 'membrana', 'aireador', 'sedimentador', 'cloracion', 'salida',
-];
 const IDIOMAS: Idioma[] = ['es', 'en', 'fr', 'pt'];
 
 function actualizarEnLista<T>(lista: T[], idx: number, cambios: Partial<T>): T[] {
@@ -80,13 +77,12 @@ export function EditorPerfil() {
   const [importando, setImportando] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [desplegando, setDesplegando] = useState(false);
+  const [pasoDiagrama, setPasoDiagrama] = useState<'topologia' | 'sensores'>('topologia');
 
   const clavesDisponibles = useMemo(() => {
     if (!perfil) return [] as string[];
     return [...perfil.variablesLectura.map((v) => v.clave), ...perfil.variablesControl.map((v) => v.clave)];
   }, [perfil]);
-
-  const idsNodos = useMemo(() => perfil?.diagrama.nodos.map((n) => n.id) ?? [], [perfil]);
 
   function limpiarAvisos() {
     setErroresValidacion(null);
@@ -410,78 +406,29 @@ export function EditorPerfil() {
             </div>
           </section>
 
-          {/* --- 6. Diagrama: nodos + conexiones ---------------------------------------------------- */}
+          {/* --- 6. Diagrama: editor de 2 pasos (topología + sensores) ------------------------------- */}
           <section className="seccion">
             <h2 className="seccion__titulo">{t('editorPerfil.seccionDiagrama')}</h2>
-
-            <p className="subtitulo-lista">{t('editorPerfil.diagramaNodosTitulo')}</p>
-            {perfil.diagrama.nodos.length === 0 && <p className="lista-vacia">{t('editorPerfil.sinFilas')}</p>}
-            {perfil.diagrama.nodos.map((nodo, idx) => (
-              <FilaNodo
-                key={idx}
-                nodo={nodo}
-                clavesDisponibles={clavesDisponibles}
-                onCambiar={(cambios) =>
-                  campo('diagrama', {
-                    ...perfil.diagrama,
-                    nodos: actualizarEnLista(perfil.diagrama.nodos, idx, cambios),
-                  })
-                }
-                onQuitar={() =>
-                  campo('diagrama', { ...perfil.diagrama, nodos: quitarDeLista(perfil.diagrama.nodos, idx) })
-                }
-                t={t}
+            {pasoDiagrama === 'topologia' ? (
+              <SelectorTopologia
+                tipoPlanta={perfil.tipoPlanta}
+                onListo={(secuencia: SegmentoElegido[], numDosificadoras: number) => {
+                  campo('diagrama', ensamblar(secuencia, numDosificadoras));
+                  setPasoDiagrama('sensores');
+                }}
               />
-            ))}
-            <button
-              type="button"
-              className="agregar-fila"
-              onClick={() =>
-                campo('diagrama', {
-                  ...perfil.diagrama,
-                  nodos: [...perfil.diagrama.nodos, { id: '', tipo: 'tanque', etiqueta: '', x: 0, y: 0 }],
-                })
-              }
-            >
-              <Plus size={15} aria-hidden />
-              {t('editorPerfil.agregarNodo')}
-            </button>
-
-            <p className="subtitulo-lista">{t('editorPerfil.diagramaConexionesTitulo')}</p>
-            {perfil.diagrama.conexiones.length === 0 && <p className="lista-vacia">{t('editorPerfil.sinFilas')}</p>}
-            {perfil.diagrama.conexiones.map((con, idx) => (
-              <FilaConexion
-                key={idx}
-                conexion={con}
-                idsNodos={idsNodos}
-                onCambiar={(cambios) =>
-                  campo('diagrama', {
-                    ...perfil.diagrama,
-                    conexiones: actualizarEnLista(perfil.diagrama.conexiones, idx, cambios),
-                  })
-                }
-                onQuitar={() =>
-                  campo('diagrama', {
-                    ...perfil.diagrama,
-                    conexiones: quitarDeLista(perfil.diagrama.conexiones, idx),
-                  })
-                }
-                t={t}
-              />
-            ))}
-            <button
-              type="button"
-              className="agregar-fila"
-              onClick={() =>
-                campo('diagrama', {
-                  ...perfil.diagrama,
-                  conexiones: [...perfil.diagrama.conexiones, { desde: '', hasta: '' }],
-                })
-              }
-            >
-              <Plus size={15} aria-hidden />
-              {t('editorPerfil.agregarConexion')}
-            </button>
+            ) : (
+              <>
+                <button type="button" className="boton-tenue" onClick={() => setPasoDiagrama('topologia')}>
+                  {t('diagramaEditor.volverATopologia')}
+                </button>
+                <EnlaceSensores
+                  diagrama={perfil.diagrama}
+                  clavesDisponibles={clavesDisponibles}
+                  onCambiar={(diagrama) => campo('diagrama', diagrama)}
+                />
+              </>
+            )}
           </section>
 
           {/* --- 7. Gráficas ------------------------------------------------------------------------ */}
@@ -803,131 +750,6 @@ function FilaAlarma({ alarma, clavesDisponibles, onCambiar, onQuitar, t }: Props
           ))}
         </div>
       </div>
-    </div>
-  );
-}
-
-// --- Sección 6: fila de un nodo del diagrama --------------------------------------------------------------
-
-interface PropsFilaNodo {
-  nodo: NodoDiagrama;
-  clavesDisponibles: string[];
-  onCambiar: (cambios: Partial<NodoDiagrama>) => void;
-  onQuitar: () => void;
-  t: (clave: string, opciones?: Record<string, unknown>) => string;
-}
-
-function FilaNodo({ nodo, clavesDisponibles, onCambiar, onQuitar, t }: PropsFilaNodo) {
-  const variables = nodo.variables ?? [];
-  return (
-    <div className="fila-compuesta">
-      <div className="fila-compuesta__top">
-        <label className="auth-campo">
-          {t('editorPerfil.campo.nodoId')}
-          <input type="text" value={nodo.id} onChange={(e) => onCambiar({ id: e.target.value })} />
-        </label>
-        <label className="auth-campo">
-          {t('editorPerfil.campo.tipo')}
-          <select value={nodo.tipo} onChange={(e) => onCambiar({ tipo: e.target.value as TipoNodoDiagrama })}>
-            {TIPOS_NODO.map((tn) => (
-              <option key={tn} value={tn}>
-                {t(`tipoNodo.${tn}`)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="auth-campo">
-          {t('editorPerfil.campo.etiqueta')}
-          <input type="text" value={nodo.etiqueta} onChange={(e) => onCambiar({ etiqueta: e.target.value })} />
-        </label>
-        <label className="auth-campo">
-          {t('editorPerfil.campo.x')}
-          <input type="number" value={nodo.x} onChange={(e) => onCambiar({ x: Number(e.target.value) || 0 })} />
-        </label>
-        <label className="auth-campo">
-          {t('editorPerfil.campo.y')}
-          <input type="number" value={nodo.y} onChange={(e) => onCambiar({ y: Number(e.target.value) || 0 })} />
-        </label>
-        <button
-          type="button"
-          className="icono-boton icono-boton--peligro fila-compuesta__quitar"
-          title={t('editorPerfil.quitar')}
-          onClick={onQuitar}
-        >
-          <Trash2 size={15} aria-hidden />
-        </button>
-      </div>
-      <div className="fila-compuesta__extra">
-        <p className="subtitulo-lista">{t('editorPerfil.campo.variables')}</p>
-        <div className="casillas">
-          {clavesDisponibles.map((clave) => {
-            const marcada = variables.includes(clave);
-            return (
-              <label className="casilla" key={clave}>
-                <input
-                  type="checkbox"
-                  checked={marcada}
-                  onChange={() =>
-                    onCambiar({ variables: marcada ? variables.filter((c) => c !== clave) : [...variables, clave] })
-                  }
-                />
-                {clave}
-              </label>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// --- Sección 6: fila de una conexión del diagrama ---------------------------------------------------------
-
-interface PropsFilaConexion {
-  conexion: ConexionDiagrama;
-  idsNodos: string[];
-  onCambiar: (cambios: Partial<ConexionDiagrama>) => void;
-  onQuitar: () => void;
-  t: (clave: string, opciones?: Record<string, unknown>) => string;
-}
-
-function FilaConexion({ conexion, idsNodos, onCambiar, onQuitar, t }: PropsFilaConexion) {
-  return (
-    <div className="fila">
-      <label className="auth-campo">
-        {t('editorPerfil.campo.desde')}
-        <select value={conexion.desde} onChange={(e) => onCambiar({ desde: e.target.value })}>
-          <option value=""></option>
-          {idsNodos.map((id) => (
-            <option key={id} value={id}>
-              {id}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="auth-campo">
-        {t('editorPerfil.campo.hasta')}
-        <select value={conexion.hasta} onChange={(e) => onCambiar({ hasta: e.target.value })}>
-          <option value=""></option>
-          {idsNodos.map((id) => (
-            <option key={id} value={id}>
-              {id}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="auth-campo">
-        {t('editorPerfil.campo.etiquetaConexion')}
-        <input type="text" value={conexion.etiqueta ?? ''} onChange={(e) => onCambiar({ etiqueta: e.target.value })} />
-      </label>
-      <button
-        type="button"
-        className="icono-boton icono-boton--peligro fila__quitar"
-        title={t('editorPerfil.quitar')}
-        onClick={onQuitar}
-      >
-        <Trash2 size={15} aria-hidden />
-      </button>
     </div>
   );
 }

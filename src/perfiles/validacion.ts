@@ -26,9 +26,9 @@ export function validarPerfil(p: PerfilDispositivo): string[] {
   }
 
   for (const nodo of p.diagrama.nodos) {
-    for (const clave of nodo.variables ?? []) {
-      if (!clavesDisponibles.has(clave)) {
-        errores.push(`Diagrama: el nodo "${nodo.id}" referencia la variable inexistente "${clave}"`);
+    for (const sensor of nodo.sensores ?? []) {
+      if (sensor.variable && !clavesDisponibles.has(sensor.variable)) {
+        errores.push(`Diagrama: el nodo "${nodo.id}" referencia la variable inexistente "${sensor.variable}"`);
       }
     }
   }
@@ -36,6 +36,11 @@ export function validarPerfil(p: PerfilDispositivo): string[] {
   for (const con of p.diagrama.conexiones) {
     if (!idsNodos.has(con.desde)) errores.push(`Diagrama: conexión con origen inexistente "${con.desde}"`);
     if (!idsNodos.has(con.hasta)) errores.push(`Diagrama: conexión con destino inexistente "${con.hasta}"`);
+    for (const sensor of con.sensores ?? []) {
+      if (sensor.variable && !clavesDisponibles.has(sensor.variable)) {
+        errores.push(`Diagrama: la conexión "${con.id}" referencia la variable inexistente "${sensor.variable}"`);
+      }
+    }
   }
 
   for (const grafica of p.graficas) {

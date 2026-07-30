@@ -1,10 +1,22 @@
-// Capa de acceso a la API (API Gateway con dominio propio, vía proxy same-origin /api). Recurso propio de
-// esta app: /app-vpn/*. El token (ID token de Cognito, pool Staff) lo obtiene Amplify y se adjunta como
-// Authorization. Un 401 fuerza el cierre de sesión (idempotente). Ver plant-arquitectura/07-app-vpn.md.
+// Capa de acceso a la API (API Gateway con dominio propio). Recurso propio de esta app: /app-vpn/*. El
+// token (ID token de Cognito, pool Staff) lo obtiene Amplify y se adjunta como Authorization. Un 401
+// fuerza el cierre de sesión (idempotente). Ver plant-arquitectura/07-app-vpn.md.
 import { fetchAuthSession, signOut } from 'aws-amplify/auth';
 import type { ModeloPLC, PerfilDispositivo, TipoPlanta } from '../perfiles/tipos';
 
-const BASE = '/api';
+// BUG encontrado en auditoría 2026-07-28: esta app es un binario de escritorio Tauri v2, no una SPA servida
+// por un servidor propio. En dev, Vite reescribe '/api' hacia la API real (proxy same-origin, ver
+// vite.config.ts) — pero `tauri build` NO empaqueta ese servidor: `frontendDist` sirve los archivos
+// estáticos directo desde la webview, así que un `fetch('/api/...')` en producción intentaría resolver
+// contra el propio origen de la webview (p.ej. `tauri://localhost` o `https://tauri.localhost`) y SIEMPRE
+// fallaría (nunca llegaría a la API real). `src-tauri/tauri.conf.json` ya anticipaba esto en su CSP
+// (`connect-src 'self' https://*.amazonaws.com https://*.iesinternacional.com`), pero el código nunca
+// llegó a hacer la llamada directa. Fix: en build de producción (`import.meta.env.PROD`) se apunta directo
+// a la URL real de la API (mismo patrón que `vite.config.ts` usa para el destino del proxy de dev); en dev
+// se mantiene '/api' (same-origin vía el proxy de Vite, sin tocar nada ahí).
+const BASE = import.meta.env.PROD
+  ? (import.meta.env.VITE_API_BASE_URL ?? 'https://plant-api.iesinternacional.com')
+  : '/api';
 
 /** Error de API con el código de máquina y el status HTTP. */
 export class ErrorApi extends Error {
