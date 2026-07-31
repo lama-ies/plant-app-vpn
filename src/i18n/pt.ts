@@ -210,6 +210,7 @@ export const pt = {
       errorCargar: 'Não foi possível carregar o perfil.',
 
       seccionEquipo: 'Dados do equipamento',
+      seccionFichaTecnica: 'Ficha técnica',
       seccionLectura: 'Variáveis de leitura',
       seccionControl: 'Variáveis de controle',
       seccionAlarmas: 'Catálogo de alarmes',
@@ -249,6 +250,14 @@ export const pt = {
         etiquetaConexion: 'Rótulo (opcional)',
         graficaId: 'ID do gráfico',
         graficaTitulo: 'Título',
+        capacidad: 'Capacidade do equipamento',
+        voltajeOperacion: 'Tensão de operação',
+        numeroEquipo: 'Número do equipamento',
+        ubicacion: 'Local de instalação',
+        fichaCliente: 'Cliente',
+        modelo: 'Modelo',
+        serie: 'Número de série',
+        fabricante: 'Fabricante',
       },
 
       agregarLectura: 'Adicionar variável de leitura',

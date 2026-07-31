@@ -50,6 +50,22 @@ export interface PlantillaGrafica {
   variables: string[];
 }
 
+/** Ficha técnica de la planta/equipo: datos descriptivos de construcción, todos OPCIONALES (se llenan al
+ * armar el config de la planta, ver 11-perfiles-dispositivo.md). Ninguno participa de la lógica del
+ * sistema (no se referencia desde alarmas/dashboard/diagrama) — es solo información de referencia que se
+ * muestra en el panel del diagrama mimético. */
+export interface FichaTecnica {
+  descripcion?: string;
+  capacidad?: string;
+  voltajeOperacion?: string;
+  numeroEquipo?: string;
+  ubicacion?: string;
+  cliente?: string;
+  modelo?: string;
+  serie?: string;
+  fabricante?: string;
+}
+
 /** El perfil completo de una planta/equipo (esquema canónico, ver 11-perfiles-dispositivo.md). */
 export interface PerfilDispositivo {
   equipoId: string;
@@ -68,6 +84,7 @@ export interface PerfilDispositivo {
   dashboard: { variables: string[] }; // máximo 6 claves
   diagrama: DiagramaEquipo;
   graficas: PlantillaGrafica[];
+  fichaTecnica: FichaTecnica;
 
   perfil: { esBase: boolean; tipoBase: TipoPlanta; version: number };
 }
@@ -88,6 +105,7 @@ export function perfilVacio(tipoPlanta: TipoPlanta, esBase: boolean): PerfilDisp
     dashboard: { variables: [] },
     diagrama: { viewBox: '0 0 100 100', nodos: [], conexiones: [] },
     graficas: [],
+    fichaTecnica: {},
     perfil: { esBase, tipoBase: tipoPlanta, version: 1 },
   };
 }

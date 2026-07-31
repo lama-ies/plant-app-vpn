@@ -20,6 +20,7 @@ import { codigoAMensaje } from '../lib/mensajesError';
 import {
   perfilVacio,
   type EntradaCatalogoAlarma,
+  type FichaTecnica,
   type GrupoEscritura,
   type Idioma,
   type ModeloPLC,
@@ -133,6 +134,10 @@ export function EditorPerfil() {
 
   function campo<K extends keyof PerfilDispositivo>(clave: K, valor: PerfilDispositivo[K]) {
     setPerfil((p) => (p ? { ...p, [clave]: valor } : p));
+  }
+
+  function campoFicha<K extends keyof FichaTecnica>(clave: K, valor: FichaTecnica[K]) {
+    setPerfil((p) => (p ? { ...p, fichaTecnica: { ...p.fichaTecnica, [clave]: valor } } : p));
   }
 
   function validar() {
@@ -320,7 +325,77 @@ export function EditorPerfil() {
             </div>
           </section>
 
-          {/* --- 2. Variables de lectura --------------------------------------------------------- */}
+          {/* --- 2. Ficha técnica (todos los campos opcionales, ver 11-perfiles-dispositivo.md) ---- */}
+          <section className="seccion">
+            <h2 className="seccion__titulo">{t('editorPerfil.seccionFichaTecnica')}</h2>
+            <div className="rejilla-campos">
+              <label className="auth-campo">
+                {t('editorPerfil.campo.descripcion')}
+                <input
+                  type="text" value={perfil.fichaTecnica.descripcion ?? ''}
+                  onChange={(e) => campoFicha('descripcion', e.target.value)}
+                />
+              </label>
+              <label className="auth-campo">
+                {t('editorPerfil.campo.capacidad')}
+                <input
+                  type="text" value={perfil.fichaTecnica.capacidad ?? ''}
+                  onChange={(e) => campoFicha('capacidad', e.target.value)}
+                />
+              </label>
+              <label className="auth-campo">
+                {t('editorPerfil.campo.voltajeOperacion')}
+                <input
+                  type="text" value={perfil.fichaTecnica.voltajeOperacion ?? ''}
+                  onChange={(e) => campoFicha('voltajeOperacion', e.target.value)}
+                />
+              </label>
+              <label className="auth-campo">
+                {t('editorPerfil.campo.numeroEquipo')}
+                <input
+                  type="text" value={perfil.fichaTecnica.numeroEquipo ?? ''}
+                  onChange={(e) => campoFicha('numeroEquipo', e.target.value)}
+                />
+              </label>
+              <label className="auth-campo">
+                {t('editorPerfil.campo.ubicacion')}
+                <input
+                  type="text" value={perfil.fichaTecnica.ubicacion ?? ''}
+                  onChange={(e) => campoFicha('ubicacion', e.target.value)}
+                />
+              </label>
+              <label className="auth-campo">
+                {t('editorPerfil.campo.fichaCliente')}
+                <input
+                  type="text" value={perfil.fichaTecnica.cliente ?? ''}
+                  onChange={(e) => campoFicha('cliente', e.target.value)}
+                />
+              </label>
+              <label className="auth-campo">
+                {t('editorPerfil.campo.modelo')}
+                <input
+                  type="text" value={perfil.fichaTecnica.modelo ?? ''}
+                  onChange={(e) => campoFicha('modelo', e.target.value)}
+                />
+              </label>
+              <label className="auth-campo">
+                {t('editorPerfil.campo.serie')}
+                <input
+                  type="text" value={perfil.fichaTecnica.serie ?? ''}
+                  onChange={(e) => campoFicha('serie', e.target.value)}
+                />
+              </label>
+              <label className="auth-campo">
+                {t('editorPerfil.campo.fabricante')}
+                <input
+                  type="text" value={perfil.fichaTecnica.fabricante ?? ''}
+                  onChange={(e) => campoFicha('fabricante', e.target.value)}
+                />
+              </label>
+            </div>
+          </section>
+
+          {/* --- 3. Variables de lectura --------------------------------------------------------- */}
           <SeccionVariables
             titulo={t('editorPerfil.seccionLectura')}
             variables={perfil.variablesLectura}
@@ -329,7 +404,7 @@ export function EditorPerfil() {
             t={t}
           />
 
-          {/* --- 3. Variables de control ---------------------------------------------------------- */}
+          {/* --- 4. Variables de control ---------------------------------------------------------- */}
           <SeccionVariables
             titulo={t('editorPerfil.seccionControl')}
             variables={perfil.variablesControl}
@@ -338,7 +413,7 @@ export function EditorPerfil() {
             t={t}
           />
 
-          {/* --- 4. Catálogo de alarmas ------------------------------------------------------------ */}
+          {/* --- 5. Catálogo de alarmas ------------------------------------------------------------ */}
           <section className="seccion">
             <h2 className="seccion__titulo">{t('editorPerfil.seccionAlarmas')}</h2>
             {perfil.catalogoAlarmas.length === 0 && <p className="lista-vacia">{t('editorPerfil.sinFilas')}</p>}
@@ -375,7 +450,7 @@ export function EditorPerfil() {
             </button>
           </section>
 
-          {/* --- 5. Variables del dashboard --------------------------------------------------------- */}
+          {/* --- 6. Variables del dashboard --------------------------------------------------------- */}
           <section className="seccion">
             <h2 className="seccion__titulo">{t('editorPerfil.seccionDashboard')}</h2>
             <p className="seccion__ayuda">
@@ -406,7 +481,7 @@ export function EditorPerfil() {
             </div>
           </section>
 
-          {/* --- 6. Diagrama: editor de 2 pasos (topología + sensores) ------------------------------- */}
+          {/* --- 7. Diagrama: editor de 2 pasos (topología + sensores) ------------------------------- */}
           <section className="seccion">
             <h2 className="seccion__titulo">{t('editorPerfil.seccionDiagrama')}</h2>
             {pasoDiagrama === 'topologia' ? (
@@ -431,7 +506,7 @@ export function EditorPerfil() {
             )}
           </section>
 
-          {/* --- 7. Gráficas ------------------------------------------------------------------------ */}
+          {/* --- 8. Gráficas ------------------------------------------------------------------------ */}
           <section className="seccion">
             <h2 className="seccion__titulo">{t('editorPerfil.seccionGraficas')}</h2>
             {perfil.graficas.length === 0 && <p className="lista-vacia">{t('editorPerfil.sinFilas')}</p>}
@@ -455,7 +530,7 @@ export function EditorPerfil() {
             </button>
           </section>
 
-          {/* --- 8. Acciones ------------------------------------------------------------------------ */}
+          {/* --- 9. Acciones ------------------------------------------------------------------------ */}
           <section className="seccion">
             <h2 className="seccion__titulo">{t('editorPerfil.seccionAcciones')}</h2>
 

@@ -210,6 +210,7 @@ export const en = {
       errorCargar: 'Could not load the profile.',
 
       seccionEquipo: 'Equipment data',
+      seccionFichaTecnica: 'Technical data sheet',
       seccionLectura: 'Read variables',
       seccionControl: 'Control variables',
       seccionAlarmas: 'Alarm catalog',
@@ -249,6 +250,14 @@ export const en = {
         etiquetaConexion: 'Label (optional)',
         graficaId: 'Chart ID',
         graficaTitulo: 'Title',
+        capacidad: 'Equipment capacity',
+        voltajeOperacion: 'Operating voltage',
+        numeroEquipo: 'Equipment number',
+        ubicacion: 'Installation location',
+        fichaCliente: 'Client',
+        modelo: 'Model',
+        serie: 'Serial number',
+        fabricante: 'Manufacturer',
       },
 
       agregarLectura: 'Add read variable',
