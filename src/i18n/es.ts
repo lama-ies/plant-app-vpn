@@ -313,6 +313,7 @@ export const es = {
       sensorNinguno: 'Sin enlazar',
       zoom: { acercar: 'Acercar', alejar: 'Alejar', centrar: 'Centrar vista' },
       editarEtiqueta: 'Editar nombre',
+      leyenda: { alimentacion: 'Alimentación', permeado: 'Permeado', rechazo: 'Rechazo' },
       sensor: {
         flujo: 'Flujo', presion: 'Presión', conductividad: 'Conductividad', tds: 'TDS', orp: 'ORP',
         ph: 'PH', cloro: 'Cloro', temperatura: 'Temperatura', flujoOnOff: 'Flujo On/Off',

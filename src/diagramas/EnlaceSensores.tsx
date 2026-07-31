@@ -61,6 +61,7 @@ export function EnlaceSensores({ diagrama, clavesDisponibles, onCambiar }: Props
           ...diagrama,
           nodos: diagrama.nodos.map((n) => (n.id === id ? { ...n, etiqueta } : n)),
         })}
+        onCambiar={onCambiar}
       />
       <ul className="enlace-sensores__lista">
         {anclas.map((a) => (

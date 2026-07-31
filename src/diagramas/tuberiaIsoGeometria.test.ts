@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { tramoRecto, relenoCodo, poligonosDeRuta, puntoMedioDeRuta } from './tuberiaIsoGeometria';
+import { tramoRecto, relenoCodo, poligonosDeRuta, puntoMedioDeRuta, flechasDeRuta } from './tuberiaIsoGeometria';
 
 test('tramoRecto de una línea horizontal produce un rectángulo centrado, ancho perpendicular vertical', () => {
   const poligono = tramoRecto({ x: 0, y: 0 }, { x: 100, y: 0 }, 10);
@@ -36,4 +36,21 @@ test('puntoMedioDeRuta con codo pondera por longitud real de cada tramo, no por 
   // Tramo 1: 0->40 (largo 40). Tramo 2: 40,0 -> 40,10 (largo 10). Total 50, mitad = 25 -> dentro del tramo 1.
   const medio = puntoMedioDeRuta([{ x: 0, y: 0 }, { x: 40, y: 0 }, { x: 40, y: 10 }]);
   assert.deepEqual(medio, { x: 25, y: 0 });
+});
+
+test('flechasDeRuta: una tubería horizontal hacia la derecha produce 1 flecha en el punto medio, ángulo 0°', () => {
+  const [flecha] = flechasDeRuta([{ x: 0, y: 0 }, { x: 100, y: 0 }]);
+  assert.deepEqual(flecha, { x: 50, y: 0, anguloGrados: 0 });
+});
+
+test('flechasDeRuta: una tubería vertical hacia abajo apunta a 90° (Y crece hacia abajo en pantalla)', () => {
+  const [flecha] = flechasDeRuta([{ x: 0, y: 0 }, { x: 0, y: 40 }]);
+  assert.equal(flecha.x, 0);
+  assert.equal(flecha.y, 20);
+  assert.equal(flecha.anguloGrados, 90);
+});
+
+test('flechasDeRuta: una tubería con 1 codo produce 2 flechas, una por tramo recto (nunca en el codo)', () => {
+  const flechas = flechasDeRuta([{ x: 0, y: 0 }, { x: 50, y: 0 }, { x: 50, y: 50 }]);
+  assert.equal(flechas.length, 2);
 });

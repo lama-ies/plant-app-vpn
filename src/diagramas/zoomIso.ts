@@ -38,3 +38,22 @@ export function pixelesAUnidadesViewBox(deltaPx: number, anchoViewBox: number, a
   if (anchoElementoPx === 0) return 0;
   return deltaPx * (anchoViewBox / anchoElementoPx);
 }
+
+/** Clamp de "contención" (ver spec §9, Muestra5): la ventana de vista (`caja`) nunca puede salir de la caja
+ * del contenido real del diagrama (`contenido`) cuando el zoom está acercado (viewport más chico que el
+ * contenido) — cada lado de la vista topa con el lado correspondiente del contenido antes de dejarlo fuera
+ * de cuadro. Si el zoom está alejado más allá del tamaño real del contenido (viewport más grande), el
+ * contenido queda centrado dentro de la vista en vez de pegado a una esquina. Los ejes X/Y se resuelven de
+ * forma independiente. */
+export function limitar(caja: CajaVista, contenido: CajaVista): CajaVista {
+  function ejeLimitado(min: number, ancho: number, contMin: number, contAncho: number): number {
+    if (ancho >= contAncho) return contMin - (ancho - contAncho) / 2;
+    return Math.min(Math.max(min, contMin), contMin + contAncho - ancho);
+  }
+  return {
+    minX: ejeLimitado(caja.minX, caja.ancho, contenido.minX, contenido.ancho),
+    minY: ejeLimitado(caja.minY, caja.alto, contenido.minY, contenido.alto),
+    ancho: caja.ancho,
+    alto: caja.alto,
+  };
+}

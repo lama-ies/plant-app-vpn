@@ -1,8 +1,9 @@
 // Segmentos de alimentación/pretratamiento/grupo de bombas de presión para Ósmosis Inversa (y, C8, también
 // reusado por Hidroneumático — ver catalogo/hidroneumatico.ts). Coordenadas de REJILLA (col/fila/
-// elevacion), no píxeles — ver spec 2026-07-30-diagrama-isometrico-design.md §3.1. El Filtro Multimedia
+// elevacion), no píxeles — ver spec 2026-07-30-diagrama-isometrico-design.md §3.1/§9. El Filtro Multimedia
 // SIEMPRE cierra la alimentación (A1/A2/A3), nunca el núcleo (ver §5 del mismo spec — evita la duplicación
-// real que existía cuando se combinaba A3 con cualquier núcleo).
+// real que existía cuando se combinaba A3 con cualquier núcleo). Todas las tuberías de este archivo son
+// `tipo: 'alimentacion'` (agua cruda/de proceso, antes de entrar a la membrana).
 import type { SegmentoDiagrama } from '../tipos';
 
 /** A1 — Pozo → Bomba sumergible → Filtro multimedia. Repetible: 2+ pozos convergen a una sola línea. */
@@ -14,8 +15,8 @@ export const SEGMENTO_A1: SegmentoDiagrama = {
     { idLocal: 'filtroMultimedia', tipo: 'filtroMultimedia', etiqueta: 'Filtro multimedia', col: 2, fila: 0 },
   ],
   conexiones: [
-    { desde: 'pozo', hasta: 'bombaSumergible' },
-    { desde: 'bombaSumergible', hasta: 'filtroMultimedia' },
+    { desde: 'pozo', hasta: 'bombaSumergible', tipo: 'alimentacion' },
+    { desde: 'bombaSumergible', hasta: 'filtroMultimedia', tipo: 'alimentacion' },
   ],
   entradaIdLocal: null,
   salidaIdLocal: 'filtroMultimedia',
@@ -31,8 +32,8 @@ export const SEGMENTO_A2: SegmentoDiagrama = {
     { idLocal: 'filtroMultimedia', tipo: 'filtroMultimedia', etiqueta: 'Filtro multimedia', col: 2, fila: 0 },
   ],
   conexiones: [
-    { desde: 'cisterna', hasta: 'bombaRealce' },
-    { desde: 'bombaRealce', hasta: 'filtroMultimedia' },
+    { desde: 'cisterna', hasta: 'bombaRealce', tipo: 'alimentacion' },
+    { desde: 'bombaRealce', hasta: 'filtroMultimedia', tipo: 'alimentacion' },
   ],
   entradaIdLocal: null,
   salidaIdLocal: 'filtroMultimedia',
@@ -49,10 +50,10 @@ export const SEGMENTO_A3: SegmentoDiagrama = {
     { idLocal: 'filtroMultimedia', tipo: 'filtroMultimedia', etiqueta: 'Filtro multimedia', col: 4, fila: 0 },
   ],
   conexiones: [
-    { desde: 'pozo', hasta: 'bombaSumergible' },
-    { desde: 'bombaSumergible', hasta: 'cisterna' },
-    { desde: 'cisterna', hasta: 'bombaRealce' },
-    { desde: 'bombaRealce', hasta: 'filtroMultimedia' },
+    { desde: 'pozo', hasta: 'bombaSumergible', tipo: 'alimentacion' },
+    { desde: 'bombaSumergible', hasta: 'cisterna', tipo: 'alimentacion' },
+    { desde: 'cisterna', hasta: 'bombaRealce', tipo: 'alimentacion' },
+    { desde: 'bombaRealce', hasta: 'filtroMultimedia', tipo: 'alimentacion' },
   ],
   entradaIdLocal: null,
   salidaIdLocal: 'filtroMultimedia',
@@ -65,7 +66,7 @@ export const SEGMENTO_A4: SegmentoDiagrama = {
     { idLocal: 'inyeccionCloro', tipo: 'inyeccionCloro', etiqueta: 'Inyección de cloro', col: 0, fila: 0 },
     { idLocal: 'filtroCarbonoActivado', tipo: 'filtroCarbonoActivado', etiqueta: 'Filtro carbono activado', col: 1, fila: 0 },
   ],
-  conexiones: [{ desde: 'inyeccionCloro', hasta: 'filtroCarbonoActivado' }],
+  conexiones: [{ desde: 'inyeccionCloro', hasta: 'filtroCarbonoActivado', tipo: 'alimentacion' }],
   entradaIdLocal: 'inyeccionCloro',
   salidaIdLocal: 'filtroCarbonoActivado',
 };

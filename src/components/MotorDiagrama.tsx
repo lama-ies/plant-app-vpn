@@ -1,85 +1,103 @@
-// Motor de render del diagrama mimético (vista isométrica) — vista previa del editor. Dibuja CUALQUIER
-// DiagramaEquipo ya ensamblado: no conoce el catálogo de segmentos ni el ensamblador. Este editor NUNCA
-// tiene telemetría real: cada sensor muestra el TAG (variable asignada) para confirmar el enlace
-// visualmente, no un valor en vivo. Ver spec 2026-07-30-diagrama-isometrico-design.md §4.
-import { useState } from 'react';
+// Motor de render del diagrama mimético (2.5D, ver spec 2026-07-30-diagrama-isometrico-design.md §9) —
+// vista previa del editor. Dibuja CUALQUIER DiagramaEquipo ya ensamblado: no conoce el catálogo de
+// segmentos ni el ensamblador. Este editor NUNCA tiene telemetría real: cada sensor muestra el TAG
+// (variable asignada) para confirmar el enlace visualmente, no un valor en vivo.
+import { useLayoutEffect, useRef, useState, type PointerEvent, type RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  ArrowRightToLine, Beaker, Cylinder, Droplet, Fan, Filter, Gauge, Wind, type LucideIcon,
-} from 'lucide-react';
-import type { DiagramaEquipo, NodoDiagrama, TipoNodoProceso } from '../diagramas/tipos';
-import { BloqueIsoGenerico } from './BloqueIsoGenerico';
-import { TuberiaIso, medioDeTuberia } from './TuberiaIso';
+import type { ConexionDiagrama, DiagramaEquipo, NodoDiagrama } from '../diagramas/tipos';
+import { medioDeTuberia, TuberiaIso } from './TuberiaIso';
 import { LienzoZoomable } from './LienzoZoomable';
+import { pixelesAUnidadesViewBox } from '../diagramas/zoomIso';
+import type { Punto } from '../diagramas/tuberiaIsoGeometria';
+import { ICONO_PROCESO } from './iconosProceso';
 import './motor-diagrama.css';
 
-// Fase 1: los 21 tipos usan el mismo bloque isométrico genérico con este ícono Lucide como placa frontal.
-// La Fase 2 reemplaza entradas una por una (ver spec §4.2), sin tocar el resto de este archivo.
-const ICONO_ISO: Record<TipoNodoProceso, LucideIcon> = {
-  tanque: Cylinder, tanquePulmon: Cylinder, torreDesgasificadora: Cylinder,
-  bomba: Fan, bombaSumergible: Fan, bombaRealce: Fan, bombaAltaPresion: Fan, bombaBooster: Fan,
-  turbocharger: Fan, recuperadorPX: Fan, soplador: Wind,
-  pozo: ArrowRightToLine, filtroMultimedia: Filter, valvulaActuadora: Gauge, filtroCanasta: Filter,
-  filtroCarbono: Filter, filtroCarbonoActivado: Filter, membranaRO: Filter, inyeccionCloro: Droplet,
-  lamparaUV: Beaker, dosificadora: Beaker, salidaDrenaje: ArrowRightToLine, lineaDistribucion: ArrowRightToLine,
-};
-
-const CAJA = 92;
-const ALTO_CAJA = 78;
+// Radio del fondo circular sólido detrás de cada ícono: oculta el extremo de la tubería que llega bajo el
+// ícono (ver spec §9 — el usuario pidió quitar la caja/cubo isométrico y mostrar el ícono grande, directo
+// sobre el lienzo, con este círculo como único elemento de "carcasa").
+const RADIO_ICONO = 30;
+const LADO_ICONO = RADIO_ICONO * 1.7;
 
 interface Props {
   diagrama: DiagramaEquipo;
+  /** Presente = modo editor (permite renombrar nodos). Ausente = solo lectura (portal-client). */
   onEditarEtiqueta?: (nodoId: string, nuevaEtiqueta: string) => void;
+  /** Presente = modo editor (permite arrastrar el badge de sensores de una tubería, persistido en
+   * `offsetEtiqueta`). Ausente = solo lectura: se respeta la posición que dejó el admin, sin poder tocarla
+   * (ver gobierno de la función, spec §9 addendum). */
+  onCambiar?: (diagrama: DiagramaEquipo) => void;
 }
 
-export function MotorDiagrama({ diagrama, onEditarEtiqueta }: Props) {
+export function MotorDiagrama({ diagrama, onEditarEtiqueta, onCambiar }: Props) {
+  const { t } = useTranslation();
   const porId = new Map(diagrama.nodos.map((n) => [n.id, n]));
+  const svgRef = useRef<SVGSVGElement>(null);
+
+  function moverEtiquetaConexion(conexionId: string, offsetEtiqueta: { dx: number; dy: number }) {
+    if (!onCambiar) return;
+    onCambiar({
+      ...diagrama,
+      conexiones: diagrama.conexiones.map((c) => (c.id === conexionId ? { ...c, offsetEtiqueta } : c)),
+    });
+  }
 
   return (
-    <LienzoZoomable viewBoxBase={diagrama.viewBox}>
-      {(viewBoxActual) => (
-        <svg viewBox={viewBoxActual} className="motor-diagrama">
-          <g aria-hidden>
-            {diagrama.conexiones.map((c) => {
-              const a = porId.get(c.desde);
-              const b = porId.get(c.hasta);
-              if (!a || !b) return null;
-              const puntos = [{ x: a.x, y: a.y }, ...c.ruta, { x: b.x, y: b.y }];
-              const medio = medioDeTuberia(puntos);
-              return (
-                <g key={c.id}>
-                  <TuberiaIso puntos={puntos} />
-                  {c.sensores.length > 0 && (
-                    <foreignObject x={medio.x - 30} y={medio.y - 14} width={60} height={28}>
-                      <div className="mimico-sensor-tuberia">
-                        {c.sensores.map((s, i) => (
-                          <span key={i}>{s.variable ?? s.tipo}</span>
-                        ))}
-                      </div>
-                    </foreignObject>
-                  )}
-                </g>
-              );
-            })}
-          </g>
+    <div className="motor-diagrama__contenedor">
+      <LienzoZoomable viewBoxBase={diagrama.viewBox}>
+        {(viewBoxActual) => (
+          <svg ref={svgRef} viewBox={viewBoxActual} className="motor-diagrama">
+            <g aria-hidden>
+              {diagrama.conexiones.map((c) => {
+                const a = porId.get(c.desde);
+                const b = porId.get(c.hasta);
+                if (!a || !b) return null;
+                const puntos: Punto[] = [{ x: a.x, y: a.y }, ...c.ruta, { x: b.x, y: b.y }];
+                const medio = medioDeTuberia(puntos);
+                return (
+                  <g key={c.id}>
+                    <TuberiaIso puntos={puntos} tipo={c.tipo} />
+                    {c.sensores.length > 0 && (
+                      <EtiquetaTuberia
+                        conexion={c}
+                        medio={medio}
+                        svgRef={svgRef}
+                        editable={Boolean(onCambiar)}
+                        onMover={(offset) => moverEtiquetaConexion(c.id, offset)}
+                      />
+                    )}
+                  </g>
+                );
+              })}
+            </g>
 
-          {diagrama.nodos.map((n) => (
-            <foreignObject key={n.id} x={n.x - CAJA / 2} y={n.y - ALTO_CAJA / 2} width={CAJA} height={ALTO_CAJA}>
-              <NodoIsla nodo={n} Icono={ICONO_ISO[n.tipo]} onEditarEtiqueta={onEditarEtiqueta} />
-            </foreignObject>
-          ))}
-        </svg>
-      )}
-    </LienzoZoomable>
+            {diagrama.nodos.map((n) => (
+              <NodoProceso key={n.id} nodo={n} onEditarEtiqueta={onEditarEtiqueta} />
+            ))}
+          </svg>
+        )}
+      </LienzoZoomable>
+      <div className="motor-diagrama__leyenda">
+        <span className="motor-diagrama__leyenda-item motor-diagrama__leyenda-item--alimentacion">
+          {t('diagramaEditor.leyenda.alimentacion')}
+        </span>
+        <span className="motor-diagrama__leyenda-item motor-diagrama__leyenda-item--permeado">
+          {t('diagramaEditor.leyenda.permeado')}
+        </span>
+        <span className="motor-diagrama__leyenda-item motor-diagrama__leyenda-item--rechazo">
+          {t('diagramaEditor.leyenda.rechazo')}
+        </span>
+      </div>
+    </div>
   );
 }
 
-function NodoIsla({
-  nodo, Icono, onEditarEtiqueta,
-}: { nodo: NodoDiagrama; Icono: LucideIcon; onEditarEtiqueta?: (id: string, etiqueta: string) => void }) {
+function NodoProceso({
+  nodo, onEditarEtiqueta,
+}: { nodo: NodoDiagrama; onEditarEtiqueta?: (id: string, etiqueta: string) => void }) {
   const { t } = useTranslation();
   const [editando, setEditando] = useState(false);
   const [valor, setValor] = useState(nodo.etiqueta);
+  const Icono = ICONO_PROCESO[nodo.tipo];
 
   function confirmar() {
     setEditando(false);
@@ -89,35 +107,122 @@ function NodoIsla({
   }
 
   return (
-    <div className={`mimico-nodo ${nodo.flotante ? 'mimico-nodo--flotante' : ''}`}>
-      <BloqueIsoGenerico Icono={Icono} flotante={nodo.flotante} />
-      {editando ? (
-        <input
-          className="mimico-nodo__etiqueta-input"
-          value={valor}
-          autoFocus
-          aria-label={t('diagramaEditor.editarEtiqueta')}
-          onChange={(e) => setValor(e.target.value)}
-          onBlur={confirmar}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') confirmar();
-            if (e.key === 'Escape') { setValor(nodo.etiqueta); setEditando(false); }
-          }}
-        />
-      ) : onEditarEtiqueta ? (
-        <button type="button" className="mimico-nodo__etiqueta mimico-nodo__etiqueta--editable" onClick={() => setEditando(true)}>
-          {nodo.etiqueta}
-        </button>
-      ) : (
-        <span className="mimico-nodo__etiqueta">{nodo.etiqueta}</span>
-      )}
-      {nodo.sensores.length > 0 && (
-        <span className="mimico-nodo__valores">
-          {nodo.sensores.map((s, i) => (
-            <span className="mimico-nodo__valor" key={i}>{s.variable ?? s.tipo}</span>
-          ))}
-        </span>
-      )}
-    </div>
+    <g className={`nodo-proceso ${nodo.flotante ? 'nodo-proceso--flotante' : ''}`}>
+      <circle cx={nodo.x} cy={nodo.y} r={RADIO_ICONO} className="nodo-proceso__fondo" />
+      <g transform={nodo.rotacion ? `rotate(${nodo.rotacion} ${nodo.x} ${nodo.y})` : undefined}>
+        <svg
+          x={nodo.x - LADO_ICONO / 2} y={nodo.y - LADO_ICONO / 2} width={LADO_ICONO} height={LADO_ICONO}
+          viewBox="0 0 48 48" className="nodo-proceso__icono" aria-hidden
+        >
+          <Icono />
+        </svg>
+      </g>
+      {/* Nombre y datos anclados en la MISMA posición diagonal (esquina inferior derecha del ícono) para
+          que nunca choquen con una tubería que llegue por otro lado (ver spec §9, Muestra2/3). */}
+      <foreignObject x={nodo.x + RADIO_ICONO * 0.6} y={nodo.y + RADIO_ICONO * 0.6} width={170} height={64}>
+        <div className="nodo-proceso__datos">
+          {editando ? (
+            <input
+              className="nodo-proceso__etiqueta-input"
+              value={valor}
+              autoFocus
+              aria-label={t('diagramaEditor.editarEtiqueta')}
+              onChange={(e) => setValor(e.target.value)}
+              onBlur={confirmar}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') confirmar();
+                if (e.key === 'Escape') { setValor(nodo.etiqueta); setEditando(false); }
+              }}
+            />
+          ) : onEditarEtiqueta ? (
+            <button type="button" className="nodo-proceso__etiqueta nodo-proceso__etiqueta--editable" onClick={() => setEditando(true)}>
+              {nodo.etiqueta}
+            </button>
+          ) : (
+            <span className="nodo-proceso__etiqueta">{nodo.etiqueta}</span>
+          )}
+          {nodo.sensores.length > 0 && (
+            <span className="nodo-proceso__valores">
+              {nodo.sensores.map((s, i) => (
+                <span className="nodo-proceso__valor" key={i}>{s.variable ?? s.tipo}</span>
+              ))}
+            </span>
+          )}
+        </div>
+      </foreignObject>
+    </g>
+  );
+}
+
+const OFFSET_DEFECTO = { dx: 0, dy: -22 };
+
+/** Badge de sensores de una tubería: tamaño real medido con `getBBox()` (nunca por cantidad de caracteres,
+ * ver spec §9 — evita que el fondo quede corto/largo respecto del texto real). Arrastrable SOLO cuando
+ * `editable` (modo editor de plant-app-vpn); el desplazamiento final se persiste en
+ * `ConexionDiagrama.offsetEtiqueta` vía `onMover`, que plant-portal-client y las vistas de solo lectura de
+ * plant-app-vpn simplemente leen y respetan (nunca lo escriben, ver gobierno de la función en el spec). */
+function EtiquetaTuberia({
+  conexion, medio, svgRef, editable, onMover,
+}: {
+  conexion: ConexionDiagrama;
+  medio: Punto;
+  svgRef: RefObject<SVGSVGElement | null>;
+  editable: boolean;
+  onMover: (offset: { dx: number; dy: number }) => void;
+}) {
+  const textoRef = useRef<SVGTextElement>(null);
+  const [caja, setCaja] = useState({ ancho: 0, alto: 0 });
+  const arrastreRef = useRef<{ x: number; y: number; inicial: { dx: number; dy: number } } | null>(null);
+  const [offsetArrastre, setOffsetArrastre] = useState<{ dx: number; dy: number } | null>(null);
+
+  const texto = conexion.sensores.map((s) => s.variable ?? s.tipo).join(' · ');
+
+  useLayoutEffect(() => {
+    if (!textoRef.current) return;
+    const bbox = textoRef.current.getBBox();
+    setCaja({ ancho: bbox.width + 16, alto: bbox.height + 10 });
+  }, [texto]);
+
+  const offset = offsetArrastre ?? conexion.offsetEtiqueta ?? OFFSET_DEFECTO;
+  const x = medio.x + offset.dx;
+  const y = medio.y + offset.dy;
+
+  function onPointerDown(e: PointerEvent<SVGGElement>) {
+    if (!editable) return;
+    e.stopPropagation();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    arrastreRef.current = { x: e.clientX, y: e.clientY, inicial: offset };
+  }
+
+  function onPointerMove(e: PointerEvent<SVGGElement>) {
+    if (!arrastreRef.current || !svgRef.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const vb = svgRef.current.viewBox.baseVal;
+    const deltaX = pixelesAUnidadesViewBox(e.clientX - arrastreRef.current.x, vb.width, rect.width);
+    const deltaY = pixelesAUnidadesViewBox(e.clientY - arrastreRef.current.y, vb.height, rect.height);
+    setOffsetArrastre({ dx: arrastreRef.current.inicial.dx + deltaX, dy: arrastreRef.current.inicial.dy + deltaY });
+  }
+
+  function onPointerUp() {
+    if (!arrastreRef.current) return;
+    arrastreRef.current = null;
+    if (offsetArrastre) onMover(offsetArrastre);
+    setOffsetArrastre(null);
+  }
+
+  return (
+    <g
+      transform={`translate(${x} ${y})`}
+      className={`etiqueta-tuberia ${editable ? 'etiqueta-tuberia--arrastrable' : ''}`}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerLeave={onPointerUp}
+    >
+      <rect x={-caja.ancho / 2} y={-caja.alto / 2} width={caja.ancho} height={caja.alto} rx={6} className="etiqueta-tuberia__fondo" />
+      <text ref={textoRef} textAnchor="middle" dominantBaseline="central" className="etiqueta-tuberia__texto">
+        {texto}
+      </text>
+    </g>
   );
 }

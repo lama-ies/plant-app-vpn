@@ -1,8 +1,8 @@
 // Ensamblador puro: toma la secuencia de segmentos elegidos por el Administrador y produce el
-// DiagramaEquipo final (nodos+conexiones con ids/posiciones absolutas, ya proyectadas a isométrico). Ver
-// plant-arquitectura/docs/superpowers/specs/2026-07-30-diagrama-isometrico-design.md.
+// DiagramaEquipo final (nodos+conexiones con ids/posiciones absolutas, ya proyectadas). Ver
+// plant-arquitectura/docs/superpowers/specs/2026-07-30-diagrama-isometrico-design.md (§9: pivote a 2.5D).
 import { gridAPantalla, type PuntoPantalla } from './proyeccionIso';
-import type { ConexionDiagrama, DiagramaEquipo, NodoDiagrama, SegmentoDiagrama } from './tipos';
+import type { ConexionDiagrama, DiagramaEquipo, NodoDiagrama, SegmentoDiagrama, TipoFlujo } from './tipos';
 
 /** Un segmento elegido por el Administrador, con cuántas copias si es repetible (1 si no aplica). */
 export interface SegmentoElegido {
@@ -23,6 +23,15 @@ interface PosicionGrid {
   elevacion: number;
 }
 
+interface ConexionCruda {
+  id: string;
+  desde: string;
+  hasta: string;
+  etiqueta?: string;
+  tipo: TipoFlujo;
+  ordenRuta?: 'col-fila' | 'fila-col';
+}
+
 /** Expande cada SegmentoElegido a sus copias individuales (1 copia si no es repetible). */
 function expandirCopias(secuencia: SegmentoElegido[]): InstanciaSegmento[] {
   const instancias: InstanciaSegmento[] = [];
@@ -33,13 +42,19 @@ function expandirCopias(secuencia: SegmentoElegido[]): InstanciaSegmento[] {
   return instancias;
 }
 
-/** Descompone el desplazamiento entre dos posiciones de rejilla en los waypoints intermedios necesarios
- * para que cada tramo dibujado sea un único eje isométrico válido (primero col, después fila; el cambio de
- * elevación, si lo hay, siempre termina exactamente en `hasta`, sin waypoint propio). */
-function calcularRuta(desde: PosicionGrid, hasta: PosicionGrid): PuntoPantalla[] {
+/** Descompone el desplazamiento entre dos posiciones de rejilla en el waypoint intermedio necesario para
+ * que cada tramo dibujado sea un único eje ortogonal válido. `orden` decide qué eje se resuelve primero:
+ * `'col-fila'` (default) dobla primero al col de destino y después a su fila; `'fila-col'` dobla primero a
+ * la fila de destino y después a su col — usado cuando dos tuberías distintas convergerían en el mismo
+ * tramo si ambas usaran el orden por defecto (ver spec §9, fix real del núcleo N3). El cambio de elevación,
+ * si lo hay, siempre termina exactamente en `hasta`, sin waypoint propio. */
+function calcularRuta(desde: PosicionGrid, hasta: PosicionGrid, orden: 'col-fila' | 'fila-col' = 'col-fila'): PuntoPantalla[] {
+  const intermedio: PosicionGrid = orden === 'fila-col'
+    ? { col: desde.col, fila: hasta.fila, elevacion: desde.elevacion }
+    : { col: hasta.col, fila: desde.fila, elevacion: desde.elevacion };
   const puntosGrid: PosicionGrid[] = [
     desde,
-    { col: hasta.col, fila: desde.fila, elevacion: desde.elevacion },
+    intermedio,
     { col: hasta.col, fila: hasta.fila, elevacion: desde.elevacion },
     hasta,
   ];
@@ -55,7 +70,7 @@ function calcularRuta(desde: PosicionGrid, hasta: PosicionGrid): PuntoPantalla[]
 /** Ensambla la secuencia completa en un DiagramaEquipo con posiciones/ids absolutos, ya proyectados. */
 export function ensamblar(secuencia: SegmentoElegido[], numDosificadoras = 0): DiagramaEquipo {
   const nodos: NodoDiagrama[] = [];
-  const conexionesCrudas: { id: string; desde: string; hasta: string; etiqueta?: string }[] = [];
+  const conexionesCrudas: ConexionCruda[] = [];
   const posiciones = new Map<string, PosicionGrid>();
   let colOffset = 0;
   let salidasPendientes: string[] = [];
@@ -75,7 +90,7 @@ export function ensamblar(secuencia: SegmentoElegido[], numDosificadoras = 0): D
     }
 
     // Copias de un mismo grupo repetible se apilan en ELEVACIÓN (nunca en fila — fila es para ramas
-    // reales del proceso, ver spec §3.1), así que comparten col/fila y por lo tanto el mismo x en pantalla.
+    // reales del proceso), así que comparten col/fila y por lo tanto el mismo x en pantalla.
     const elevacionExtra = total > 1 ? indice - (total - 1) / 2 : 0;
 
     const idPorLocal = new Map<string, string>();
@@ -89,7 +104,10 @@ export function ensamblar(secuencia: SegmentoElegido[], numDosificadoras = 0): D
       };
       posiciones.set(idGlobal, pos);
       const { x, y } = gridAPantalla(pos.col, pos.fila, pos.elevacion);
-      nodos.push({ id: idGlobal, tipo: n.tipo, etiqueta: n.etiqueta, x, y, sensores: [], flotante: n.flotante });
+      nodos.push({
+        id: idGlobal, tipo: n.tipo, etiqueta: n.etiqueta, x, y, sensores: [],
+        flotante: n.flotante, rotacion: n.rotacion,
+      });
     }
     for (const c of segmento.conexiones) {
       conexionesCrudas.push({
@@ -97,15 +115,21 @@ export function ensamblar(secuencia: SegmentoElegido[], numDosificadoras = 0): D
         desde: idPorLocal.get(c.desde)!,
         hasta: idPorLocal.get(c.hasta)!,
         etiqueta: c.etiqueta,
+        tipo: c.tipo,
+        ordenRuta: c.ordenRuta,
       });
     }
 
     // Empalme: conecta CADA salida pendiente de la secuencia anterior con la entrada de este segmento
-    // (fan-in si hubo varias copias antes, ej. varios pozos).
+    // (fan-in si hubo varias copias antes, ej. varios pozos). El tipo de flujo de este tramo sintético lo
+    // declara el segmento RECEPTOR vía `tipoEntrada` (default 'alimentacion').
     if (segmento.entradaIdLocal !== null) {
       const entradaGlobal = idPorLocal.get(segmento.entradaIdLocal)!;
       for (const salidaPrevia of salidasPendientes) {
-        conexionesCrudas.push({ id: `c${contadorConexion++}`, desde: salidaPrevia, hasta: entradaGlobal });
+        conexionesCrudas.push({
+          id: `c${contadorConexion++}`, desde: salidaPrevia, hasta: entradaGlobal,
+          tipo: segmento.tipoEntrada ?? 'alimentacion',
+        });
       }
     }
 
@@ -148,7 +172,8 @@ export function ensamblar(secuencia: SegmentoElegido[], numDosificadoras = 0): D
     hasta: c.hasta,
     etiqueta: c.etiqueta,
     sensores: [],
-    ruta: calcularRuta(posiciones.get(c.desde)!, posiciones.get(c.hasta)!),
+    tipo: c.tipo,
+    ruta: calcularRuta(posiciones.get(c.desde)!, posiciones.get(c.hasta)!, c.ordenRuta),
   }));
 
   const minX = nodos.length ? Math.min(...nodos.map((n) => n.x)) - 100 : 0;

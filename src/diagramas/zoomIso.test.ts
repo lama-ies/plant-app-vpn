@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { parsearViewBox, formatearViewBox, zoomCentradoEn, desplazar, pixelesAUnidadesViewBox } from './zoomIso';
+import { parsearViewBox, formatearViewBox, zoomCentradoEn, desplazar, pixelesAUnidadesViewBox, limitar } from './zoomIso';
 
 test('parsearViewBox / formatearViewBox son inversas', () => {
   const caja = parsearViewBox('10 20 300 150');
@@ -37,4 +37,26 @@ test('pixelesAUnidadesViewBox convierte proporcionalmente al tamaño renderizado
 
 test('pixelesAUnidadesViewBox con ancho de elemento 0 devuelve 0 (evita división por cero)', () => {
   assert.equal(pixelesAUnidadesViewBox(10, 200, 0), 0);
+});
+
+const CONTENIDO = { minX: 0, minY: 0, ancho: 1000, alto: 500 };
+
+test('limitar: acercado (viewport < contenido), arrastrado hacia la derecha, topa con el borde izquierdo del contenido', () => {
+  const vista = { minX: -50, minY: 100, ancho: 200, alto: 100 };
+  assert.deepEqual(limitar(vista, CONTENIDO), { minX: 0, minY: 100, ancho: 200, alto: 100 });
+});
+
+test('limitar: acercado, arrastrado hacia la izquierda, topa con el borde derecho del contenido', () => {
+  const vista = { minX: 900, minY: 100, ancho: 200, alto: 100 };
+  assert.deepEqual(limitar(vista, CONTENIDO), { minX: 800, minY: 100, ancho: 200, alto: 100 });
+});
+
+test('limitar: acercado dentro de los límites no cambia nada', () => {
+  const vista = { minX: 300, minY: 100, ancho: 200, alto: 100 };
+  assert.deepEqual(limitar(vista, CONTENIDO), vista);
+});
+
+test('limitar: alejado más allá del contenido (viewport > contenido) centra el contenido en la vista', () => {
+  const vista = { minX: 123, minY: 456, ancho: 1400, alto: 900 };
+  assert.deepEqual(limitar(vista, CONTENIDO), { minX: -200, minY: -200, ancho: 1400, alto: 900 });
 });

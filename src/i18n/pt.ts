@@ -312,6 +312,7 @@ export const pt = {
       sensorNinguno: 'Não vinculado',
       zoom: { acercar: 'Aproximar', alejar: 'Afastar', centrar: 'Centralizar' },
       editarEtiqueta: 'Editar nome',
+      leyenda: { alimentacion: 'Alimentação', permeado: 'Permeado', rechazo: 'Rejeito' },
       sensor: {
         flujo: 'Vazão', presion: 'Pressão', conductividad: 'Condutividade', tds: 'TDS', orp: 'ORP',
         ph: 'PH', cloro: 'Cloro', temperatura: 'Temperatura', flujoOnOff: 'Vazão On/Off',

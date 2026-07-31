@@ -43,6 +43,28 @@ test('N3 PX: la rama de Bomba Alta Presión y la rama de Recuperador PX están e
   assert.equal(porId.get('bombaAltaPresion')!.col, porId.get('recuperadorPX')!.col);
 });
 
+test('N1/N2/N3: el Drenaje principal llega con tubería vertical, su flecha se rota 90° hacia abajo', () => {
+  for (const seg of [SEGMENTO_N1, SEGMENTO_N2, SEGMENTO_N3]) {
+    const drenaje = seg.nodos.find((n) => n.idLocal === 'drenaje')!;
+    assert.equal(drenaje.rotacion, 90, `${seg.id}: drenaje debe tener rotacion 90`);
+  }
+});
+
+test('N3: la válvula de venteo tiene su propia descarga (drenaje2), separada del drenaje del Recuperador PX', () => {
+  const ids = SEGMENTO_N3.nodos.map((n) => n.idLocal);
+  assert.ok(ids.includes('valvulaVenteo'));
+  assert.ok(ids.includes('drenaje2'));
+  assert.ok(SEGMENTO_N3.conexiones.some((c) => c.desde === 'valvulaVenteo' && c.hasta === 'drenaje2' && c.tipo === 'rechazo'));
+  // drenaje2 no es alcanzado por ninguna otra conexión (no comparte descarga con recuperadorPX->drenaje).
+  assert.ok(!SEGMENTO_N3.conexiones.some((c) => c.hasta === 'drenaje2' && c.desde !== 'valvulaVenteo'));
+});
+
+test('N3: las ramas de alimentación desde Filtro Canasta usan ordenRuta "fila-col" (dejan libre la columna del Rechazo)', () => {
+  const ramas = SEGMENTO_N3.conexiones.filter((c) => c.desde === 'filtroCanasta');
+  assert.ok(ramas.length > 0);
+  assert.ok(ramas.every((c) => c.ordenRuta === 'fila-col'));
+});
+
 test('todo idLocal referenciado en conexiones existe en la lista de nodos (invariante)', () => {
   for (const seg of [SEGMENTO_N1, SEGMENTO_N2, SEGMENTO_N3]) {
     const ids = new Set(seg.nodos.map((n) => n.idLocal));

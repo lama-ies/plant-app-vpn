@@ -1,49 +1,145 @@
+/* Motor de render del diagrama mimético (2.5D) — ver spec 2026-07-30-diagrama-isometrico-design.md §9.
+   Paleta de tuberías por tipo de agua: alimentacion=verde, permeado=celeste, rechazo=rojo (nunca se
+   confunden a simple vista, ni siquiera donde dos tramos se cruzan en 90°). */
+:root {
+  --color-tuberia-alimentacion: #22c55e;
+  --color-tuberia-permeado: #38bdf8;
+  --color-tuberia-rechazo: #ef4444;
+}
+
+.motor-diagrama__contenedor {
+  position: relative;
+}
 .motor-diagrama {
   width: 100%;
   height: auto;
-  max-height: 420px;
+  max-height: 480px;
 }
-.motor-diagrama__tuberia {
+
+/* --- Nodo de proceso: ícono bespoke + fondo circular (oculta el extremo de tubería bajo el ícono) ---- */
+.nodo-proceso__fondo {
+  fill: var(--color-superficie, #1e293b);
   stroke: var(--color-borde, #94a3b8);
-  stroke-width: 2;
+  stroke-width: 1.5;
 }
-.mimico-nodo {
+.nodo-proceso--flotante .nodo-proceso__fondo {
+  opacity: 0.85;
+  stroke-dasharray: 3 2;
+}
+.nodo-proceso__icono {
+  color: #e2e8f0;
+  overflow: visible;
+}
+.nodo-proceso__datos {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 2px;
   font-size: 11px;
-  text-align: center;
+  line-height: 1.3;
 }
-.mimico-nodo--flotante {
-  opacity: 0.85;
-}
-.mimico-nodo__icono {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--icono-box);
-  height: var(--icono-box);
-  border-radius: 8px;
-  background: var(--color-superficie, #1e293b);
-}
-.mimico-nodo__etiqueta {
+.nodo-proceso__etiqueta {
   font-weight: 600;
+  color: #e2e8f0;
 }
-.mimico-nodo__valores {
+.nodo-proceso__etiqueta--editable {
+  background: none;
+  border: none;
+  font-weight: 600;
+  cursor: text;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+  text-decoration: underline dotted;
+}
+.nodo-proceso__etiqueta-input {
+  font-weight: 600;
+  font-size: 11px;
+  width: 100%;
+  background: var(--color-superficie, #1e293b);
+  border: 1px solid var(--color-borde, #94a3b8);
+  border-radius: 4px;
+  color: inherit;
+}
+.nodo-proceso__valores {
   display: flex;
   flex-direction: column;
   gap: 1px;
+  color: #94a3b8;
 }
-.mimico-sensor-tuberia {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.nodo-proceso__valor {
+  white-space: nowrap;
+}
+
+/* --- Tubería: tramos + codos coloreados por tipo de flujo + flechas de sentido ----------------------- */
+.tuberia-iso__tramo,
+.tuberia-iso__codo {
+  fill: currentColor;
+}
+.tuberia-iso__flecha {
+  fill: var(--color-superficie, #1e293b);
+}
+.tuberia-iso--alimentacion {
+  color: var(--color-tuberia-alimentacion);
+}
+.tuberia-iso--permeado {
+  color: var(--color-tuberia-permeado);
+}
+.tuberia-iso--rechazo {
+  color: var(--color-tuberia-rechazo);
+}
+
+/* --- Badge de sensores sobre una tubería: tamaño medido por getBBox(), arrastrable solo en editor ---- */
+.etiqueta-tuberia__fondo {
+  fill: var(--color-superficie, #1e293b);
+  stroke: var(--color-borde, #94a3b8);
+  stroke-width: 1;
+}
+.etiqueta-tuberia__texto {
   font-size: 9px;
-  background: var(--color-superficie, #1e293b);
-  border-radius: 4px;
-  padding: 1px 4px;
+  fill: #e2e8f0;
 }
+.etiqueta-tuberia--arrastrable {
+  cursor: grab;
+}
+.etiqueta-tuberia--arrastrable:active {
+  cursor: grabbing;
+}
+
+/* --- Leyenda de colores de tubería ---------------------------------------------------------------- */
+.motor-diagrama__leyenda {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+.motor-diagrama__leyenda-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.motor-diagrama__leyenda-item::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+.motor-diagrama__leyenda-item--alimentacion::before {
+  background: var(--color-tuberia-alimentacion);
+}
+.motor-diagrama__leyenda-item--permeado::before {
+  background: var(--color-tuberia-permeado);
+}
+.motor-diagrama__leyenda-item--rechazo::before {
+  background: var(--color-tuberia-rechazo);
+}
+
+/* --- Lienzo con zoom/pan: controles flotantes -------------------------------------------------------- */
 .lienzo-zoomable {
   position: relative;
   overflow: hidden;
@@ -72,45 +168,4 @@
   background: var(--color-superficie, #1e293b);
   color: inherit;
   cursor: pointer;
-}
-.tuberia-iso__tramo {
-  fill: #33475a;
-}
-.tuberia-iso__codo {
-  fill: #263544;
-}
-.bloque-iso__cara-superior {
-  fill: #3a5068;
-}
-.bloque-iso__cara-izquierda {
-  fill: #141d29;
-}
-.bloque-iso__cara-derecha {
-  fill: var(--color-superficie, #1e293b);
-}
-.bloque-iso--flotante {
-  opacity: 0.85;
-}
-.bloque-iso__icono {
-  color: #e2e8f0;
-}
-.mimico-nodo__etiqueta--editable {
-  background: none;
-  border: none;
-  font-weight: 600;
-  cursor: text;
-  padding: 0;
-  color: inherit;
-  font-size: inherit;
-  text-decoration: underline dotted;
-}
-.mimico-nodo__etiqueta-input {
-  font-weight: 600;
-  font-size: 11px;
-  text-align: center;
-  width: 100%;
-  background: var(--color-superficie, #1e293b);
-  border: 1px solid var(--color-borde, #94a3b8);
-  border-radius: 4px;
-  color: inherit;
 }

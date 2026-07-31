@@ -5,7 +5,7 @@ import { useRef, useState, type ReactElement, type WheelEvent, type PointerEvent
 import { useTranslation } from 'react-i18next';
 import { Plus, Minus, Scan } from 'lucide-react';
 import {
-  parsearViewBox, formatearViewBox, zoomCentradoEn, desplazar, pixelesAUnidadesViewBox, type CajaVista,
+  parsearViewBox, formatearViewBox, zoomCentradoEn, desplazar, pixelesAUnidadesViewBox, limitar, type CajaVista,
 } from '../diagramas/zoomIso';
 
 const FACTOR_BOTON = 1.2;
@@ -22,17 +22,22 @@ export function LienzoZoomable({ viewBoxBase, children }: Props) {
   const arrastre = useRef<{ x: number; y: number } | null>(null);
   const contenedorRef = useRef<HTMLDivElement>(null);
 
+  // Caja de CONTENIDO real del diagrama (nunca cambia salvo que cambie viewBoxBase): la vista jamás puede
+  // salir de sus límites al acercar, y se centra dentro de ella al alejar más allá de su tamaño real (ver
+  // spec §9, algoritmo de "contención" — zoomIso.ts `limitar`).
+  const contenido = parsearViewBox(viewBoxBase);
+
   function centro(c: CajaVista) {
     return { x: c.minX + c.ancho / 2, y: c.minY + c.alto / 2 };
   }
 
   function zoomBoton(factor: number) {
     const { x, y } = centro(caja);
-    setCaja((actual) => zoomCentradoEn(actual, factor, x, y));
+    setCaja((actual) => limitar(zoomCentradoEn(actual, factor, x, y), contenido));
   }
 
   function centrar() {
-    setCaja(parsearViewBox(viewBoxBase));
+    setCaja(contenido);
   }
 
   function onWheel(e: WheelEvent<HTMLDivElement>) {
@@ -41,7 +46,7 @@ export function LienzoZoomable({ viewBoxBase, children }: Props) {
     const puntoX = caja.minX + ((e.clientX - rect.left) / rect.width) * caja.ancho;
     const puntoY = caja.minY + ((e.clientY - rect.top) / rect.height) * caja.alto;
     const factor = FACTOR_RUEDA ** -e.deltaY;
-    setCaja((actual) => zoomCentradoEn(actual, factor, puntoX, puntoY));
+    setCaja((actual) => limitar(zoomCentradoEn(actual, factor, puntoX, puntoY), contenido));
   }
 
   function onPointerDown(e: PointerEvent<HTMLDivElement>) {
@@ -56,7 +61,7 @@ export function LienzoZoomable({ viewBoxBase, children }: Props) {
     arrastre.current = { x: e.clientX, y: e.clientY };
     const deltaX = pixelesAUnidadesViewBox(deltaXPx, caja.ancho, rect.width);
     const deltaY = pixelesAUnidadesViewBox(deltaYPx, caja.alto, rect.height);
-    setCaja((actual) => desplazar(actual, deltaX, deltaY));
+    setCaja((actual) => limitar(desplazar(actual, deltaX, deltaY), contenido));
   }
 
   function onPointerUp() {

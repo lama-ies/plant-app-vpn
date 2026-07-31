@@ -42,6 +42,30 @@ export function poligonosDeRuta(puntos: Punto[], ancho: number): { tramos: Punto
   return { tramos, codos };
 }
 
+/** Una flecha de dirección de flujo: centrada en el punto medio de un tramo recto, orientada (en grados,
+ * para `transform="rotate(...)"`) según el sentido real `desde -> hasta` de ese tramo. */
+export interface FlechaFlujo {
+  x: number;
+  y: number;
+  anguloGrados: number;
+}
+
+/** Una flecha por cada tramo recto de la ruta (nunca en los codos, donde no hay una dirección única) — así
+ * el sentido del agua se ve en cada segmento visible, no solo una vez en toda la tubería (ver spec §9). */
+export function flechasDeRuta(puntos: Punto[]): FlechaFlujo[] {
+  const flechas: FlechaFlujo[] = [];
+  for (let i = 0; i < puntos.length - 1; i++) {
+    const a = puntos[i];
+    const b = puntos[i + 1];
+    flechas.push({
+      x: (a.x + b.x) / 2,
+      y: (a.y + b.y) / 2,
+      anguloGrados: (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI,
+    });
+  }
+  return flechas;
+}
+
 /** Punto medio de la ruta completa, ponderado por longitud de cada tramo (para posicionar el badge de
  * sensores a medio camino real, no al punto medio recto entre extremos). */
 export function puntoMedioDeRuta(puntos: Punto[]): Punto {

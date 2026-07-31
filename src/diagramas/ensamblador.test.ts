@@ -103,9 +103,9 @@ test('humo: Ósmosis A1(3 pozos) + N3(PX) + C2 + UV + cisterna final ensambla si
     { segmento: SEGMENTO_UV },
     { segmento: SEGMENTO_CISTERNA_FINAL },
   ]);
-  // 3 copias de A1 (3 nodos c/u = 9) + N3 (7 nodos, sin filtroMultimedia) + C2 (4 nodos) + UV (1) +
-  // cisterna final (1) = 22.
-  assert.equal(resultado.nodos.length, 22);
+  // 3 copias de A1 (3 nodos c/u = 9) + N3 (9 nodos, sin filtroMultimedia; incluye válvula de venteo +
+  // drenaje2, ver spec §9) + C2 (4 nodos) + UV (1) + cisterna final (1) = 24.
+  assert.equal(resultado.nodos.length, 24);
   const ids = resultado.nodos.map((n) => n.id);
   assert.equal(new Set(ids).size, ids.length);
 });
@@ -120,6 +120,19 @@ test('N3: valvulaActuadora->filtroCanasta (misma fila) no necesita waypoints', (
   const resultado = ensamblar([{ segmento: SEGMENTO_N3 }]);
   const con = resultado.conexiones.find((c) => c.desde.includes('#valvulaActuadora') && c.hasta.includes('#filtroCanasta'))!;
   assert.equal(con.ruta.length, 0);
+});
+
+test('N3: válvula de venteo tiene su propio drenaje2, independiente del drenaje del Recuperador PX', () => {
+  const resultado = ensamblar([{ segmento: SEGMENTO_N3 }]);
+  const drenaje = resultado.nodos.find((n) => n.id.includes('#drenaje'))!;
+  const valvulaVenteo = resultado.nodos.find((n) => n.id.includes('#valvulaVenteo'))!;
+  const drenaje2 = resultado.nodos.find((n) => n.id.includes('#drenaje2'))!;
+  assert.equal(drenaje.rotacion, 90); // la tubería que llega es vertical, la flecha apunta hacia abajo
+  assert.ok(valvulaVenteo);
+  assert.ok(drenaje2);
+  assert.ok(resultado.conexiones.some((c) => c.desde === valvulaVenteo.id && c.hasta === drenaje2.id && c.tipo === 'rechazo'));
+  // El drenaje2 no recibe tubería alguna del Recuperador PX (son dos descargas físicas distintas).
+  assert.ok(!resultado.conexiones.some((c) => c.hasta === drenaje2.id && c.desde !== valvulaVenteo.id));
 });
 
 test('dosificadoras: se insertan como nodos flotantes cerca del ancla del núcleo, sin conexiones', () => {
