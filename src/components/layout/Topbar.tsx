@@ -1,7 +1,7 @@
 // Barra superior de navegación. Nav declarada como data-array + filtrada por permisos (rol Staff). A la
 // derecha: idioma, correo+rol del usuario y cerrar sesión. Ver plant-arquitectura/07-app-vpn.md.
 import type { ReactNode } from 'react';
-import { ClipboardList, Factory, FileCog, Filter, LayoutDashboard, LayoutTemplate, LogOut, MapPin, ShieldAlert, UserPlus, Users } from 'lucide-react';
+import { ClipboardList, Factory, FileCog, Filter, LayoutDashboard, LayoutTemplate, LogOut, MapPin, ShieldAlert, UserCog, UserPlus, Users } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../auth/contexto';
@@ -26,6 +26,7 @@ const ITEMS: ItemNav[] = [
   { clave: 'altaEquipo', a: '/alta-equipo', etiqueta: 'nav.altaEquipo', icono: <Factory size={16} aria-hidden />, perm: 'canAltaEquipo' },
   { clave: 'gestionZonas', a: '/gestion-zonas', etiqueta: 'nav.gestionZonas', icono: <MapPin size={16} aria-hidden />, perm: 'canGestionZonas' },
   { clave: 'gestionGerentes', a: '/gestion-gerentes', etiqueta: 'nav.gestionGerentes', icono: <Users size={16} aria-hidden />, perm: 'canGestionZonas' },
+  { clave: 'gestionStaff', a: '/gestion-staff', etiqueta: 'nav.gestionStaff', icono: <UserCog size={16} aria-hidden />, perm: 'canGestionStaff' },
   { clave: 'gestionPlantillas', a: '/gestion-plantillas', etiqueta: 'nav.gestionPlantillas', icono: <LayoutTemplate size={16} aria-hidden />, perm: 'canGestionPlantillas' },
   { clave: 'auditoria', a: '/auditoria', etiqueta: 'nav.auditoria', icono: <ClipboardList size={16} aria-hidden />, perm: 'canAuditoria' },
   { clave: 'panelErrores', a: '/panel-errores', etiqueta: 'nav.panelErrores', icono: <ShieldAlert size={16} aria-hidden />, perm: 'canPanelErrores' },

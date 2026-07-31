@@ -14,6 +14,7 @@ import { AltaCliente } from './pages/AltaCliente';
 import { AltaEquipo } from './pages/AltaEquipo';
 import { GestionZonas } from './pages/GestionZonas';
 import { GestionGerentes } from './pages/GestionGerentes';
+import { GestionStaff } from './pages/GestionStaff';
 import { GestionPlantillas } from './pages/GestionPlantillas';
 import { AppShell } from './components/layout/AppShell';
 
@@ -37,6 +38,7 @@ export function App() {
         <Route path="/alta-equipo" element={<AltaEquipo />} />
         <Route path="/gestion-zonas" element={<GestionZonas />} />
         <Route path="/gestion-gerentes" element={<GestionGerentes />} />
+        <Route path="/gestion-staff" element={<GestionStaff />} />
         <Route path="/gestion-plantillas" element={<GestionPlantillas />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Route>

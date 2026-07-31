@@ -18,6 +18,17 @@ const CODIGOS_CONOCIDOS = new Set([
   'ZONA_OUT_OF_SCOPE',
   'USUARIO_NOT_FOUND',
   'VALIDATION_INVALID_EMAIL',
+  // Agregados 2026-07-31 (GestionStaff.tsx, auditoría pre-AWS): CRUD de personal interno + reenvío.
+  'USUARIO_ALREADY_EXISTS',
+  'USUARIO_ROLE_NOT_ALLOWED',
+  'USUARIO_INVALID_ROLE',
+  'USUARIO_SELF_ACTION_FORBIDDEN',
+  'USUARIO_LAST_ADMIN_PROTECTED',
+  'INVITE_ALREADY_ACTIVE',
+  'VALIDATION_MISSING_FIELDS',
+  'VALIDATION_INVALID_BODY',
+  'VALIDATION_NO_FIELDS_TO_UPDATE',
+  'RATE_LIMIT',
 ]);
 
 /** Devuelve el mensaje localizado para un error (ErrorApi u otro). */

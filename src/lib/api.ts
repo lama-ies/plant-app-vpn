@@ -121,14 +121,16 @@ export function consumirActivacionStaff(code: string, email: string) {
   });
 }
 
-// --- Gestión de personal Staff (Plant_StaffUsuarios) — GestionGerentes.tsx ------------------------------
+// --- Gestión de personal Staff (Plant_StaffUsuarios) — GestionStaff.tsx ---------------------------------
 
 export interface UsuarioStaffApi {
   email: string;
   nombre: string | null;
   rol: string;
   zonaIds: string[];
-  estado: 'inactive' | 'active';
+  // 'expired' (código vencido, marcado perezoso) y 'suspended' faltaban aquí — el backend sí los usa
+  // (Plant_StaffValidateActivation marca expired; Plant_StaffUsuarios PUT acepta suspended).
+  estado: 'inactive' | 'active' | 'expired' | 'suspended';
   creadoEn: string;
 }
 
@@ -156,6 +158,16 @@ export function actualizarStaff(datos: {
 
 export function eliminarStaff(email: string) {
   return peticion<{ eliminado: string }>('DELETE', '/staff/usuarios', { query: { email } });
+}
+
+/** Reenvía una invitación pendiente (estado inactive/expired): regenera el código y reenvía el correo.
+ * Ver plant-lambdas Plant_ResendStaffInvitation (auditoría pre-AWS 2026-07-31, hallazgo ALTO). */
+export function reenviarInvitacionStaff(email: string) {
+  return peticion<{ email: string; rol: string; expiresAt: string; correoEnviado: boolean; activationCode?: string }>(
+    'POST',
+    '/staff/usuarios/reenviar',
+    { cuerpo: { email } },
+  );
 }
 
 // --- PCs de sitio (Plant_PCs) — TarjetaEquipo.tsx (host-key/IP automáticos) y AltaCliente.tsx ------------

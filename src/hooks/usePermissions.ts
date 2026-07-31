@@ -24,6 +24,7 @@ export interface Permisos {
   canEditorPerfil: boolean;
   canGestionPlantillas: boolean;
   canGestionZonas: boolean;
+  canGestionStaff: boolean;
   canPanelErrores: boolean;
   // Auditoría: Gerente/Coordinador/Administrador (no Técnico).
   canAuditoria: boolean;
@@ -46,6 +47,7 @@ export function usePermissions(): Permisos {
       canEditorPerfil: esAdministrador,
       canGestionPlantillas: esAdministrador,
       canGestionZonas: esAdministrador,
+      canGestionStaff: esAdministrador,
       canPanelErrores: esAdministrador,
       canAuditoria: rol ? VE_AUDITORIA.has(rol) : false,
     };
