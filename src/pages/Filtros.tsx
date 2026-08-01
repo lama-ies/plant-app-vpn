@@ -126,7 +126,9 @@ export function Filtros() {
             <p className="vacio">{t('filtros.sinPcs')}</p>
           ) : (
             <div className="tarjetas-equipo">
-              {pcs?.map((pc) => <TarjetaEquipo key={pc.pcId} pc={pc} />)}
+              {pcs?.map((pc) => (
+                <TarjetaEquipo key={pc.pcId} pc={pc} onEliminada={() => void elegirFamilia(familiaSel)} />
+              ))}
             </div>
           )}
         </>

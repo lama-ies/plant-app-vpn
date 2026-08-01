@@ -207,6 +207,12 @@ export function guardarPc(datos: {
   return peticion<{ pc: PcApi }>('PUT', '/app-vpn/pcs', { cuerpo: datos });
 }
 
+/** Da de baja una sola PC (cierre de hallazgo de auditoría 2026-07-31: antes solo se podía borrar retirando
+ * la Familia completa). Rechaza con `PC_TIENE_EQUIPOS_ASIGNADOS` si algún equipo todavía la referencia. */
+export function eliminarPc(pcId: string) {
+  return peticion<{ eliminada: string }>('DELETE', '/app-vpn/pcs', { query: { pcId } });
+}
+
 // --- Equipos/plantas (Plant_Equipos) — AltaEquipo.tsx / GestionPlantillas.tsx, rol Administrador ---------
 
 export interface EquipoApi {
@@ -343,6 +349,40 @@ export function invitarMiembroFamilia(datos: { familiaId: string; email: string;
     '/usuarios/invitar',
     { cuerpo: datos },
   );
+}
+
+/** Usuario (Cliente o S&O) de `Plant_Usuarios`, tal como lo ve Staff a través de Plant_ListUsers. */
+export interface UsuarioFamiliaApi {
+  email: string;
+  nombre?: string;
+  familiaId: string;
+  familyType: 'cliente' | 'so';
+  rol: string;
+  zonaIds?: string[];
+  status: 'active' | 'inactive' | 'expired' | 'suspended';
+  invitedBy?: string;
+  createdAt?: string;
+}
+
+/** Lista los usuarios (activos + pendientes) de una familia. Staff Administrador ve cualquier familia
+ * completa (cierre de hallazgo de auditoría 2026-07-31: antes GestionGerentes.tsx invitaba a ciegas, sin
+ * forma de ver/reenviar/cancelar después una invitación perdida). */
+export function listarUsuariosFamilia(familiaId: string) {
+  return peticion<{ usuarios: UsuarioFamiliaApi[] }>('GET', '/usuarios', { query: { familiaId } });
+}
+
+/** Reenvía una invitación pendiente (inactive/expired) de un usuario de la familia. */
+export function reenviarInvitacionFamilia(familiaId: string, email: string) {
+  return peticion<{ email: string; rol: string; correoEnviado: boolean; activationCode?: string; link?: string }>(
+    'POST',
+    '/usuarios/invitar/reenviar',
+    { cuerpo: { familiaId, email } },
+  );
+}
+
+/** Elimina/cancela un usuario (incluida una invitación pendiente) de la familia. El dueño está protegido. */
+export function eliminarUsuarioFamilia(familiaId: string, email: string) {
+  return peticion<{ eliminado: string }>('DELETE', '/usuarios', { query: { familiaId, email } });
 }
 
 /** Crea la Familia Cliente (o S&O) + invita a su gerente/owner en un solo paso. */

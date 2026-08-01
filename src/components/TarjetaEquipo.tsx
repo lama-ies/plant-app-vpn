@@ -1,15 +1,21 @@
 // Tarjeta de un equipo/PC: establece o cierra la conexión VPN (automática, sin pedir ninguna llave — ver
 // vpn/conexion.ts) y, una vez conectado, abre la terminal SSH con la IP y la huella de host ya resueltas.
+//
+// "Dar de baja" (2026-07-31, cierre de hallazgo de auditoría): antes la única forma de retirar una PC era
+// borrar la Familia completa vía GestionZonas/Plant_DeleteFamiliaComplete — sin camino para un reemplazo
+// de hardware puntual. Solo Administrador (`canAltaEquipo`, mismo nivel que da de alta PCs/equipos);
+// `onEliminada` deja que el llamador (Filtros.tsx) refresque su lista.
 import { useState } from 'react';
-import { FolderUp, Terminal as IconoTerminal } from 'lucide-react';
+import { FolderUp, Terminal as IconoTerminal, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { conectarVpn, desconectarVpn, type ConexionEstablecida } from '../vpn/conexion';
 import { usePermissions } from '../hooks/usePermissions';
-import type { PcApi } from '../lib/api';
+import { eliminarPc, type PcApi } from '../lib/api';
+import { codigoAMensaje } from '../lib/mensajesError';
 import './tarjeta-equipo.css';
 
-export function TarjetaEquipo({ pc }: { pc: PcApi }) {
+export function TarjetaEquipo({ pc, onEliminada }: { pc: PcApi; onEliminada?: () => void }) {
   const { t } = useTranslation();
   const navegar = useNavigate();
   const permisos = usePermissions();
@@ -17,6 +23,21 @@ export function TarjetaEquipo({ pc }: { pc: PcApi }) {
   const [conexion, setConexion] = useState<ConexionEstablecida | null>(null);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dandoBaja, setDandoBaja] = useState(false);
+
+  async function darDeBaja() {
+    if (!window.confirm(t('tarjetaEquipo.confirmarBaja', { nombre: pc.nombre }))) return;
+    setError(null);
+    setDandoBaja(true);
+    try {
+      await eliminarPc(pc.pcId);
+      onEliminada?.();
+    } catch (e) {
+      setError(codigoAMensaje(t, e));
+    } finally {
+      setDandoBaja(false);
+    }
+  }
 
   async function conectar() {
     setError(null);
@@ -77,14 +98,27 @@ export function TarjetaEquipo({ pc }: { pc: PcApi }) {
 
       <div className="tarjeta-equipo__acciones">
         {!conexion ? (
-          <button
-            type="button"
-            className="boton-tenue"
-            onClick={() => void conectar()}
-            disabled={cargando || !pc.direccionVirtual}
-          >
-            {cargando ? t('tarjetaEquipo.conectando') : t('tarjetaEquipo.conectar')}
-          </button>
+          <>
+            <button
+              type="button"
+              className="boton-tenue"
+              onClick={() => void conectar()}
+              disabled={cargando || !pc.direccionVirtual}
+            >
+              {cargando ? t('tarjetaEquipo.conectando') : t('tarjetaEquipo.conectar')}
+            </button>
+            {permisos.canAltaEquipo && (
+              <button
+                type="button"
+                className="icono-boton icono-boton--peligro"
+                title={dandoBaja ? t('tarjetaEquipo.dandoBaja') : t('tarjetaEquipo.darDeBaja')}
+                disabled={dandoBaja}
+                onClick={() => void darDeBaja()}
+              >
+                <Trash2 size={15} aria-hidden />
+              </button>
+            )}
+          </>
         ) : (
           <>
             <button type="button" className="boton-tenue" onClick={() => void desconectar()} disabled={cargando}>

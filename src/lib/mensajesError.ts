@@ -18,6 +18,11 @@ const CODIGOS_CONOCIDOS = new Set([
   'ZONA_OUT_OF_SCOPE',
   'USUARIO_NOT_FOUND',
   'VALIDATION_INVALID_EMAIL',
+  // Agregados 2026-07-31 (GestionGerentes.tsx con lista/reenviar/cancelar, cierre de hallazgo de auditoría).
+  'USUARIO_OWNER_PROTECTED',
+  'USUARIO_WRONG_FAMILIA',
+  // Agregado 2026-07-31 (TarjetaEquipo.tsx, baja de una sola PC — cierre de hallazgo de auditoría).
+  'PC_TIENE_EQUIPOS_ASIGNADOS',
   // Agregados 2026-07-31 (GestionStaff.tsx, auditoría pre-AWS): CRUD de personal interno + reenvío.
   'USUARIO_ALREADY_EXISTS',
   'USUARIO_ROLE_NOT_ALLOWED',
