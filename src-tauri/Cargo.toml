@@ -1,6 +1,6 @@
 [package]
 name = "plant-app-vpn"
-version = "0.1.0"
+version = "0.1.1"
 description = "IES Monitor Plant - App VPN (nucleo Rust)"
 authors = ["IES Internacional"]
 license = "UNLICENSED"
@@ -14,10 +14,10 @@ name = "plant_app_vpn_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.0.0", features = [] }
+tauri-build = { version = "2.6", features = [] }
 
 [dependencies]
-tauri = { version = "2.0.0", features = [] }
+tauri = { version = "2.11", features = [] }
 # Diálogo nativo de abrir/guardar archivo (TransferenciaArchivos.tsx necesita una ruta LOCAL real, que un
 # <input type="file"> del navegador no expone).
 tauri-plugin-dialog = "2"

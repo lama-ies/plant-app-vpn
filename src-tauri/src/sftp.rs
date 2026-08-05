@@ -8,10 +8,13 @@
 //! Mismo pineo de huella de host que `ssh.rs` (ver su cabecera y el fix de seguridad ahí documentado): con
 //! huella esperada presente, la exige; sin ella (`llave_host_esperada: None`), `abrir_sftp` rechaza la
 //! conexión con un mensaje claro en vez de aceptar cualquier llave — nunca hay una rama "acepta lo que sea".
-//! NOTA DE VERIFICACIÓN: sin toolchain Rust, este archivo no se compiló en esta sesión.
+//! NOTA DE VERIFICACIÓN (2026-08-05, primera compilación real): mismo hallazgo que `ssh.rs` — en russh
+//! 0.45.0 no existe `HashAlg` ni `russh::keys::PublicKey` (es `russh::keys::key::PublicKey`, API vieja),
+//! `fingerprint()` no toma algoritmo y no incluye el prefijo `SHA256:`, y `authenticate_password()`
+//! devuelve `bool` directo (no una struct con `.success()`). Ver detalle en ssh.rs.
 
 use russh::client::Handler;
-use russh::keys::HashAlg;
+use russh::keys::key::PublicKey;
 use russh_sftp::client::SftpSession;
 use russh_sftp::protocol::OpenFlags;
 use serde::{Deserialize, Serialize};
@@ -28,9 +31,10 @@ struct ManejadorSsh {
 #[async_trait::async_trait]
 impl Handler for ManejadorSsh {
     type Error = russh::Error;
-    async fn check_server_key(&mut self, clave: &russh::keys::PublicKey) -> Result<bool, Self::Error> {
+    async fn check_server_key(&mut self, clave: &PublicKey) -> Result<bool, Self::Error> {
         match &self.llave_host_esperada {
-            Some(esperada) => Ok(&clave.fingerprint(HashAlg::Sha256).to_string() == esperada),
+            // fingerprint() no incluye el prefijo "SHA256:" en esta version -- se agrega antes de comparar.
+            Some(esperada) => Ok(&format!("SHA256:{}", clave.fingerprint()) == esperada),
             // Fix de seguridad: antes era `Ok(true)` (acepta cualquier llave sin verificar -> MITM).
             None => Ok(false),
         }
@@ -78,11 +82,12 @@ async fn abrir_sftp(params: &ParametrosSftp) -> Result<SftpSession, String> {
     let mut manejador = russh::client::connect_stream(config, flujo, manejador)
         .await
         .map_err(|e| format!("negociación SSH falló: {e}"))?;
+    // authenticate_password() devuelve Result<bool, Error> en esta version (no una struct con .success()).
     let autenticado = manejador
         .authenticate_password(&params.usuario, &params.contrasena)
         .await
         .map_err(|e| format!("fallo de autenticación: {e}"))?;
-    if !autenticado.success() {
+    if !autenticado {
         return Err("usuario o contraseña incorrectos".into());
     }
     let canal = manejador
