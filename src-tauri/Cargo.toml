@@ -17,7 +17,11 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2.6", features = [] }
 
 [dependencies]
-tauri = { version = "2.11", features = [] }
+# "devtools": habilita el inspector (clic derecho > Inspeccionar / Ctrl+Shift+I) también en release —
+# por defecto Tauri lo apaga fuera de dev, pero esta app es de uso interno de IES (staff), no se firma ni
+# se distribuye a terceros, y el inspector es la única forma de ver el error real de red/CSP en un binario
+# ya empaquetado (ver recap.md 2026-08-06: "Failed to fetch" sin más detalle sin esto).
+tauri = { version = "2.11", features = ["devtools"] }
 # Diálogo nativo de abrir/guardar archivo (TransferenciaArchivos.tsx necesita una ruta LOCAL real, que un
 # <input type="file"> del navegador no expone).
 tauri-plugin-dialog = "2"

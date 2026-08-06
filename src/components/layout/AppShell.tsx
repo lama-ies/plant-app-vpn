@@ -3,6 +3,7 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../auth/contexto';
+import { GotaCargando } from '../GotaCargando';
 import { Topbar } from './Topbar';
 import './appshell.css';
 
@@ -11,7 +12,13 @@ export function AppShell() {
   const { t } = useTranslation();
 
   // Mientras se resuelve la sesión inicial, evitar parpadeo/redirección temprana.
-  if (cargando) return <div className="cargando-pantalla">{t('app.cargando')}</div>;
+  if (cargando) {
+    return (
+      <div className="cargando-pantalla">
+        <GotaCargando tamano="pantalla" texto={t('app.cargando')} />
+      </div>
+    );
+  }
   // Sin sesión -> al login.
   if (!identidad) return <Navigate to="/login" replace />;
 

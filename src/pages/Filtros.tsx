@@ -7,6 +7,7 @@ import { AlertTriangle, Building2, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { listarFamilias, listarPcs, type FamiliaApi, type PcApi } from '../lib/api';
 import { codigoAMensaje } from '../lib/mensajesError';
+import { GotaCargando } from '../components/GotaCargando';
 import { TarjetaEquipo } from '../components/TarjetaEquipo';
 import './lista.css';
 
@@ -92,7 +93,9 @@ export function Filtros() {
       )}
 
       {cargandoFamilias ? (
-        <p className="vacio">{t('app.cargando')}</p>
+        <p className="vacio">
+          <GotaCargando tamano="inline" texto={t('app.cargando')} />
+        </p>
       ) : filtradas.length === 0 ? (
         <p className="vacio">{t('filtros.sinFamilias')}</p>
       ) : (
@@ -121,7 +124,9 @@ export function Filtros() {
             <Search size={13} aria-hidden /> {t('filtros.pcsDe', { nombre: familiaSel.nombre })}
           </p>
           {cargandoPcs ? (
-            <p className="vacio">{t('app.cargando')}</p>
+            <p className="vacio">
+              <GotaCargando tamano="inline" texto={t('app.cargando')} />
+            </p>
           ) : pcs && pcs.length === 0 ? (
             <p className="vacio">{t('filtros.sinPcs')}</p>
           ) : (

@@ -1,0 +1,82 @@
+/* Spinner de carga en forma de gota: el contorno queda quieto (flotando levemente) y un "oleaje" interno,
+   recortado a la silueta de la gota, sube y baja en bucle para simular que se llena de agua. */
+
+.gota-cargando {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gota-cargando--pantalla {
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.gota-cargando__svg {
+  display: block;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--agua) 55%, transparent));
+  animation: gota-flotar 2.4s ease-in-out infinite;
+}
+
+.gota-cargando--pantalla .gota-cargando__svg {
+  width: 3rem;
+  height: 4.2rem;
+}
+
+.gota-cargando--inline .gota-cargando__svg {
+  width: 0.95rem;
+  height: 1.35rem;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--agua) 55%, transparent));
+}
+
+.gota-cargando__contorno {
+  fill: color-mix(in srgb, var(--agua) 10%, transparent);
+  stroke: var(--agua-oscuro);
+  stroke-width: 2;
+}
+
+.gota-cargando__ola {
+  fill: var(--agua);
+  transform: translateY(50px);
+  animation: gota-llenar 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.gota-cargando__texto {
+  color: var(--texto-tenue);
+}
+
+.gota-cargando--pantalla .gota-cargando__texto {
+  font-size: 0.95rem;
+}
+
+@keyframes gota-llenar {
+  0% {
+    transform: translateY(50px);
+  }
+  50% {
+    transform: translateY(14px);
+  }
+  100% {
+    transform: translateY(50px);
+  }
+}
+
+@keyframes gota-flotar {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gota-cargando__svg {
+    animation: none;
+  }
+  .gota-cargando__ola {
+    animation: none;
+    transform: translateY(28px);
+  }
+}

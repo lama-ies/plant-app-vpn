@@ -21,6 +21,7 @@ import {
   type UsuarioStaffApi,
 } from '../lib/api';
 import { codigoAMensaje } from '../lib/mensajesError';
+import { GotaCargando } from '../components/GotaCargando';
 import { Modal } from '../components/Modal';
 import './editor-perfil.css';
 import './lista.css';
@@ -105,7 +106,11 @@ export function GestionStaff() {
         )}
       </div>
 
-      {cargando && <p className="vacio">{t('app.cargando')}</p>}
+      {cargando && (
+        <p className="vacio">
+          <GotaCargando tamano="inline" texto={t('app.cargando')} />
+        </p>
+      )}
       {errorCarga && (
         <p className="auth-error" role="alert">
           <AlertTriangle size={15} aria-hidden /> {errorCarga}

@@ -5,6 +5,7 @@ import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { listarErrores, type ErrorRegistradoApi } from '../lib/api';
 import { codigoAMensaje } from '../lib/mensajesError';
+import { GotaCargando } from '../components/GotaCargando';
 import './lista.css';
 
 export function PanelErrores() {
@@ -40,7 +41,11 @@ export function PanelErrores() {
         </button>
       </div>
 
-      {cargando && <p className="vacio">{t('app.cargando')}</p>}
+      {cargando && (
+        <p className="vacio">
+          <GotaCargando tamano="inline" texto={t('app.cargando')} />
+        </p>
+      )}
       {error && (
         <p className="auth-error" role="alert">
           <AlertTriangle size={15} aria-hidden /> {error}

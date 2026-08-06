@@ -52,11 +52,42 @@
   box-sizing: border-box;
 }
 
+/* Lluvia de fondo global (mismo motivo que .auth::before de auth.css, más tenue: estas son pantallas de
+   trabajo con datos densos, no una portada). Vive en el propio background de <body> — nunca tapa nada
+   porque los paneles/tarjetas tienen su propio fondo opaco encima; solo se asoma en los márgenes/huecos
+   entre ellos. En /login no se ve: .auth cubre el viewport completo con su propio fondo opaco. */
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--fondo);
+  background:
+    repeating-linear-gradient(
+      112deg,
+      transparent 0,
+      transparent 37px,
+      color-mix(in srgb, var(--agua-oscuro) 12%, transparent) 38px,
+      transparent 39px,
+      transparent 280px
+    ),
+    var(--fondo);
+  background-size: 280px 280px, auto;
+  background-attachment: fixed, fixed;
+  animation: fondo-lluvia 16s linear infinite;
   color: var(--texto);
+}
+
+@keyframes fondo-lluvia {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: -280px 560px, 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation: none;
+  }
 }
 
 h1,

@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { listarEquipos, obtenerPerfilBase, type EquipoApi } from '../lib/api';
 import { codigoAMensaje } from '../lib/mensajesError';
+import { GotaCargando } from '../components/GotaCargando';
 import type { TipoPlanta } from '../perfiles/tipos';
 import './lista.css';
 
@@ -69,7 +70,9 @@ export function GestionPlantillas() {
             <div className="fila-lista__cab">
               <span className="fila-lista__principal">{t(`tipoPlanta.${tipo}`)}</span>
               {estado[tipo] === null ? (
-                <span className="fila-lista__meta">{t('app.cargando')}</span>
+                <span className="fila-lista__meta">
+                  <GotaCargando tamano="inline" texto={t('app.cargando')} />
+                </span>
               ) : estado[tipo] ? (
                 <span className="fila-lista__meta">
                   <CheckCircle2 size={14} aria-hidden /> {t('gestionPlantillas.existe')}
