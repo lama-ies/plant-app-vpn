@@ -92,12 +92,12 @@
 }
 
 .fila-lista__boton:focus-visible {
-  outline: 2px solid var(--agua);
+  outline: 2px solid var(--agua-oscuro);
   outline-offset: -2px;
 }
 
 .fila-lista--activa {
-  border-color: var(--agua);
+  border-color: var(--agua-oscuro);
 }
 
 /* Grilla de tarjetas de equipo (Filtros.tsx: PCs de la familia elegida). */

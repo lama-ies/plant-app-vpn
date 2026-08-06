@@ -20,7 +20,7 @@
   background: var(--superficie);
   border: 1px solid var(--linea);
   border-radius: var(--r-card);
-  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 30px 70px -30px rgba(0, 36, 90, 0.18);
 }
 
 .modal__cab {
@@ -52,7 +52,7 @@
 }
 
 .modal__cerrar:focus-visible {
-  outline: 2px solid var(--agua);
+  outline: 2px solid var(--agua-oscuro);
   outline-offset: 1px;
 }
 

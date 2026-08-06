@@ -1,32 +1,48 @@
-/* Sistema de diseño base de plant-app-vpn (tema "sala de control / agua profunda", consistente con el
-   portal). Tokens de color/tipografía. Sin fuentes externas. Las pantallas se construyen en Fase 6.6.
-   Paleta alineada a la identidad de marca IES Internacional (gota navy -> turquesa de LogoIES), mismo
-   ajuste que plant-portal-client: neutros oscuros retonados hacia azul profundo y acento cian afinado al
-   turquesa real del logo. El rojo del logo (anillo) sigue sin usarse como acento decorativo: --falla ya
-   es rojo y es semantico (estado de falla), no se mezcla con la identidad de marca. */
+/* Sistema de diseño base de plant-app-vpn — tema CLARO alineado a la identidad de marca IES Internacional
+   (2026-08-05, reemplaza el tema oscuro "sala de control"), mismos tokens que plant-portal-client.
+
+   Los 4 colores de marca (--fondo/--agua/--agua-oscuro/--divisor) son valores REALES muestreados de los
+   logos, no inventados: --fondo = fondo de LogoIES.jpeg (#E8FBFF); --agua = turquesa de la gota de
+   IES_Logo_R.png (#00B5E3); --agua-oscuro = navy de la misma gota (#0024A6); --divisor = azul de
+   IES_MonitorPlant_LogoAjustado.png (#4B9FCA). --texto = negro-azulado de ese mismo logo (#1B1E24).
+
+   IMPORTANTE (verificado con la fórmula WCAG, no a ojo): el turquesa brillante --agua da solo ~2.25:1
+   sobre --fondo (y ~2.4:1 sobre blanco) — falla como texto/borde/ícono/outline de foco sobre un fondo
+   claro. Por eso hay DOS acentos con roles distintos, no uno solo:
+     --agua        turquesa brillante -> SOLO relleno (fondo de botón primario, badges, gráficos). Nunca
+                   como color de texto/borde/ícono/outline sobre un fondo claro.
+     --agua-oscuro navy -> texto de enlace, bordes con significado, ícono interactivo, outline de foco.
+                   10.9:1 sobre --fondo, 11.65:1 sobre blanco — de sobra para WCAG AA.
+   El rojo del logo (anillo, #D50404) SÍ se reutiliza aquí, pero no como decoración: coincide con el rol
+   semántico que --falla ya tenía (estado de error) y de hecho cumple contraste (5.11:1) — es el mismo
+   color por casualidad de diseño, no una mezcla de "marca" con "estado". */
 
 :root {
-  --fondo: #08131f;
-  --fondo-2: #0c1c2e;
-  --superficie: #112438;
-  --superficie-alta: #162e46;
-  --linea: #223f5c;
+  --fondo: #e8fbff;
+  --fondo-2: #f4fafc;
+  --superficie: #ffffff;
+  --superficie-alta: #f0f9fc;
+  --linea: #c7dee8;
 
-  --texto: #e4edf5;
-  --texto-tenue: #86a0b8;
+  --texto: #1b1e24;
+  --texto-tenue: #5a6b78;
 
-  --agua: #1fc4d6;
-  --ok: #43c08a;
-  --advertencia: #f2a93b;
-  --falla: #f0616b;
-  --offline: #7f92a8;
+  --agua: #00b5e3;
+  --agua-tenue: rgba(0, 181, 227, 0.12);
+  --agua-oscuro: #0024a6;
+  --divisor: #4b9fca;
+
+  --ok: #1b7a48;
+  --advertencia: #96620a;
+  --falla: #d50404;
+  --offline: #5c6d80;
 
   --r-card: 14px;
 
   --fuente-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --fuente-datos: ui-monospace, 'SFMono-Regular', 'Cascadia Code', Consolas, monospace;
 
-  color-scheme: dark;
+  color-scheme: light;
   font-family: var(--fuente-ui);
   color: var(--texto);
   line-height: 1.5;
@@ -51,6 +67,33 @@ h2 {
 button {
   font: inherit;
   cursor: pointer;
+}
+
+/* Marca (componente Marca.tsx): los 2 logos oficiales + línea divisoria, reemplaza el wordmark de texto
+   en la topbar y las pantallas de auth. La línea usa --divisor (azul del logo ajustado) con un
+   degradado a transparente en los extremos para que se vea "elegante", no una barra rígida. */
+.marca-ies {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-right: auto;
+}
+
+.marca-ies__logo {
+  display: block;
+  height: 32px;
+  width: auto;
+}
+
+.marca-ies__logo--monitor {
+  height: 30px;
+}
+
+.marca-ies__divisor {
+  width: 2px;
+  height: 34px;
+  border-radius: 1px;
+  background: linear-gradient(to bottom, transparent, var(--divisor), transparent);
 }
 
 .sr-only {
@@ -82,7 +125,7 @@ button {
 }
 
 .selector-idioma select:focus-visible {
-  outline: 2px solid var(--agua);
+  outline: 2px solid var(--agua-oscuro);
   outline-offset: 1px;
 }
 
@@ -106,12 +149,12 @@ button {
 }
 
 .boton-tenue:hover:not(:disabled) {
-  border-color: var(--agua);
-  color: var(--agua);
+  border-color: var(--agua-oscuro);
+  color: var(--agua-oscuro);
 }
 
 .boton-tenue:focus-visible {
-  outline: 2px solid var(--agua);
+  outline: 2px solid var(--agua-oscuro);
   outline-offset: 1px;
 }
 
@@ -132,12 +175,12 @@ button {
 }
 
 .icono-boton:hover:not(:disabled) {
-  border-color: var(--agua);
-  color: var(--agua);
+  border-color: var(--agua-oscuro);
+  color: var(--agua-oscuro);
 }
 
 .icono-boton:focus-visible {
-  outline: 2px solid var(--agua);
+  outline: 2px solid var(--agua-oscuro);
   outline-offset: 1px;
 }
 
@@ -182,9 +225,9 @@ button {
 .auth-campo input:focus-visible,
 .auth-campo select:focus-visible,
 .auth-campo textarea:focus-visible {
-  outline: 2px solid var(--agua);
+  outline: 2px solid var(--agua-oscuro);
   outline-offset: 1px;
-  border-color: var(--agua);
+  border-color: var(--agua-oscuro);
 }
 
 .auth-boton {
@@ -194,7 +237,7 @@ button {
   justify-content: center;
   gap: 0.5rem;
   background: var(--agua);
-  color: #04141a;
+  color: var(--texto);
   border: 1px solid var(--agua);
   border-radius: 9px;
   padding: 0.65rem 0.9rem;
@@ -203,11 +246,11 @@ button {
 }
 
 .auth-boton:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--agua) 88%, white);
+  background: color-mix(in srgb, var(--agua) 85%, black);
 }
 
 .auth-boton:focus-visible {
-  outline: 2px solid var(--agua);
+  outline: 2px solid var(--agua-oscuro);
   outline-offset: 2px;
 }
 

@@ -16,7 +16,7 @@
 }
 
 .estado-pill--invitado {
-  color: var(--agua);
+  color: var(--agua-oscuro);
   border-color: color-mix(in srgb, var(--agua) 40%, transparent);
   background: color-mix(in srgb, var(--agua) 12%, transparent);
 }

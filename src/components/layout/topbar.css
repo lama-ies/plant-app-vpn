@@ -17,17 +17,6 @@
   padding: 0.7rem 1.25rem;
 }
 
-.topbar__marca {
-  margin-right: auto;
-  font-size: 1.05rem;
-  font-weight: 650;
-  letter-spacing: 0.01em;
-}
-
-.topbar__acento {
-  color: var(--agua);
-}
-
 .topbar__acciones {
   display: flex;
   align-items: center;
@@ -48,7 +37,7 @@
 }
 
 .topbar__rol {
-  color: var(--agua);
+  color: var(--agua-oscuro);
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -80,12 +69,12 @@
 }
 
 .topbar__tab.active {
-  color: var(--agua);
-  border-bottom-color: var(--agua);
+  color: var(--agua-oscuro);
+  border-bottom-color: var(--agua-oscuro);
 }
 
 .topbar__tab:focus-visible {
-  outline: 2px solid var(--agua);
+  outline: 2px solid var(--agua-oscuro);
   outline-offset: -2px;
   border-radius: 4px;
 }

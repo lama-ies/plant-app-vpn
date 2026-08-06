@@ -1,5 +1,5 @@
-/* Estilos de la pantalla de login. Tema "sala de control / agua profunda": tarjeta centrada sobre el
-   fondo, con un resplandor sutil arriba. Mismos tokens que index.css. Sin fuentes externas (CSP). */
+/* Estilos de la pantalla de login. Tarjeta centrada sobre el fondo, con un resplandor sutil arriba.
+   Mismos tokens que index.css. Sin fuentes externas (CSP). */
 
 .auth {
   min-height: 100vh;
@@ -10,22 +10,13 @@
     var(--fondo);
 }
 
+/* Barra superior: marca (componente Marca.tsx) + selector de idioma. */
 .auth__barra {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.25rem;
-}
-
-.auth__marca {
-  font-size: 1.05rem;
-  font-weight: 650;
-  letter-spacing: 0.01em;
-}
-
-.auth__acento {
-  color: var(--agua);
 }
 
 .auth__centro {
@@ -42,7 +33,7 @@
   border: 1px solid var(--linea);
   border-radius: var(--r-card);
   padding: 1.75rem 1.6rem;
-  box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 24px 60px -30px rgba(0, 36, 90, 0.16);
 }
 
 .auth-card__titulo {
@@ -70,7 +61,7 @@
   background: none;
   border: 0;
   padding: 0;
-  color: var(--agua);
+  color: var(--agua-oscuro);
   font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
@@ -82,7 +73,7 @@
 }
 
 .auth-link:focus-visible {
-  outline: 2px solid var(--agua);
+  outline: 2px solid var(--agua-oscuro);
   outline-offset: 2px;
   border-radius: 4px;
 }

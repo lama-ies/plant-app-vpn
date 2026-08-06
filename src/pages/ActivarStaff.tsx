@@ -11,6 +11,7 @@ import { useAuth } from '../auth/contexto';
 import { registrarActivacionStaff } from '../auth/cognito';
 import { consumirActivacionStaff, ErrorApi, validarActivacionStaff, type PreviewActivacionStaff } from '../lib/api';
 import { codigoAMensaje } from '../lib/mensajesError';
+import { Marca } from '../components/Marca';
 import { SelectorIdioma } from '../components/SelectorIdioma';
 import './auth.css';
 
@@ -68,9 +69,7 @@ export function ActivarStaff() {
   return (
     <main className="auth">
       <header className="auth__barra">
-        <span className="auth__marca">
-          IES <span className="auth__acento">Monitor Plant</span>
-        </span>
+        <Marca />
         <SelectorIdioma />
       </header>
 

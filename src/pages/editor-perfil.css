@@ -109,12 +109,12 @@
 }
 
 .agregar-fila:hover {
-  border-color: var(--agua);
-  color: var(--agua);
+  border-color: var(--agua-oscuro);
+  color: var(--agua-oscuro);
 }
 
 .agregar-fila:focus-visible {
-  outline: 2px solid var(--agua);
+  outline: 2px solid var(--agua-oscuro);
   outline-offset: 1px;
 }
 
@@ -188,7 +188,7 @@
 }
 
 .casilla input {
-  accent-color: var(--agua);
+  accent-color: var(--agua-oscuro);
 }
 
 .subtitulo-lista {
@@ -230,7 +230,7 @@
 }
 
 .enlace-sensores__punto:hover {
-  border-color: var(--agua);
+  border-color: var(--agua-oscuro);
 }
 
 .enlace-sensores__panel {

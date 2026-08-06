@@ -6,6 +6,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../auth/contexto';
 import { usePermissions, type Permisos } from '../../hooks/usePermissions';
+import { Marca } from '../Marca';
 import { SelectorIdioma } from '../SelectorIdioma';
 import './topbar.css';
 
@@ -48,9 +49,7 @@ export function Topbar() {
   return (
     <header className="topbar">
       <div className="topbar__fila">
-        <span className="topbar__marca">
-          IES <span className="topbar__acento">Monitor Plant</span>
-        </span>
+        <Marca />
         <div className="topbar__acciones">
           <SelectorIdioma />
           {identidad && (

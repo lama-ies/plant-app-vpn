@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../auth/contexto';
+import { Marca } from '../components/Marca';
 import { SelectorIdioma } from '../components/SelectorIdioma';
 import './auth.css';
 
@@ -38,9 +39,7 @@ export function Login() {
   return (
     <main className="auth">
       <header className="auth__barra">
-        <span className="auth__marca">
-          IES <span className="auth__acento">Monitor Plant</span>
-        </span>
+        <Marca />
         <SelectorIdioma />
       </header>
 
