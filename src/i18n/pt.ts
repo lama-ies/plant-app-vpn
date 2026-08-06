@@ -32,7 +32,17 @@ export const pt = {
       volverLogin: 'Voltar ao login',
       errorLongitud: 'A senha deve ter pelo menos 8 caracteres.',
       errorCoincide: 'As senhas não coincidem.',
-      errorCodigo: 'Código inválido ou expirado.',
+    },
+    authErrores: {
+      credenciales: 'E-mail ou senha incorretos.',
+      cuentaNoConfirmada: 'A conta ainda não foi confirmada. Contate um administrador.',
+      restablecerRequerido: 'Você deve redefinir sua senha antes de continuar.',
+      demasiadosIntentos: 'Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.',
+      sinInternet: 'Sem conexão com a internet. Verifique sua rede e tente novamente.',
+      servidor: 'Não foi possível contatar o servidor. Tente novamente em alguns minutos.',
+      codigoInvalido: 'O código digitado está incorreto.',
+      codigoExpirado: 'O código expirou. Solicite um novo.',
+      contrasenaPolitica: 'A senha não atende aos requisitos: {{detalle}}',
     },
     idioma: {
       etiqueta: 'Idioma',

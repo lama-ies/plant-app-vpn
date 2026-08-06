@@ -32,7 +32,17 @@ export const fr = {
       volverLogin: 'Retour à la connexion',
       errorLongitud: 'Le mot de passe doit contenir au moins 8 caractères.',
       errorCoincide: 'Les mots de passe ne correspondent pas.',
-      errorCodigo: 'Code invalide ou expiré.',
+    },
+    authErrores: {
+      credenciales: 'Courriel ou mot de passe incorrect.',
+      cuentaNoConfirmada: "Le compte n'est pas encore confirmé. Contactez un administrateur.",
+      restablecerRequerido: 'Vous devez réinitialiser votre mot de passe avant de continuer.',
+      demasiadosIntentos: 'Trop de tentatives. Attendez quelques minutes avant de réessayer.',
+      sinInternet: 'Aucune connexion internet. Vérifiez votre réseau et réessayez.',
+      servidor: "Impossible de contacter le serveur. Réessayez dans quelques minutes.",
+      codigoInvalido: 'Le code saisi est incorrect.',
+      codigoExpirado: 'Le code a expiré. Demandez-en un nouveau.',
+      contrasenaPolitica: 'Le mot de passe ne respecte pas les exigences : {{detalle}}',
     },
     idioma: {
       etiqueta: 'Langue',

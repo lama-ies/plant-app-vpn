@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { confirmarRecuperacion, solicitarRecuperacion } from '../auth/cognito';
 import { Marca } from '../components/Marca';
 import { SelectorIdioma } from '../components/SelectorIdioma';
+import { mensajeErrorRecuperacion } from '../lib/mensajesAuth';
 import './auth.css';
 
 export function RecuperarStaff() {
@@ -45,8 +46,10 @@ export function RecuperarStaff() {
     try {
       await confirmarRecuperacion(correo.trim().toLowerCase(), codigo.trim(), contrasena);
       navegar('/login', { replace: true });
-    } catch {
-      setError(t('recuperarStaff.errorCodigo'));
+    } catch (err) {
+      // Mensaje específico según el error real de Cognito (código, política de contraseña, red o
+      // servidor) — nunca "código expirado" adivinado cuando la causa real fue otra.
+      setError(mensajeErrorRecuperacion(t, err));
       setEnviando(false);
     }
   }

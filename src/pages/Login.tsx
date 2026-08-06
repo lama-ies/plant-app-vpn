@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../auth/contexto';
 import { Marca } from '../components/Marca';
 import { SelectorIdioma } from '../components/SelectorIdioma';
+import { mensajeErrorLogin } from '../lib/mensajesAuth';
 import './auth.css';
 
 export function Login() {
@@ -15,7 +16,7 @@ export function Login() {
 
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
 
   // Multi-pestaña / auto-login: si ya hay sesión (JWT válido en localStorage), entrar directo al tablero.
@@ -23,14 +24,15 @@ export function Login() {
 
   async function enviar(e: FormEvent) {
     e.preventDefault();
-    setError(false);
+    setError(null);
     setEnviando(true);
     try {
       await iniciarSesion(correo, contrasena);
       navegar('/dashboard', { replace: true });
-    } catch {
-      // No se filtra el detalle del error de Cognito; mensaje genérico de credenciales.
-      setError(true);
+    } catch (err) {
+      // Mensaje específico según el error real de Cognito (credenciales, cuenta, red o servidor),
+      // nunca un "incorrectos" genérico que oculte la causa real.
+      setError(mensajeErrorLogin(t, err));
     } finally {
       setEnviando(false);
     }
@@ -75,7 +77,7 @@ export function Login() {
             </label>
             {error && (
               <p role="alert" className="auth-error">
-                {t('login.error')}
+                {error}
               </p>
             )}
             <button className="auth-boton" type="submit" disabled={enviando}>

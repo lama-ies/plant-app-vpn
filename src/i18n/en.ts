@@ -32,7 +32,17 @@ export const en = {
       volverLogin: 'Back to sign in',
       errorLongitud: 'The password must be at least 8 characters long.',
       errorCoincide: 'The passwords do not match.',
-      errorCodigo: 'Invalid or expired code.',
+    },
+    authErrores: {
+      credenciales: 'Incorrect email or password.',
+      cuentaNoConfirmada: 'The account is not confirmed yet. Contact an administrator.',
+      restablecerRequerido: 'You must reset your password before continuing.',
+      demasiadosIntentos: 'Too many attempts. Wait a few minutes before trying again.',
+      sinInternet: 'No internet connection. Check your network and try again.',
+      servidor: 'Could not reach the server. Try again in a few minutes.',
+      codigoInvalido: 'The code you entered is incorrect.',
+      codigoExpirado: 'The code expired. Request a new one.',
+      contrasenaPolitica: 'The password does not meet the requirements: {{detalle}}',
     },
     idioma: {
       etiqueta: 'Language',
