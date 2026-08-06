@@ -19,6 +19,18 @@
   padding: 1rem 1.25rem;
 }
 
+/* Marca al triple de tamaño solo aquí (pantalla de login) — en la topbar del resto de la app se queda al
+   tamaño normal, ahí sí sería demasiado grande (barra persistente, no una pantalla de un solo logo). */
+.auth__barra .marca-ies__logo {
+  height: 96px;
+}
+.auth__barra .marca-ies__logo--monitor {
+  height: 90px;
+}
+.auth__barra .marca-ies__divisor {
+  height: 100px;
+}
+
 .auth__centro {
   flex: 1;
   display: grid;
