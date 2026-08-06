@@ -2,6 +2,8 @@
    Mismos tokens que index.css. Sin fuentes externas (CSP). */
 
 .auth {
+  position: relative;
+  overflow: hidden;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -10,8 +12,49 @@
     var(--fondo);
 }
 
-/* Barra superior: marca (componente Marca.tsx) + selector de idioma. */
+/* "Lluvia" decorativa: líneas diagonales finas y dispersas (no saturan la pantalla), a juego con la
+   identidad de marca (gota de agua). Un solo repeating-linear-gradient con un tile grande (280px) para
+   que las líneas queden espaciadas, no una cuadrícula densa. Deriva lentamente hacia abajo con
+   animación de background-position — se respeta prefers-reduced-motion (congela el patrón, sin quitarlo). */
+.auth::before {
+  content: '';
+  position: absolute;
+  inset: -10% -10%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: repeating-linear-gradient(
+    112deg,
+    transparent 0,
+    transparent 37px,
+    color-mix(in srgb, var(--agua-oscuro) 24%, transparent) 38px,
+    transparent 39px,
+    transparent 280px
+  );
+  background-size: 280px 280px;
+  opacity: 0.55;
+  animation: auth-lluvia 16s linear infinite;
+}
+
+@keyframes auth-lluvia {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -280px 560px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth::before {
+    animation: none;
+  }
+}
+
+/* Barra superior: marca (componente Marca.tsx) + selector de idioma. Necesita z-index para quedar
+   ARRIBA de la lluvia decorativa (::before de .auth, ver arriba). */
 .auth__barra {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -31,7 +74,10 @@
   height: 100px;
 }
 
+/* z-index para quedar arriba de la lluvia decorativa. */
 .auth__centro {
+  position: relative;
+  z-index: 1;
   flex: 1;
   display: grid;
   place-items: center;
@@ -60,11 +106,14 @@
   gap: 0.95rem;
 }
 
+/* flex-direction: column porque Login.tsx puede mostrar 2 links (recuperar + activar cuenta) — uno por
+   renglón se lee mejor que apretados en una sola línea. */
 .auth-pie {
   margin-top: 1.1rem;
   display: flex;
-  justify-content: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
   font-size: 0.85rem;
   color: var(--texto-tenue);
 }

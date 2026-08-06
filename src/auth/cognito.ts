@@ -1,6 +1,14 @@
 // Acceso a la sesión vía AWS Amplify (pool Staff). Cognito solo autentica; el perfil de sesión (rol/zonas)
 // lo resuelve el backend (`staffLogin`, real — ver lib/api.ts) a partir del email del JWT.
-import { fetchAuthSession, getCurrentUser, signIn, signOut, signUp } from 'aws-amplify/auth';
+import {
+  confirmResetPassword,
+  fetchAuthSession,
+  getCurrentUser,
+  resetPassword,
+  signIn,
+  signOut,
+  signUp,
+} from 'aws-amplify/auth';
 import { staffLogin } from '../lib/api';
 import type { Identidad } from './tipos';
 
@@ -39,6 +47,20 @@ export async function sesionActual(): Promise<Identidad | null> {
   } catch {
     return null;
   }
+}
+
+/** Pide el código de recuperación de contraseña (llega al correo del usuario Staff). */
+export async function solicitarRecuperacion(email: string): Promise<void> {
+  await resetPassword({ username: email });
+}
+
+/** Confirma la recuperación con el código recibido y fija la nueva contraseña. */
+export async function confirmarRecuperacion(
+  email: string,
+  codigo: string,
+  nuevaContrasena: string,
+): Promise<void> {
+  await confirmResetPassword({ username: email, confirmationCode: codigo, newPassword: nuevaContrasena });
 }
 
 /** Cierra la sesión (borra los tokens locales). */

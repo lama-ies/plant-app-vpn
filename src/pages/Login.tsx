@@ -84,6 +84,9 @@ export function Login() {
           </form>
 
           <div className="auth-pie">
+            <Link className="auth-link" to="/recuperar-staff">
+              {t('login.olvide')}
+            </Link>
             <Link className="auth-link" to="/activar-staff">
               {t('activarStaff.titulo')}
             </Link>

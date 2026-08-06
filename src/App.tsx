@@ -3,6 +3,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Login } from './pages/Login';
 import { ActivarStaff } from './pages/ActivarStaff';
+import { RecuperarStaff } from './pages/RecuperarStaff';
 import { Dashboard } from './pages/Dashboard';
 import { Filtros } from './pages/Filtros';
 import { EditorPerfil } from './pages/EditorPerfil';
@@ -24,6 +25,7 @@ export function App() {
       {/* Públicas (sin sesión). */}
       <Route path="/login" element={<Login />} />
       <Route path="/activar-staff" element={<ActivarStaff />} />
+      <Route path="/recuperar-staff" element={<RecuperarStaff />} />
 
       {/* Privadas: cuelgan del marco autenticado (gate de sesión + topbar). */}
       <Route element={<AppShell />}>
