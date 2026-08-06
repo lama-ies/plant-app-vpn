@@ -39,7 +39,7 @@ export const pt = {
       restablecerRequerido: 'Você deve redefinir sua senha antes de continuar.',
       demasiadosIntentos: 'Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.',
       sinInternet: 'Sem conexão com a internet. Verifique sua rede e tente novamente.',
-      servidor: 'Não foi possível contatar o servidor. Tente novamente em alguns minutos.',
+      servidor: 'Não foi possível concluir a conexão: {{detalle}}',
       codigoInvalido: 'O código digitado está incorreto.',
       codigoExpirado: 'O código expirou. Solicite um novo.',
       contrasenaPolitica: 'A senha não atende aos requisitos: {{detalle}}',

@@ -39,7 +39,7 @@ export const en = {
       restablecerRequerido: 'You must reset your password before continuing.',
       demasiadosIntentos: 'Too many attempts. Wait a few minutes before trying again.',
       sinInternet: 'No internet connection. Check your network and try again.',
-      servidor: 'Could not reach the server. Try again in a few minutes.',
+      servidor: 'Could not complete the connection: {{detalle}}',
       codigoInvalido: 'The code you entered is incorrect.',
       codigoExpirado: 'The code expired. Request a new one.',
       contrasenaPolitica: 'The password does not meet the requirements: {{detalle}}',

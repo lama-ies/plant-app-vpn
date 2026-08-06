@@ -40,7 +40,7 @@ export const es = {
       restablecerRequerido: 'Debes restablecer tu contraseña antes de continuar.',
       demasiadosIntentos: 'Demasiados intentos. Espera unos minutos antes de volver a intentar.',
       sinInternet: 'No hay conexión a internet. Verifica tu red e intenta de nuevo.',
-      servidor: 'No se pudo contactar al servidor. Intenta de nuevo en unos minutos.',
+      servidor: 'No se pudo completar la conexión: {{detalle}}',
       codigoInvalido: 'El código introducido no es correcto.',
       codigoExpirado: 'El código expiró. Solicita uno nuevo.',
       contrasenaPolitica: 'La contraseña no cumple los requisitos: {{detalle}}',

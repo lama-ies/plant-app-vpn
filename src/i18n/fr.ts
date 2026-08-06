@@ -39,7 +39,7 @@ export const fr = {
       restablecerRequerido: 'Vous devez réinitialiser votre mot de passe avant de continuer.',
       demasiadosIntentos: 'Trop de tentatives. Attendez quelques minutes avant de réessayer.',
       sinInternet: 'Aucune connexion internet. Vérifiez votre réseau et réessayez.',
-      servidor: "Impossible de contacter le serveur. Réessayez dans quelques minutes.",
+      servidor: "Impossible d'établir la connexion : {{detalle}}",
       codigoInvalido: 'Le code saisi est incorrect.',
       codigoExpirado: 'Le code a expiré. Demandez-en un nouveau.',
       contrasenaPolitica: 'Le mot de passe ne respecte pas les exigences : {{detalle}}',
