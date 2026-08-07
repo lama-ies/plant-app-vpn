@@ -30,7 +30,6 @@ import { Modal } from '../components/Modal';
 import { SelectorFamilia } from '../components/SelectorFamilia';
 import './editor-perfil.css';
 import './lista.css';
-import './gestion-staff.css';
 
 const ROLES_SO = ['gerente', 'coordinador', 'tecnico'];
 const ESTADO_CSS: Record<string, string> = {

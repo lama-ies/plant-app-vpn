@@ -2,7 +2,7 @@
 // token (ID token de Cognito, pool Staff) lo obtiene Amplify y se adjunta como Authorization. Un 401
 // fuerza el cierre de sesión (idempotente). Ver plant-arquitectura/07-app-vpn.md.
 import { fetchAuthSession, signOut } from 'aws-amplify/auth';
-import type { ModeloPLC, PerfilDispositivo, TipoPlanta } from '../perfiles/tipos';
+import type { ModeloPLC, PerfilDispositivo, TipoAlarma, TipoPlanta } from '../perfiles/tipos';
 
 // BUG encontrado en auditoría 2026-07-28: esta app es un binario de escritorio Tauri v2, no una SPA servida
 // por un servidor propio. En dev, Vite reescribe '/api' hacia la API real (proxy same-origin, ver
@@ -465,6 +465,42 @@ export function guardarPerfilBase(tipoPlanta: string, perfil: PerfilDispositivo)
 export function guardarPerfilEquipo(equipoId: string, perfil: PerfilDispositivo) {
   return peticion<{ equipoId: string; guardado: string }>('PUT', '/app-vpn/perfiles', {
     cuerpo: { equipoId, perfil },
+  });
+}
+
+// --- Telemetría/alarmas en vivo (Plant_Telemetria/Plant_Alarmas) — Dashboard.tsx, estado por tarjeta ----
+// Mismos lambdas que ya usaba plant-portal-client; 2026-08-07 se les agregó la rama Staff
+// (`validarAccesoEquipoStaff`) y la ruta `/app-vpn/*` para que el Tablero pinte el mismo estado en vivo.
+
+/** Última telemetría reportada de un equipo (o `null` si nunca ha reportado). */
+export interface TelemetriaActualApi {
+  equipoId: string;
+  timestamp: string;
+  valores: Record<string, number | boolean>;
+}
+
+export function obtenerTelemetriaActual(equipoId: string) {
+  return peticion<{ actual: TelemetriaActualApi | null }>('GET', '/app-vpn/telemetria', {
+    query: { equipoId },
+  });
+}
+
+/** Fila de Plant_AlarmasActivas (una por código de alarma activo del equipo). */
+export interface AlarmaActivaApi {
+  pk: string;
+  sk: string;
+  pcId: string;
+  equipoId: string;
+  codigoAlarma: string;
+  tipoAlarma: TipoAlarma;
+  timestampActivacion: string;
+  timestampDesactivacion?: string | null;
+}
+
+/** Alarmas activas de un equipo. */
+export function listarAlarmasActivas(equipoId: string) {
+  return peticion<{ tipo: string; alarmas: AlarmaActivaApi[] }>('GET', '/app-vpn/alarmas', {
+    query: { equipoId, tipo: 'activas' },
   });
 }
 

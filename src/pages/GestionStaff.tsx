@@ -26,7 +26,6 @@ import { Modal } from '../components/Modal';
 import { SelectorZonasStaff } from '../components/SelectorZonasStaff';
 import './editor-perfil.css';
 import './lista.css';
-import './gestion-staff.css';
 
 const ROLES_STAFF = ['administrador', 'gerente', 'coordinador', 'tecnico'];
 const ESTADO_CSS: Record<string, string> = {

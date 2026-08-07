@@ -57,3 +57,39 @@
   outline: 2px solid var(--agua-oscuro);
   outline-offset: 1px;
 }
+
+/* Lecturas clave de la tarjeta de equipo (hasta 6, del dashboard del perfil) — mismo dato que ya pinta
+   plant-portal-client, formato compacto valor+unidad / etiqueta debajo. */
+.tarjeta-equipo__lecturas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 0.5rem;
+  margin: 0.3rem 0;
+}
+
+.tarjeta-equipo__lectura {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.tarjeta-equipo__valor {
+  font-family: var(--fuente-datos);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--texto);
+  white-space: nowrap;
+}
+
+.tarjeta-equipo__unidad {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--texto-tenue);
+  margin-left: 0.15rem;
+}
+
+.tarjeta-equipo__etq {
+  font-size: 0.68rem;
+  color: var(--texto-tenue);
+}
