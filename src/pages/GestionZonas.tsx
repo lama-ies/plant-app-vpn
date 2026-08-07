@@ -1,12 +1,13 @@
 // Gestión de zonas de una Familia (Fase 6.6.11), rol Administrador: crear/renombrar/eliminar zonas contra
-// Plant_Zonas (ya extendido para operar cualquier familia desde el pool Staff). Interino: la familia se
-// identifica por su ID directo (mismo patrón que el buscador de PC en Dashboard) mientras no exista un
-// listado de clientes/familias en app-vpn.
+// Plant_Zonas (ya extendido para operar cualquier familia desde el pool Staff). La familia se elige de una
+// lista filtrable (SelectorFamilia) — el Administrador no tiene por qué conocer el familiaId de memoria.
 import { useCallback, useState, type FormEvent } from 'react';
 import { AlertTriangle, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { actualizarZona, crearZona, eliminarZona, listarZonas, type ZonaApi } from '../lib/api';
 import { codigoAMensaje } from '../lib/mensajesError';
+import { GotaCargando } from '../components/GotaCargando';
+import { SelectorFamilia } from '../components/SelectorFamilia';
 import './lista.css';
 
 export function GestionZonas() {
@@ -36,9 +37,9 @@ export function GestionZonas() {
     [t],
   );
 
-  function buscar(e: FormEvent) {
-    e.preventDefault();
-    if (familiaId.trim()) void cargar(familiaId.trim());
+  function elegirFamilia(f: { familiaId: string }) {
+    setFamiliaId(f.familiaId);
+    void cargar(f.familiaId);
   }
 
   async function agregar(e: FormEvent) {
@@ -77,15 +78,12 @@ export function GestionZonas() {
     <div className="panel">
       <p className="panel__titulo">{t('gestionZonas.titulo')}</p>
 
-      <form className="panel-acciones" onSubmit={buscar}>
-        <label className="auth-campo">
-          {t('altaCliente.numeroCliente')} / familiaId
-          <input type="text" value={familiaId} onChange={(e) => setFamiliaId(e.target.value)} required />
-        </label>
-        <button type="submit" className="boton-tenue" disabled={cargando}>
-          {cargando ? t('dashboard.buscando') : t('dashboard.buscar')}
-        </button>
-      </form>
+      <SelectorFamilia valor={familiaId} onSeleccionar={elegirFamilia} />
+      {cargando && (
+        <p className="vacio">
+          <GotaCargando tamano="inline" texto={t('dashboard.buscando')} />
+        </p>
+      )}
 
       {error && (
         <p className="auth-error" role="alert">

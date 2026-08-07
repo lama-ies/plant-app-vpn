@@ -220,6 +220,14 @@ export const pt = {
       sub: 'Para conectar a uma PC de site, vá em Filtros e escolha o cliente. O Editor de perfil está disponível para preparar os modelos de configuração.',
       buscar: 'Buscar',
       buscando: 'Buscando...',
+      pcIdEtiqueta: 'ID da PC',
+      equipos: {
+        titulo: 'Equipamentos',
+        buscar: 'Buscar equipamento',
+        buscarPlaceholder: 'Nome, zona, cliente ou ID',
+        sinEquipos: 'Ainda não há equipamentos cadastrados.',
+        sinCoincidencias: 'Nenhum equipamento corresponde à busca.',
+      },
     },
     filtros: {
       titulo: 'Filtros',
@@ -231,6 +239,14 @@ export const pt = {
       sinFamilias: 'Nenhum cliente cadastrado ainda.',
       pcsDe: 'PCs de {{nombre}}',
       sinPcs: 'Esse cliente ainda não tem PCs de site cadastradas.',
+    },
+    selectorFamilia: {
+      buscar: 'Buscar família',
+      buscarPlaceholder: 'Nome ou número de cliente',
+      sinResultados: 'Nenhuma família corresponde à busca.',
+    },
+    selectorZonasStaff: {
+      sinZonas: 'Nenhuma zona foi criada ainda em nenhuma família.',
     },
     tarjetaEquipo: {
       conectar: 'Estabelecer conexão',

@@ -1,7 +1,7 @@
 // Wrapper de zoom/pan para el lienzo del diagrama: botones +/-/centrar, arrastre con clic, scroll de
 // mouse/trackpad centrado en el cursor. Ajusta el viewBox del <svg> hijo — ver spec
 // 2026-07-30-diagrama-isometrico-design.md §4.3.
-import { useRef, useState, type ReactElement, type WheelEvent, type PointerEvent } from 'react';
+import { useEffect, useRef, useState, type ReactElement, type PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Minus, Scan } from 'lucide-react';
 import {
@@ -40,14 +40,24 @@ export function LienzoZoomable({ viewBoxBase, children }: Props) {
     setCaja(contenido);
   }
 
-  function onWheel(e: WheelEvent<HTMLDivElement>) {
-    e.preventDefault();
-    const rect = contenedorRef.current!.getBoundingClientRect();
-    const puntoX = caja.minX + ((e.clientX - rect.left) / rect.width) * caja.ancho;
-    const puntoY = caja.minY + ((e.clientY - rect.top) / rect.height) * caja.alto;
-    const factor = FACTOR_RUEDA ** -e.deltaY;
-    setCaja((actual) => limitar(zoomCentradoEn(actual, factor, puntoX, puntoY), contenido));
-  }
+  // React adjunta `onWheel` como listener PASIVO por defecto (desde React 17) — `preventDefault()` ahí no
+  // hace nada (advertencia real de consola: "Unable to preventDefault inside passive event listener").
+  // Sin poder bloquear el scroll de la página, la rueda del mouse haría zoom en el diagrama Y desplazaría
+  // la página al mismo tiempo. Se registra el listener nativo aparte con `{ passive: false }`.
+  useEffect(() => {
+    const el = contenedorRef.current;
+    if (!el) return;
+    const onWheelNativo = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = el.getBoundingClientRect();
+      const puntoX = caja.minX + ((e.clientX - rect.left) / rect.width) * caja.ancho;
+      const puntoY = caja.minY + ((e.clientY - rect.top) / rect.height) * caja.alto;
+      const factor = FACTOR_RUEDA ** -e.deltaY;
+      setCaja((actual) => limitar(zoomCentradoEn(actual, factor, puntoX, puntoY), contenido));
+    };
+    el.addEventListener('wheel', onWheelNativo, { passive: false });
+    return () => el.removeEventListener('wheel', onWheelNativo);
+  }, [caja, contenido]);
 
   function onPointerDown(e: PointerEvent<HTMLDivElement>) {
     arrastre.current = { x: e.clientX, y: e.clientY };
@@ -72,7 +82,6 @@ export function LienzoZoomable({ viewBoxBase, children }: Props) {
     <div
       ref={contenedorRef}
       className="lienzo-zoomable"
-      onWheel={onWheel}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}

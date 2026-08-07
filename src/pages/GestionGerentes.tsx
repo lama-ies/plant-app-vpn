@@ -11,9 +11,11 @@
 // una fila pendiente (reemplaza en vez de fallar); Plant_ListUsers/Plant_ResendInvitation/Plant_RemoveUser
 // ahora aceptan identidad Staff además de Portal (mismo privilegio de blanket authority que ya tenía
 // Plant_InviteUser). Se busca por familiaId (no hay listado global de familias con miembros, mismo criterio
-// que Auditoria.tsx) — al buscar se ve la familia completa y desde ahí se invita/reenvía/cancela.
+// que Auditoria.tsx) — al buscar se ve la familia completa y desde ahí se invita/reenvía/cancela. La
+// familia se elige de una lista filtrable (SelectorFamilia, acotada a tipo "so" — esta pantalla es
+// exclusiva de familias S&O), en vez de pegar el familiaId a mano.
 import { useCallback, useState, type FormEvent } from 'react';
-import { AlertTriangle, Search, Send, Trash2, UserPlus } from 'lucide-react';
+import { AlertTriangle, Send, Trash2, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   eliminarUsuarioFamilia,
@@ -23,7 +25,9 @@ import {
   type UsuarioFamiliaApi,
 } from '../lib/api';
 import { codigoAMensaje } from '../lib/mensajesError';
+import { GotaCargando } from '../components/GotaCargando';
 import { Modal } from '../components/Modal';
+import { SelectorFamilia } from '../components/SelectorFamilia';
 import './editor-perfil.css';
 import './lista.css';
 import './gestion-staff.css';
@@ -96,28 +100,27 @@ export function GestionGerentes() {
       <h1 className="editor__titulo">{t('gestionGerentes.titulo')}</h1>
       <p className="editor__sub">{t('gestionGerentes.sub')}</p>
 
-      <form
-        className="panel-acciones"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void buscar(familiaId);
+      <SelectorFamilia
+        valor={familiaId}
+        tipo="so"
+        onSeleccionar={(f) => {
+          setFamiliaId(f.familiaId);
+          void buscar(f.familiaId);
         }}
-      >
-        <label className="auth-campo">
-          {t('altaCliente.numeroCliente')} / familiaId
-          <input type="text" value={familiaId} onChange={(e) => setFamiliaId(e.target.value)} required />
-        </label>
-        <button type="submit" className="boton-tenue" disabled={cargando}>
-          <Search size={16} aria-hidden />
-          {cargando ? t('gestionGerentes.buscando') : t('gestionGerentes.buscar')}
-        </button>
+      />
+      {cargando && (
+        <p className="vacio">
+          <GotaCargando tamano="inline" texto={t('gestionGerentes.buscando')} />
+        </p>
+      )}
+      <div className="panel-acciones">
         {buscada && (
           <button type="button" className="boton-tenue" onClick={() => setModalInvitar(true)}>
             <UserPlus size={16} aria-hidden />
             {t('gestionGerentes.invitar')}
           </button>
         )}
-      </form>
+      </div>
 
       {errorCarga && (
         <p className="auth-error" role="alert">

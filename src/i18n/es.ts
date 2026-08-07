@@ -221,6 +221,14 @@ export const es = {
       sub: 'Para conectarte a una PC de sitio, ve a Filtros y elige el cliente. El Editor de perfil está disponible para preparar las plantillas de configuración.',
       buscar: 'Buscar',
       buscando: 'Buscando...',
+      pcIdEtiqueta: 'ID de PC',
+      equipos: {
+        titulo: 'Equipos',
+        buscar: 'Buscar equipo',
+        buscarPlaceholder: 'Nombre, zona, cliente o ID',
+        sinEquipos: 'Todavía no hay equipos dados de alta.',
+        sinCoincidencias: 'Ningún equipo coincide con la búsqueda.',
+      },
     },
     filtros: {
       titulo: 'Filtros',
@@ -232,6 +240,14 @@ export const es = {
       sinFamilias: 'No hay clientes dados de alta todavía.',
       pcsDe: 'PCs de {{nombre}}',
       sinPcs: 'Este cliente todavía no tiene PCs de sitio dadas de alta.',
+    },
+    selectorFamilia: {
+      buscar: 'Buscar familia',
+      buscarPlaceholder: 'Nombre o número de cliente',
+      sinResultados: 'Ninguna familia coincide con la búsqueda.',
+    },
+    selectorZonasStaff: {
+      sinZonas: 'No hay zonas dadas de alta todavía en ninguna familia.',
     },
     tarjetaEquipo: {
       conectar: 'Establecer conexión',

@@ -21,6 +21,8 @@ import {
   type ZonaApi,
 } from '../lib/api';
 import { codigoAMensaje } from '../lib/mensajesError';
+import { GotaCargando } from '../components/GotaCargando';
+import { SelectorFamilia } from '../components/SelectorFamilia';
 import { perfilVacio, type ModeloPLC, type TipoPlanta } from '../perfiles/tipos';
 import './lista.css';
 
@@ -79,11 +81,6 @@ export function AltaEquipo() {
     },
     [t],
   );
-
-  function buscar(e: FormEvent) {
-    e.preventDefault();
-    if (familiaId.trim()) void cargar(familiaId.trim());
-  }
 
   /** Da de alta la PC de sitio en Plant_PCs y la deja preseleccionada para el equipo que se está creando. */
   async function altaPc(e: FormEvent) {
@@ -166,15 +163,18 @@ export function AltaEquipo() {
       <p className="panel__titulo">{t('altaEquipo.titulo')}</p>
       <p className="vacio">{t('altaEquipo.sub')}</p>
 
-      <form className="panel-acciones" onSubmit={buscar}>
-        <label className="auth-campo">
-          {t('altaCliente.numeroCliente')} / familiaId
-          <input type="text" value={familiaId} onChange={(e) => setFamiliaId(e.target.value)} required />
-        </label>
-        <button type="submit" className="boton-tenue" disabled={cargando}>
-          {cargando ? t('dashboard.buscando') : t('dashboard.buscar')}
-        </button>
-      </form>
+      <SelectorFamilia
+        valor={familiaId}
+        onSeleccionar={(f) => {
+          setFamiliaId(f.familiaId);
+          void cargar(f.familiaId);
+        }}
+      />
+      {cargando && (
+        <p className="vacio">
+          <GotaCargando tamano="inline" texto={t('dashboard.buscando')} />
+        </p>
+      )}
 
       {error && (
         <p className="auth-error" role="alert">

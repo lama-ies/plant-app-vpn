@@ -1,0 +1,23 @@
+/* Selector de Familia por lista filtrable. La lista tiene un tope de alto con scroll propio — el universo
+   de familias puede crecer, la pantalla que lo contiene no debería. */
+
+.selector-familia {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.selector-familia__actual {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--agua-oscuro);
+  font-weight: 550;
+  margin: 0;
+}
+
+.selector-familia__lista {
+  max-height: 220px;
+  overflow-y: auto;
+}

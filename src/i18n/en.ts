@@ -220,6 +220,14 @@ export const en = {
       sub: 'To connect to a site PC, go to Filters and pick the client. The Profile editor is available to prepare configuration templates.',
       buscar: 'Search',
       buscando: 'Searching...',
+      pcIdEtiqueta: 'PC ID',
+      equipos: {
+        titulo: 'Equipment',
+        buscar: 'Search equipment',
+        buscarPlaceholder: 'Name, zone, client or ID',
+        sinEquipos: 'No equipment has been added yet.',
+        sinCoincidencias: 'No equipment matches the search.',
+      },
     },
     filtros: {
       titulo: 'Filters',
@@ -231,6 +239,14 @@ export const en = {
       sinFamilias: 'No clients onboarded yet.',
       pcsDe: 'PCs of {{nombre}}',
       sinPcs: 'This client has no site PCs onboarded yet.',
+    },
+    selectorFamilia: {
+      buscar: 'Search family',
+      buscarPlaceholder: 'Name or client number',
+      sinResultados: 'No family matches the search.',
+    },
+    selectorZonasStaff: {
+      sinZonas: 'No zones have been created yet in any family.',
     },
     tarjetaEquipo: {
       conectar: 'Establish connection',

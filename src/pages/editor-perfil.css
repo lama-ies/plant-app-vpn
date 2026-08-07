@@ -2,11 +2,13 @@
    diagrama, gráficas, acciones). Reutiliza las primitivas de index.css (auth-campo/auth-boton/etc.) y
    agrega los patrones propios de listas editables (fila + agregar) y selección tipo chip (dashboard). */
 
+/* Sin max-width/margin:auto (2026-08-06, pedido real del usuario): antes esta pantalla y las que
+   comparten `.editor` (AltaCliente, EditorPerfil, GestionGerentes, GestionStaff) quedaban angostas y
+   centradas mientras las de `.panel` (Dashboard, Filtros, AltaEquipo, GestionZonas, GestionPlantillas,
+   Auditoria, PanelErrores) ocupaban el ancho completo — inconsistente entre pantallas del mismo nivel. */
 .editor {
   min-height: calc(100vh - 96px);
   padding: 1.5rem 1.25rem 3rem;
-  max-width: 1000px;
-  margin: 0 auto;
 }
 
 .editor__titulo {

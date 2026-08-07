@@ -23,6 +23,7 @@ import {
 import { codigoAMensaje } from '../lib/mensajesError';
 import { GotaCargando } from '../components/GotaCargando';
 import { Modal } from '../components/Modal';
+import { SelectorZonasStaff } from '../components/SelectorZonasStaff';
 import './editor-perfil.css';
 import './lista.css';
 import './gestion-staff.css';
@@ -207,7 +208,7 @@ function ModalInvitar({ onCerrar, onListo }: PropsInvitar) {
   const [email, setEmail] = useState('');
   const [nombre, setNombre] = useState('');
   const [rol, setRol] = useState(ROLES_STAFF[2]); // coordinador por defecto (evita invitar admin sin querer)
-  const [zonasTexto, setZonasTexto] = useState('');
+  const [zonaIds, setZonaIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   // Cuando SES no está activo, el backend devuelve el código para compartir manualmente.
@@ -218,7 +219,6 @@ function ModalInvitar({ onCerrar, onListo }: PropsInvitar) {
     setError(null);
     setEnviando(true);
     try {
-      const zonaIds = zonasTexto.split(',').map((z) => z.trim()).filter(Boolean);
       const r = await invitarStaff({
         email: email.trim().toLowerCase(),
         nombre: nombre.trim() || undefined,
@@ -268,15 +268,10 @@ function ModalInvitar({ onCerrar, onListo }: PropsInvitar) {
               ))}
             </select>
           </label>
-          <label className="auth-campo">
+          <div className="auth-campo">
             {t('altaCliente.zonas')}
-            <input
-              type="text"
-              value={zonasTexto}
-              onChange={(e) => setZonasTexto(e.target.value)}
-              placeholder={t('altaCliente.zonasEjemplo')}
-            />
-          </label>
+            <SelectorZonasStaff valor={zonaIds} onCambiar={setZonaIds} />
+          </div>
 
           {error && (
             <p className="auth-error" role="alert">
@@ -310,7 +305,7 @@ function ModalEditar({ usuario, propioCorreo, onCerrar, onListo }: PropsEditar) 
   const { t } = useTranslation();
   const [nombre, setNombre] = useState(usuario.nombre ?? '');
   const [rol, setRol] = useState(usuario.rol);
-  const [zonasTexto, setZonasTexto] = useState(usuario.zonaIds.join(', '));
+  const [zonaIds, setZonaIds] = useState<string[]>(usuario.zonaIds);
   const [suspendido, setSuspendido] = useState(usuario.estado === 'suspended');
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
@@ -321,7 +316,6 @@ function ModalEditar({ usuario, propioCorreo, onCerrar, onListo }: PropsEditar) 
     setError(null);
     setEnviando(true);
     try {
-      const zonaIds = zonasTexto.split(',').map((z) => z.trim()).filter(Boolean);
       await actualizarStaff({
         email: usuario.email,
         nombre: nombre.trim() || undefined,
@@ -362,15 +356,10 @@ function ModalEditar({ usuario, propioCorreo, onCerrar, onListo }: PropsEditar) 
             ))}
           </select>
         </label>
-        <label className="auth-campo">
+        <div className="auth-campo">
           {t('altaCliente.zonas')}
-          <input
-            type="text"
-            value={zonasTexto}
-            onChange={(e) => setZonasTexto(e.target.value)}
-            placeholder={t('altaCliente.zonasEjemplo')}
-          />
-        </label>
+          <SelectorZonasStaff valor={zonaIds} onCambiar={setZonaIds} />
+        </div>
 
         {!esUnoMismo && (usuario.estado === 'active' || usuario.estado === 'suspended') && (
           <label className="auth-campo auth-campo--casilla">

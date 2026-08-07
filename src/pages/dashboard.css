@@ -40,3 +40,20 @@
   flex-wrap: wrap;
   gap: 0.6rem;
 }
+
+/* Tarjeta de equipo del tablero (2026-08-06): reusa `.fila-lista`, pero es un <Link> directo (no un botón
+   dentro de una lista) -> se le quita el subrayado/color de enlace por defecto y se le da el mismo hover
+   que las filas clicables normales. */
+.tarjeta-equipo-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+}
+.tarjeta-equipo-link:hover {
+  border-color: var(--agua-oscuro);
+}
+.tarjeta-equipo-link:focus-visible {
+  outline: 2px solid var(--agua-oscuro);
+  outline-offset: 1px;
+}

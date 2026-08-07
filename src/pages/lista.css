@@ -83,7 +83,12 @@
 }
 
 .fila-lista__boton {
+  /* `all: unset` resetea TODO, incluido box-sizing -> vuelve a `content-box` (pisa el `*{box-sizing:
+     border-box}` global de index.css). Con width:100% + padding en content-box, el botón queda ~2rem más
+     ancho que su contenedor real — la causa exacta del desborde horizontal con scroll visto en Filtros/
+     SelectorFamilia (2026-08-06, reporte real del usuario). Se re-declara explícito tras el unset. */
   all: unset;
+  box-sizing: border-box;
   display: block;
   width: 100%;
   padding: 0.8rem 0.95rem;

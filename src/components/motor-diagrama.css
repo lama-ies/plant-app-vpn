@@ -16,10 +16,14 @@
   max-height: 480px;
 }
 
-/* --- Nodo de proceso: ícono bespoke + fondo circular (oculta el extremo de tubería bajo el ícono) ---- */
+/* --- Nodo de proceso: ícono bespoke + fondo circular (oculta el extremo de tubería bajo el ícono) ----
+   Colores reales del tema claro (2026-08-06): antes usaba `--color-superficie`/`--color-borde` (variables
+   que ya no existen desde el rebranding a tema claro, con su fallback oscuro #1e293b/#94a3b8/#e2e8f0
+   quedando siempre activo) — el editor de topología se veía con íconos/botones en fondo oscuro sobre el
+   resto de la app ya clara. */
 .nodo-proceso__fondo {
-  fill: var(--color-superficie, #1e293b);
-  stroke: var(--color-borde, #94a3b8);
+  fill: var(--superficie-alta);
+  stroke: var(--linea);
   stroke-width: 1.5;
 }
 .nodo-proceso--flotante .nodo-proceso__fondo {
@@ -27,7 +31,7 @@
   stroke-dasharray: 3 2;
 }
 .nodo-proceso__icono {
-  color: #e2e8f0;
+  color: var(--texto-tenue);
   overflow: visible;
 }
 .nodo-proceso__datos {
@@ -40,7 +44,7 @@
 }
 .nodo-proceso__etiqueta {
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--texto);
 }
 .nodo-proceso__etiqueta--editable {
   background: none;
@@ -56,8 +60,8 @@
   font-weight: 600;
   font-size: 11px;
   width: 100%;
-  background: var(--color-superficie, #1e293b);
-  border: 1px solid var(--color-borde, #94a3b8);
+  background: var(--superficie-alta);
+  border: 1px solid var(--linea);
   border-radius: 4px;
   color: inherit;
 }
@@ -65,7 +69,7 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
-  color: #94a3b8;
+  color: var(--texto-tenue);
 }
 .nodo-proceso__valor {
   white-space: nowrap;
@@ -77,7 +81,7 @@
   fill: currentColor;
 }
 .tuberia-iso__flecha {
-  fill: var(--color-superficie, #1e293b);
+  fill: var(--superficie-alta);
 }
 .tuberia-iso--alimentacion {
   color: var(--color-tuberia-alimentacion);
@@ -91,13 +95,13 @@
 
 /* --- Badge de sensores sobre una tubería: tamaño medido por getBBox(), arrastrable solo en editor ---- */
 .etiqueta-tuberia__fondo {
-  fill: var(--color-superficie, #1e293b);
-  stroke: var(--color-borde, #94a3b8);
+  fill: var(--superficie-alta);
+  stroke: var(--linea);
   stroke-width: 1;
 }
 .etiqueta-tuberia__texto {
   font-size: 9px;
-  fill: #e2e8f0;
+  fill: var(--texto);
 }
 .etiqueta-tuberia--arrastrable {
   cursor: grab;
@@ -114,7 +118,7 @@
   display: flex;
   gap: 10px;
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--texto-tenue);
   pointer-events: none;
 }
 .motor-diagrama__leyenda-item {
@@ -158,14 +162,22 @@
   gap: 4px;
 }
 .lienzo-zoomable__controles button {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 28px;
   height: 28px;
-  border-radius: 6px;
-  border: 1px solid var(--color-borde, #94a3b8);
-  background: var(--color-superficie, #1e293b);
-  color: inherit;
+  background: var(--fondo-2);
+  color: var(--texto-tenue);
+  border: 1px solid var(--linea);
+  border-radius: 8px;
   cursor: pointer;
+}
+.lienzo-zoomable__controles button:hover {
+  border-color: var(--agua-oscuro);
+  color: var(--agua-oscuro);
+}
+.lienzo-zoomable__controles button:focus-visible {
+  outline: 2px solid var(--agua-oscuro);
+  outline-offset: 1px;
 }

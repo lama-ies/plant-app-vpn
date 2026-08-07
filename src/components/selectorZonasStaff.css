@@ -1,0 +1,32 @@
+/* Selector de zonas de staff: checkboxes agrupados por familia, con tope de alto y scroll propio — el
+   universo de familias/zonas puede crecer, el modal que lo contiene no debería. */
+
+.selector-zonas-staff {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.selector-zonas-staff__familia {
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+}
+
+.selector-zonas-staff__familia legend {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--texto-tenue);
+  padding: 0 0.3rem;
+}
+
+.selector-zonas-staff__opcion {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  padding: 0.15rem 0;
+}

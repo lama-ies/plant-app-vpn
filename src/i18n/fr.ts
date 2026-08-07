@@ -220,6 +220,14 @@ export const fr = {
       sub: "Pour vous connecter à une PC de site, allez dans Filtres et choisissez le client. L'éditeur de profil est disponible pour préparer les modèles de configuration.",
       buscar: 'Rechercher',
       buscando: 'Recherche...',
+      pcIdEtiqueta: 'ID du PC',
+      equipos: {
+        titulo: 'Équipements',
+        buscar: "Rechercher un équipement",
+        buscarPlaceholder: 'Nom, zone, client ou ID',
+        sinEquipos: "Aucun équipement n'a encore été ajouté.",
+        sinCoincidencias: 'Aucun équipement ne correspond à la recherche.',
+      },
     },
     filtros: {
       titulo: 'Filtres',
@@ -231,6 +239,14 @@ export const fr = {
       sinFamilias: 'Aucun client créé pour le moment.',
       pcsDe: 'PC de {{nombre}}',
       sinPcs: 'Ce client n\'a pas encore de PC de site.',
+    },
+    selectorFamilia: {
+      buscar: 'Rechercher une famille',
+      buscarPlaceholder: 'Nom ou numéro de client',
+      sinResultados: 'Aucune famille ne correspond à la recherche.',
+    },
+    selectorZonasStaff: {
+      sinZonas: "Aucune zone n'a encore été créée dans aucune famille.",
     },
     tarjetaEquipo: {
       conectar: 'Établir la connexion',

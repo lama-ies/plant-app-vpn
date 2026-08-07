@@ -2,13 +2,14 @@
 // BASE por tipo de planta (número fijo y conocido: osmosis/ptar/hidroneumatico, no necesitan listado) y
 // las PERSONALIZADAS por equipo — desbloqueadas por Plant_Equipos/AltaEquipo.tsx (antes no existía ningún
 // alta de planta/equipo individual; ver plan-de-trabajo.md Fase 6.6.13).
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, FileCog, Plus, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { listarEquipos, obtenerPerfilBase, type EquipoApi } from '../lib/api';
 import { codigoAMensaje } from '../lib/mensajesError';
 import { GotaCargando } from '../components/GotaCargando';
+import { SelectorFamilia } from '../components/SelectorFamilia';
 import type { TipoPlanta } from '../perfiles/tipos';
 import './lista.css';
 
@@ -54,11 +55,6 @@ export function GestionPlantillas() {
     }
   }, [t]);
 
-  function buscar(e: FormEvent) {
-    e.preventDefault();
-    if (familiaId.trim()) void buscarEquipos(familiaId.trim());
-  }
-
   return (
     <div className="panel">
       <p className="panel__titulo">{t('gestionPlantillas.titulo')}</p>
@@ -93,19 +89,20 @@ export function GestionPlantillas() {
 
       <p className="panel__titulo panel__titulo--secundario">{t('gestionPlantillas.tituloPersonalizadas')}</p>
 
-      <form className="panel-acciones" onSubmit={buscar}>
-        <label className="auth-campo">
-          {t('altaCliente.numeroCliente')} / familiaId
-          <input type="text" value={familiaId} onChange={(e) => setFamiliaId(e.target.value)} required />
-        </label>
-        <button type="submit" className="boton-tenue" disabled={cargando}>
-          {cargando ? t('dashboard.buscando') : t('dashboard.buscar')}
-        </button>
+      <SelectorFamilia
+        valor={familiaId}
+        onSeleccionar={(f) => {
+          setFamiliaId(f.familiaId);
+          void buscarEquipos(f.familiaId);
+        }}
+      />
+      <div className="panel-acciones">
+        {cargando && <GotaCargando tamano="inline" texto={t('dashboard.buscando')} />}
         <Link to="/alta-equipo" className="boton-tenue">
           <Plus size={15} aria-hidden />
           {t('nav.altaEquipo')}
         </Link>
-      </form>
+      </div>
 
       {error && (
         <p className="auth-error" role="alert">
