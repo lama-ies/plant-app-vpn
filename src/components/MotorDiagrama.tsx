@@ -2,13 +2,14 @@
 // vista previa del editor. Dibuja CUALQUIER DiagramaEquipo ya ensamblado: no conoce el catálogo de
 // segmentos ni el ensamblador. Este editor NUNCA tiene telemetría real: cada sensor muestra el TAG
 // (variable asignada) para confirmar el enlace visualmente, no un valor en vivo.
-import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent, type RefObject } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ConexionDiagrama, DiagramaEquipo, NodoDiagrama } from '../diagramas/tipos';
 import { medioDeTuberia, TuberiaIso } from './TuberiaIso';
 import { LienzoZoomable } from './LienzoZoomable';
 import { pixelesAUnidadesViewBox } from '../diagramas/zoomIso';
 import { reencaminarRetornos } from '../diagramas/rutaRetorno';
+import { calcularEncuadre } from '../diagramas/encuadre';
 import type { Punto } from '../diagramas/tuberiaIsoGeometria';
 import { ICONO_PROCESO } from './iconosProceso';
 import './motor-diagrama.css';
@@ -76,9 +77,32 @@ export function MotorDiagrama({ diagrama, onEditarEtiqueta, onCambiar, lecturas,
     });
   }
 
+  // Proporción REAL del diagrama (ancho/alto de su viewBox). Se publica como variable CSS para que el
+  // lienzo adopte la forma del diagrama en vez de una caja fija: un tren de ósmosis es muy ancho y bajo
+  // (relación ~6) mientras que un hidroneumático de 5 bombas es más alto que ancho (~0.8). Con una caja de
+  // proporción fija, uno de los dos casos siempre queda mal — el dibujo se encoge para caber y sobra
+  // muchísimo espacio vacío al lado o arriba/abajo (reportado por el usuario en los dos sentidos).
+  // Ver motor-diagrama.css `--relacion-diagrama`.
+  // El encuadre se RECALCULA al dibujar en vez de usar `diagrama.viewBox`: el guardado quedó congelado al
+  // ensamblar y no contempla el ancho de las etiquetas, así que el nodo más a la derecha salía cortado.
+  // Ver encuadre.ts (mismo criterio que ya usaba plant-portal-client).
+  const viewBox = useMemo(
+    () => calcularEncuadre(dibujo.nodos, dibujo.conexiones),
+    [dibujo],
+  );
+
+  const relacion = useMemo(() => {
+    const [, , ancho, alto] = viewBox.split(/\s+/).map(Number);
+    // Un viewBox inválido o degenerado no debe romper el layout: se cae a una proporción apaisada sensata.
+    return Number.isFinite(ancho) && Number.isFinite(alto) && ancho > 0 && alto > 0 ? ancho / alto : 3;
+  }, [viewBox]);
+
   return (
-    <div className="motor-diagrama__contenedor">
-      <LienzoZoomable viewBoxBase={diagrama.viewBox} onPantallaCompleta={onPantallaCompleta}>
+    <div
+      className="motor-diagrama__contenedor"
+      style={{ '--relacion-diagrama': relacion } as CSSProperties}
+    >
+      <LienzoZoomable viewBoxBase={viewBox} onPantallaCompleta={onPantallaCompleta}>
         {(viewBoxActual) => (
           <svg ref={svgRef} viewBox={viewBoxActual} className="motor-diagrama">
             <g aria-hidden className={enLinea ? 'motor-diagrama__flujo' : undefined}>

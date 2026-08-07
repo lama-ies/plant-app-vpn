@@ -1,7 +1,11 @@
 /* Pantalla completa del diagrama dentro de la app: sin topbar (ruta fuera de AppShell), cabecera mínima
-   con el botón de regreso + lienzo ocupando TODO el alto restante del viewport. */
+   con el botón de regreso + lienzo ocupando todo el alto restante del viewport. */
 
 .planta-completa {
+  /* Alto FIJO de la cabecera, no `auto`: el lienzo calcula su alto máximo restándolo a 100vh, y ese cálculo
+     tiene que ser exacto. Por eso la cabecera tampoco envuelve (`flex-wrap` quedaría fuera del cálculo). */
+  --alto-cabecera: 3.5rem;
+  --pad-lienzo: 1rem;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -9,11 +13,11 @@
 }
 
 .planta-completa__cab {
+  height: var(--alto-cabecera);
   display: flex;
   align-items: center;
   gap: 1rem;
-  flex-wrap: wrap;
-  padding: 0.75rem 1.1rem;
+  padding: 0 1.1rem;
   background: var(--fondo-2);
   border-bottom: 1px solid var(--linea);
 }
@@ -27,6 +31,10 @@
 .planta-completa__nombre {
   font-weight: 650;
   font-size: 1.05rem;
+  /* La cabecera no crece: un nombre largo se recorta en vez de empujar el lienzo. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .planta-completa__tipo {
@@ -37,40 +45,27 @@
 /* Empuja el estado al extremo derecho. */
 .planta-completa__cab .estado-pill {
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 .planta-completa__lienzo {
   flex: 1;
   min-height: 0;
-  padding: 0.9rem 1.1rem 1.1rem;
+  padding: var(--pad-lienzo);
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* El lienzo se estira por FLEX en toda la cadena, NO con `height: 100%` (2026-08-07, medido en el
-   navegador sobre la pantalla equivalente del portal). El porcentaje no resuelve: `.planta-completa__lienzo`
-   es un flex item cuyo alto sale de `flex-grow`, y contra un padre sin alto propio definido el
-   `height: 100%` del hijo cae a `auto` — el contenedor se quedaba en el alto natural del SVG y el resto de
-   la pantalla quedaba vacío, que es justo lo que se reportó.
-   `min-height: 0` en cada nivel porque el mínimo automático de un flex item es su contenido: sin eso
-   ninguno puede encogerse por debajo del alto natural del SVG. */
-.planta-completa__lienzo .motor-diagrama__contenedor,
-.planta-completa__lienzo .lienzo-zoomable {
-  flex: 1;
-  min-height: 0;
-  display: flex;
+/* Único ajuste real de esta pantalla: subirle al lienzo el alto máximo que puede ocupar. Toda la lógica de
+   forma vive en motor-diagrama.css (`--relacion-diagrama`), así que el diagrama se adapta igual acá que en
+   una tarjeta — solo que con mucho más espacio disponible. */
+.planta-completa__lienzo .motor-diagrama__contenedor {
+  --alto-max-lienzo: calc(100vh - var(--alto-cabecera) - var(--pad-lienzo) * 2);
 }
 
 .planta-completa__lienzo .lienzo-zoomable {
   border: 1px solid var(--linea);
   border-radius: var(--r-card);
   background: var(--superficie);
-}
-
-/* Con `preserveAspectRatio` por defecto el dibujo mantiene su proporción y se centra: el alto extra no lo
-   agranda, pero da espacio real para desplazarse al acercar, que es el sentido de esta pantalla. */
-.planta-completa__lienzo .motor-diagrama {
-  flex: 1;
-  min-height: 0;
-  height: auto;
-  max-height: none;
 }

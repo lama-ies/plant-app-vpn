@@ -7,13 +7,31 @@
   --color-tuberia-rechazo: #ef4444;
 }
 
+/* Lienzo ADAPTATIVO (2026-08-07): la caja toma la proporción del propio diagrama en vez de una forma fija.
+   `--relacion-diagrama` (ancho/alto del viewBox) la publica MotorDiagrama.tsx; `--alto-max-lienzo` es el
+   alto máximo que le concede la pantalla que lo hospeda (una tarjeta lo deja en su valor por defecto; la
+   pantalla completa lo sube a todo el viewport).
+
+   Por qué esta fórmula y no una caja fija: un tren de ósmosis es muy ancho y bajo (relación ~6) y un
+   hidroneumático de 5 bombas es más alto que ancho (~0.8). Con caja fija, el <svg> conserva su proporción
+   (preserveAspectRatio) y se encoge para caber, así que uno de los dos casos SIEMPRE queda diminuto y
+   rodeado de espacio vacío — que es exactamente lo que se reportó, primero en un sentido y luego en el
+   otro. Acá el ancho es "todo el disponible, salvo que eso obligue a pasarse del alto máximo", y el alto
+   sale de la proporción: el dibujo llena la caja en las dos direcciones, sea cual sea la combinación de
+   segmentos. `margin-inline: auto` centra la caja cuando resulta más angosta que el hueco. */
 .motor-diagrama__contenedor {
   position: relative;
+  --alto-max-lienzo: 480px;
+  width: min(100%, calc(var(--alto-max-lienzo) * var(--relacion-diagrama, 3)));
+  aspect-ratio: var(--relacion-diagrama, 3);
+  margin-inline: auto;
+}
+.motor-diagrama__contenedor .lienzo-zoomable {
+  height: 100%;
 }
 .motor-diagrama {
   width: 100%;
-  height: auto;
-  max-height: 480px;
+  height: 100%;
 }
 
 /* --- Nodo de proceso: ícono bespoke + fondo circular (oculta el extremo de tubería bajo el ícono) ----
