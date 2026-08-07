@@ -101,6 +101,12 @@ export interface ConexionSegmento {
    * en N3: la alimentación hacia Bomba Alta Presión/Recuperador PX debe doblar en la columna de ORIGEN
    * — Filtro Canasta —, no en la del destino, para dejar esa columna libre para el Rechazo). */
   ordenRuta?: 'col-fila' | 'fila-col';
+  /** Desvío en unidades de elevación: la tubería sube esta cantidad, cruza a esa altura y baja al destino,
+   * en vez de ir por el tramo directo. Existe para las tuberías de RETORNO, que van en sentido contrario
+   * sobre el mismo par de nodos que una tubería de ida y, sin desvío, se dibujan encima tapándola (caso
+   * real: en el núcleo N2 el Rechazo Membranas→TurboCharger cubría por completo la Alimentación
+   * TurboCharger→Membranas, y el tramo se veía rojo en vez de verde). Fraccionario está permitido. */
+  desvioElevacion?: number;
 }
 
 /** Rango de repetición de un segmento (ej. 1 a 5 pozos, 1 a 5 bombas de un grupo de presión). */

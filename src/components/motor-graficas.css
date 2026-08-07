@@ -1,0 +1,87 @@
+/* Motor único de gráficas: lienzo SVG (rejilla + series) + leyenda. Mismos tokens que el resto del portal. */
+
+.motor-graficas {
+  background: var(--fondo-2);
+  border: 1px solid var(--linea);
+  border-radius: 10px;
+  padding: 0.85rem 0.9rem;
+}
+
+.motor-graficas__titulo {
+  margin: 0 0 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--texto-tenue);
+}
+
+.motor-graficas__lienzo {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.motor-graficas__rejilla {
+  stroke: var(--linea);
+  stroke-width: 1;
+}
+
+.motor-graficas__eje-y,
+.motor-graficas__eje-x {
+  font-family: var(--fuente-datos);
+  font-size: 8px;
+  fill: var(--texto-tenue);
+}
+
+.motor-graficas__serie {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.motor-graficas__serie--0 {
+  stroke: var(--agua-oscuro);
+}
+.motor-graficas__serie--1 {
+  stroke: var(--ok);
+}
+.motor-graficas__serie--2 {
+  stroke: var(--advertencia);
+}
+.motor-graficas__serie--3 {
+  stroke: var(--falla);
+}
+
+.motor-graficas__leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.6rem;
+}
+
+.motor-graficas__leyenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--texto-tenue);
+}
+
+.motor-graficas__punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.motor-graficas__punto--0 {
+  background: var(--agua-oscuro);
+}
+.motor-graficas__punto--1 {
+  background: var(--ok);
+}
+.motor-graficas__punto--2 {
+  background: var(--advertencia);
+}
+.motor-graficas__punto--3 {
+  background: var(--falla);
+}

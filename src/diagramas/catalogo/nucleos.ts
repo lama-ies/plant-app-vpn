@@ -27,7 +27,15 @@ export const SEGMENTO_N1: SegmentoDiagrama = {
   anclaDosificadoras: 'filtroCanasta',
 };
 
-/** N2 — turbo: recuperación de energía del rechazo vía TurboCharger. */
+/** N2 — turbo: recuperación de energía del rechazo vía TurboCharger.
+ *
+ * El Rechazo Membranas→TurboCharger va con `desvioElevacion` (sube por arriba de Membranas, cruza y baja
+ * al TurboCharger) porque recorre el MISMO par de nodos que la Alimentación TurboCharger→Membranas, en
+ * sentido contrario. Sin el desvío las dos tuberías comparten el tramo y la roja se dibuja encima de la
+ * verde: ese tramo se veía completamente rojo, como si el turbo alimentara rechazo a la membrana
+ * (reportado por el usuario con la muestra del 2026-08-07). Físicamente además es lo correcto: el
+ * concentrado sale por la parte alta de las membranas y entra por la parte alta del turbo, que es lo que
+ * lo mueve; el turbo recién entonces descarga a Drenaje. */
 export const SEGMENTO_N2: SegmentoDiagrama = {
   id: 'osmosis.nucleo.N2',
   nodos: [
@@ -44,7 +52,7 @@ export const SEGMENTO_N2: SegmentoDiagrama = {
     { desde: 'filtroCanasta', hasta: 'bombaAltaPresion', tipo: 'alimentacion' },
     { desde: 'bombaAltaPresion', hasta: 'turbocharger', tipo: 'alimentacion' },
     { desde: 'turbocharger', hasta: 'membranaRO', tipo: 'alimentacion' },
-    { desde: 'membranaRO', hasta: 'turbocharger', etiqueta: 'Rechazo', tipo: 'rechazo' },
+    { desde: 'membranaRO', hasta: 'turbocharger', etiqueta: 'Rechazo', tipo: 'rechazo', desvioElevacion: 0.7 },
     { desde: 'turbocharger', hasta: 'drenaje', tipo: 'rechazo' },
   ],
   entradaIdLocal: 'valvulaActuadora',

@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { ensamblar } from './ensamblador';
 import type { SegmentoDiagrama } from './tipos';
 import { SEGMENTO_A1 } from './catalogo/alimentacion';
-import { SEGMENTO_N1, SEGMENTO_N3 } from './catalogo/nucleos';
+import { SEGMENTO_N1, SEGMENTO_N2, SEGMENTO_N3 } from './catalogo/nucleos';
 import { SEGMENTO_COMPLEMENTO_NINGUNO, SEGMENTO_CISTERNA_FINAL, SEGMENTO_C2, SEGMENTO_UV } from './catalogo/complementos';
 
 const SEG_A: SegmentoDiagrama = {
@@ -153,4 +153,37 @@ test('0 dosificadoras (o parámetro omitido): no agrega ningún nodo dosificador
     { segmento: SEGMENTO_A1 }, { segmento: SEGMENTO_N1 }, { segmento: SEGMENTO_COMPLEMENTO_NINGUNO }, { segmento: SEGMENTO_CISTERNA_FINAL },
   ]);
   assert.equal(resultado.nodos.filter((n) => n.tipo === 'dosificadora').length, 0);
+});
+
+// --- Desvío por elevación: tuberías de retorno que no deben pisar la de ida ---------------------------
+
+test('N2 turbo: el Rechazo Membranas->TurboCharger sube por encima de los dos nodos y NO comparte el tramo con la Alimentación', () => {
+  const d = ensamblar([{ segmento: SEGMENTO_N2 }]);
+  const idDe = (local: string) => `${SEGMENTO_N2.id}#0#${local}`;
+  const rechazo = d.conexiones.find((c) => c.desde === idDe('membranaRO') && c.hasta === idDe('turbocharger'))!;
+  const alimentacion = d.conexiones.find((c) => c.desde === idDe('turbocharger') && c.hasta === idDe('membranaRO'))!;
+
+  assert.equal(rechazo.tipo, 'rechazo');
+  assert.equal(alimentacion.tipo, 'alimentacion');
+
+  // La alimentación es el tramo recto entre ambos (sin waypoints); el rechazo va por arriba.
+  assert.equal(alimentacion.ruta.length, 0);
+  const turbo = d.nodos.find((n) => n.id === idDe('turbocharger'))!;
+  const membrana = d.nodos.find((n) => n.id === idDe('membranaRO'))!;
+  assert.equal(turbo.y, membrana.y, 'turbo y membrana están a la misma altura: el tramo directo es horizontal');
+
+  assert.ok(rechazo.ruta.length >= 2, 'el rechazo dobla al menos dos veces (sube y baja)');
+  // En SVG, menor y = más arriba. Todo waypoint del rechazo queda por encima de ambos nodos.
+  for (const p of rechazo.ruta) assert.ok(p.y < membrana.y, `waypoint en y=${p.y} debería estar sobre y=${membrana.y}`);
+  // Sube en la columna de la membrana y baja en la del turbo — el recorrido de ida queda libre.
+  assert.equal(rechazo.ruta[0].x, membrana.x);
+  assert.equal(rechazo.ruta[rechazo.ruta.length - 1].x, turbo.x);
+});
+
+test('el viewBox encuadra también los waypoints de tubería, no solo los nodos (si no, el desvío se recorta)', () => {
+  const d = ensamblar([{ segmento: SEGMENTO_N2 }]);
+  const [, minY, , alto] = d.viewBox.split(' ').map(Number);
+  const yMinRuta = Math.min(...d.conexiones.flatMap((c) => c.ruta).map((p) => p.y));
+  assert.ok(minY < yMinRuta, `el borde superior del viewBox (${minY}) debe quedar sobre el waypoint más alto (${yMinRuta})`);
+  assert.ok(minY + alto > Math.max(...d.nodos.map((n) => n.y)));
 });

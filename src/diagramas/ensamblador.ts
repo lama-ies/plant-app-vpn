@@ -30,6 +30,7 @@ interface ConexionCruda {
   etiqueta?: string;
   tipo: TipoFlujo;
   ordenRuta?: 'col-fila' | 'fila-col';
+  desvioElevacion?: number;
 }
 
 /** Expande cada SegmentoElegido a sus copias individuales (1 copia si no es repetible). */
@@ -48,7 +49,27 @@ function expandirCopias(secuencia: SegmentoElegido[]): InstanciaSegmento[] {
  * la fila de destino y después a su col — usado cuando dos tuberías distintas convergerían en el mismo
  * tramo si ambas usaran el orden por defecto (ver spec §9, fix real del núcleo N3). El cambio de elevación,
  * si lo hay, siempre termina exactamente en `hasta`, sin waypoint propio. */
-function calcularRuta(desde: PosicionGrid, hasta: PosicionGrid, orden: 'col-fila' | 'fila-col' = 'col-fila'): PuntoPantalla[] {
+function calcularRuta(
+  desde: PosicionGrid,
+  hasta: PosicionGrid,
+  orden: 'col-fila' | 'fila-col' = 'col-fila',
+  desvioElevacion = 0,
+): PuntoPantalla[] {
+  // Ruta con desvío por arriba: sube en la columna de origen, cruza a esa altura y baja en la de destino.
+  // La usan las tuberías de retorno para no dibujarse encima de la tubería de ida (ver `desvioElevacion`
+  // en tipos.ts). El desvío ignora `orden`: al ir por una altura propia ya no comparte tramo con nadie.
+  if (desvioElevacion !== 0) {
+    const alturaDesvio = desde.elevacion + desvioElevacion;
+    const puntos: PosicionGrid[] = [
+      desde,
+      { col: desde.col, fila: desde.fila, elevacion: alturaDesvio },
+      { col: hasta.col, fila: desde.fila, elevacion: alturaDesvio },
+      { col: hasta.col, fila: hasta.fila, elevacion: alturaDesvio },
+      hasta,
+    ];
+    return dedupe(puntos).slice(1, -1).map((p) => gridAPantalla(p.col, p.fila, p.elevacion));
+  }
+
   const intermedio: PosicionGrid = orden === 'fila-col'
     ? { col: desde.col, fila: hasta.fila, elevacion: desde.elevacion }
     : { col: hasta.col, fila: desde.fila, elevacion: desde.elevacion };
@@ -58,13 +79,17 @@ function calcularRuta(desde: PosicionGrid, hasta: PosicionGrid, orden: 'col-fila
     { col: hasta.col, fila: hasta.fila, elevacion: desde.elevacion },
     hasta,
   ];
-  const unicos = puntosGrid.filter((p, i) => {
+  const intermedios = dedupe(puntosGrid).slice(1, -1);
+  return intermedios.map((p) => gridAPantalla(p.col, p.fila, p.elevacion));
+}
+
+/** Quita waypoints repetidos consecutivos (una esquina que cae sobre el punto anterior no es una esquina). */
+function dedupe(puntos: PosicionGrid[]): PosicionGrid[] {
+  return puntos.filter((p, i) => {
     if (i === 0) return true;
-    const prev = puntosGrid[i - 1];
+    const prev = puntos[i - 1];
     return p.col !== prev.col || p.fila !== prev.fila || p.elevacion !== prev.elevacion;
   });
-  const intermedios = unicos.slice(1, -1);
-  return intermedios.map((p) => gridAPantalla(p.col, p.fila, p.elevacion));
 }
 
 /** Ensambla la secuencia completa en un DiagramaEquipo con posiciones/ids absolutos, ya proyectados. */
@@ -117,6 +142,7 @@ export function ensamblar(secuencia: SegmentoElegido[], numDosificadoras = 0): D
         etiqueta: c.etiqueta,
         tipo: c.tipo,
         ordenRuta: c.ordenRuta,
+        desvioElevacion: c.desvioElevacion,
       });
     }
 
@@ -173,13 +199,16 @@ export function ensamblar(secuencia: SegmentoElegido[], numDosificadoras = 0): D
     etiqueta: c.etiqueta,
     sensores: [],
     tipo: c.tipo,
-    ruta: calcularRuta(posiciones.get(c.desde)!, posiciones.get(c.hasta)!, c.ordenRuta),
+    ruta: calcularRuta(posiciones.get(c.desde)!, posiciones.get(c.hasta)!, c.ordenRuta, c.desvioElevacion),
   }));
 
-  const minX = nodos.length ? Math.min(...nodos.map((n) => n.x)) - 100 : 0;
-  const maxX = nodos.length ? Math.max(...nodos.map((n) => n.x)) + 100 : 400;
-  const minY = nodos.length ? Math.min(...nodos.map((n) => n.y)) - 100 : 0;
-  const maxY = nodos.length ? Math.max(...nodos.map((n) => n.y)) + 100 : 200;
+  // El encuadre mide nodos Y waypoints de tubería: una conexión con `desvioElevacion` pasa por encima del
+  // nodo más alto y, midiendo solo nodos, quedaba recortada por el viewBox.
+  const puntos = [...nodos.map((n) => ({ x: n.x, y: n.y })), ...conexiones.flatMap((c) => c.ruta)];
+  const minX = puntos.length ? Math.min(...puntos.map((p) => p.x)) - 100 : 0;
+  const maxX = puntos.length ? Math.max(...puntos.map((p) => p.x)) + 100 : 400;
+  const minY = puntos.length ? Math.min(...puntos.map((p) => p.y)) - 100 : 0;
+  const maxY = puntos.length ? Math.max(...puntos.map((p) => p.y)) + 100 : 200;
 
   return {
     viewBox: `${minX} ${minY} ${maxX - minX} ${maxY - minY}`,

@@ -485,6 +485,51 @@ export function obtenerTelemetriaActual(equipoId: string) {
   });
 }
 
+/** Un punto de una serie histórica, ya normalizado (ISO UTC + número). */
+export interface PuntoHistorial {
+  timestamp: string;
+  valor: number;
+}
+
+/**
+ * Fila cruda del historial de Timestream (`SELECT *` sobre el registro multi-measure): además de
+ * `time`/`pcId`/`equipoId`/`measure_name`, cada variable reportada en el rango aparece como su propia
+ * columna (nombre = clave de la variable) y el valor SIEMPRE llega como string (ScalarValue de
+ * Timestream). Para sacar la serie de una clave concreta se usa `serieDeVariable`, no acceso directo.
+ */
+export interface FilaHistorialTelemetria {
+  time: string; // formato Timestream: 'YYYY-MM-DD HH:mm:ss.nnnnnnnnn' (UTC, sin 'T' ni 'Z')
+  pcId?: string;
+  equipoId?: string;
+  measure_name?: string;
+  [clave: string]: string | undefined;
+}
+
+/** Historial de telemetría de un equipo en un rango, para las gráficas de estudio de la vista de planta.
+ * Mismo lambda `Plant_Telemetria` que el estado actual: si vienen `desde`/`hasta` consulta Timestream. */
+export function obtenerHistorialTelemetria(equipoId: string, desde: string, hasta: string) {
+  return peticion<{ historial: FilaHistorialTelemetria[] }>('GET', '/app-vpn/telemetria', {
+    query: { equipoId, desde, hasta },
+  });
+}
+
+/** Convierte el 'YYYY-MM-DD HH:mm:ss.nnnnnnnnn' de Timestream a ISO 8601 UTC (recorta a milisegundos). */
+function timestreamTimeAIso(time: string): string {
+  const [fecha, horaFraccion] = time.split(' ');
+  const [hora, fraccion = '0'] = (horaFraccion ?? '00:00:00').split('.');
+  const ms = fraccion.slice(0, 3).padEnd(3, '0');
+  return `${fecha}T${hora}.${ms}Z`;
+}
+
+/** Extrae la serie histórica de UNA variable de las filas crudas de Timestream. Descarta lo que no sea
+ * numérico finito: las variables booleanas llegan como texto ('true'/'false') y no se pueden graficar. */
+export function serieDeVariable(historial: FilaHistorialTelemetria[], clave: string): PuntoHistorial[] {
+  return historial
+    .filter((fila) => fila[clave] !== undefined && fila[clave] !== null)
+    .map((fila) => ({ timestamp: timestreamTimeAIso(fila.time), valor: Number(fila[clave]) }))
+    .filter((p) => Number.isFinite(p.valor));
+}
+
 /** Fila de Plant_AlarmasActivas (una por código de alarma activo del equipo). */
 export interface AlarmaActivaApi {
   pk: string;

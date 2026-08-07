@@ -1,6 +1,9 @@
-/* Vista de planta (solo lectura): cabecera + lienzo del diagrama en vivo + panel lateral con alarmas y
-   lecturas. Mismo reparto que la pantalla equivalente de plant-portal-client, para que un técnico que use
-   las dos apps no tenga que reaprender dónde está cada cosa. */
+/* Vista de planta (solo lectura): cabecera + lienzo del diagrama en vivo con su lista de sensores, panel
+   lateral (variables, alarmas, ficha técnica) y, a todo lo ancho, las gráficas de estudio.
+
+   Mismo reparto que la pantalla equivalente de plant-portal-client: un técnico que use las dos apps no
+   tiene que reaprender dónde está cada cosa. `.fila-lectura` es la fila etiqueta/valor/unidad compartida
+   con `lista-sensores.css`, y se define acá (igual que `diagrama.css` en el portal) para no duplicarla. */
 
 .vista-planta__top {
   display: flex;
@@ -49,12 +52,32 @@
   }
 }
 
-.vista-planta__lienzo {
+/* Tarjeta base de cada sección (lienzo, bloques del lateral y las gráficas comparten el mismo marco). */
+.vista-planta__lienzo,
+.vista-planta__bloque,
+.vista-planta__graficas {
   background: var(--superficie);
   border: 1px solid var(--linea);
-  border-radius: 10px;
+  border-radius: var(--r-card);
   padding: 1rem;
+}
+
+/* El lienzo recorta su propio contenido (el SVG se desplaza/zoomea dentro). */
+.vista-planta__lienzo {
   overflow: hidden;
+}
+
+.vista-planta__graficas {
+  margin-top: 1rem;
+}
+
+.vista-planta__titulo {
+  margin: 0 0 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
 }
 
 .vista-planta__lateral {
@@ -63,11 +86,7 @@
   gap: 0.75rem;
 }
 
-.vista-planta__alarmas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-}
+/* --- Variables y ficha técnica: pares etiqueta/valor ------------------------------------------------- */
 
 .vista-planta__lecturas {
   display: flex;
@@ -77,29 +96,103 @@
   overflow-y: auto;
 }
 
-.vista-planta__lectura {
+.fila-lectura {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 0.75rem;
 }
 
-.vista-planta__lectura-etq {
+.fila-lectura__etq {
   font-size: 0.8rem;
   color: var(--texto-tenue);
   min-width: 0;
 }
 
-.vista-planta__lectura-valor {
+.fila-lectura__valor {
   font-family: var(--fuente-datos);
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   white-space: nowrap;
 }
 
-.vista-planta__lectura-unidad {
+.fila-lectura__unidad {
   font-size: 0.72rem;
   font-weight: 400;
   color: var(--texto-tenue);
   margin-left: 0.15rem;
+}
+
+/* --- Alarmas: conteo por severidad + lista de las activas -------------------------------------------- */
+
+.vista-planta__alarmas-resumen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.vista-planta__alarmas-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+/* La severidad se lee por la FORMA del icono (octágono = falla, triángulo = advertencia) además de por el
+   color del código: rojo y ámbar no se distinguen con daltonismo. Tres columnas: icono, código, texto. */
+.alarma-fila {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 0.1rem 0.4rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 8px;
+  background: var(--superficie-alta);
+}
+
+.alarma-fila--falla .alarma-fila__codigo,
+.alarma-fila--falla .alarma-fila__icono {
+  color: var(--falla);
+}
+
+.alarma-fila--advertencia .alarma-fila__codigo,
+.alarma-fila--advertencia .alarma-fila__icono {
+  color: var(--advertencia);
+}
+
+.alarma-fila__codigo {
+  font-family: var(--fuente-datos);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.alarma-fila__desc {
+  font-size: 0.8rem;
+  min-width: 0;
+}
+
+.alarma-fila__hora {
+  grid-column: 1 / -1;
+  font-size: 0.7rem;
+  color: var(--texto-tenue);
+  font-variant-numeric: tabular-nums;
+}
+
+.vista-planta__pie {
+  margin: 0.6rem 0 0;
+  font-size: 0.72rem;
+  color: var(--texto-tenue);
+}
+
+/* --- Gráficas de estudio ----------------------------------------------------------------------------- */
+
+.vista-planta__graficas-rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 0.9rem;
 }
