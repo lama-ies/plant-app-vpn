@@ -1,6 +1,6 @@
 {
   "name": "plant-app-vpn",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "description": "App de escritorio Windows (Tauri v2) de IES Monitor Plant: VPN + SSH/transferencia + administración interna (roles, zonas, alta de clientes/PCs/plantas, editor de perfiles, auditoría, respaldos, panel de errores). Fusiona plant-vpn-client + plant-portal-admin.",
   "private": true,
   "license": "UNLICENSED",
@@ -15,7 +15,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "tsx --test \"src/**/*.test.ts\"",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "i18n:check": "tsx scripts/verificar-i18n.ts"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.0.0",

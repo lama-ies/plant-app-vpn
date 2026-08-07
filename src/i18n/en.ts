@@ -245,6 +245,8 @@ export const en = {
         fallas_other: '{{count}} faults',
         advertencias_one: '{{count}} warning',
         advertencias_other: '{{count}} warnings',
+        editarPerfil: 'Edit profile',
+        verPlanta: 'View plant',
         actualizado: 'Updated {{t}} ago',
       },
     },
@@ -432,6 +434,12 @@ export const en = {
         flotadorOnOff: 'Float switch', alarmaNivel: 'Level alarm', onOffEquipo: 'On/Off',
         rpm: 'RPM', hz: 'Hz', falla: 'Fault', porcentajeFuncionamiento: 'Operating %',
       },
+    },
+    vistaPlanta: {
+      sinEquipo: 'Select a unit from the dashboard to view its plant.',
+      sinDiagrama: 'This unit does not have a plant diagram configured in its profile yet.',
+      alarmas: 'Status',
+      lecturas: 'Readings',
     },
     tipoPlanta: {
       osmosis: 'Reverse osmosis',

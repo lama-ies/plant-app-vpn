@@ -18,6 +18,17 @@ import './motor-diagrama.css';
 const RADIO_ICONO = 30;
 const LADO_ICONO = RADIO_ICONO * 1.7;
 
+/**
+ * Valor en vivo de una variable, para el modo VISTA (ver `MotorDiagrama.lecturas`). Se define aquí y no en
+ * `perfiles/tipos.ts` porque no es parte del perfil: es telemetría resuelta contra `Plant_Telemetria`.
+ */
+export interface Lectura {
+  clave: string;
+  etiqueta: string;
+  unidad: string;
+  valor: number;
+}
+
 interface Props {
   diagrama: DiagramaEquipo;
   /** Presente = modo editor (permite renombrar nodos). Ausente = solo lectura (portal-client). */
@@ -26,9 +37,25 @@ interface Props {
    * `offsetEtiqueta`). Ausente = solo lectura: se respeta la posición que dejó el admin, sin poder tocarla
    * (ver gobierno de la función, spec §9 addendum). */
   onCambiar?: (diagrama: DiagramaEquipo) => void;
+  /**
+   * Presente = modo VISTA EN VIVO (pantalla "Ver planta", 2026-08-07): en vez del NOMBRE de la variable
+   * enlazada —que es lo que interesa al editar— se pinta su VALOR actual con su unidad. Ausente = modo
+   * editor/topología, comportamiento previo sin cambios.
+   */
+  lecturas?: Lectura[];
+  /** Solo en modo vivo: anima el flujo de las tuberías cuando el equipo está reportando. */
+  enLinea?: boolean;
 }
 
-export function MotorDiagrama({ diagrama, onEditarEtiqueta, onCambiar }: Props) {
+/** Qué se pinta en el badge de un sensor: el valor en vivo si lo hay, si no el nombre de la variable. */
+function textoSensor(sensor: { variable?: string | null; tipo: string }, lecturas?: Lectura[]): string {
+  if (!lecturas) return sensor.variable ?? sensor.tipo;
+  const l = sensor.variable ? lecturas.find((x) => x.clave === sensor.variable) : undefined;
+  if (!l) return sensor.variable ?? sensor.tipo;
+  return `${l.valor}${l.unidad ?? ''}`;
+}
+
+export function MotorDiagrama({ diagrama, onEditarEtiqueta, onCambiar, lecturas, enLinea }: Props) {
   const { t } = useTranslation();
   const porId = new Map(diagrama.nodos.map((n) => [n.id, n]));
   const svgRef = useRef<SVGSVGElement>(null);
@@ -46,7 +73,7 @@ export function MotorDiagrama({ diagrama, onEditarEtiqueta, onCambiar }: Props) 
       <LienzoZoomable viewBoxBase={diagrama.viewBox}>
         {(viewBoxActual) => (
           <svg ref={svgRef} viewBox={viewBoxActual} className="motor-diagrama">
-            <g aria-hidden>
+            <g aria-hidden className={enLinea ? 'motor-diagrama__flujo' : undefined}>
               {diagrama.conexiones.map((c) => {
                 const a = porId.get(c.desde);
                 const b = porId.get(c.hasta);
@@ -71,7 +98,8 @@ export function MotorDiagrama({ diagrama, onEditarEtiqueta, onCambiar }: Props) 
             </g>
 
             {diagrama.nodos.map((n) => (
-              <NodoProceso key={n.id} nodo={n} onEditarEtiqueta={onEditarEtiqueta} />
+              <NodoProceso
+                lecturas={lecturas} key={n.id} nodo={n} onEditarEtiqueta={onEditarEtiqueta} />
             ))}
           </svg>
         )}
@@ -92,8 +120,8 @@ export function MotorDiagrama({ diagrama, onEditarEtiqueta, onCambiar }: Props) 
 }
 
 function NodoProceso({
-  nodo, onEditarEtiqueta,
-}: { nodo: NodoDiagrama; onEditarEtiqueta?: (id: string, etiqueta: string) => void }) {
+  nodo, onEditarEtiqueta, lecturas,
+}: { nodo: NodoDiagrama; onEditarEtiqueta?: (id: string, etiqueta: string) => void; lecturas?: Lectura[] }) {
   const { t } = useTranslation();
   const [editando, setEditando] = useState(false);
   const [valor, setValor] = useState(nodo.etiqueta);
@@ -144,7 +172,9 @@ function NodoProceso({
           {nodo.sensores.length > 0 && (
             <span className="nodo-proceso__valores">
               {nodo.sensores.map((s, i) => (
-                <span className="nodo-proceso__valor" key={i}>{s.variable ?? s.tipo}</span>
+                // Modo vivo: valor + unidad. Modo editor: nombre de la variable enlazada (o el tipo de
+                // slot si aún no se enlazó), que es lo que el administrador necesita ver para confirmar.
+                <span className="nodo-proceso__valor" key={i}>{textoSensor(s, lecturas)}</span>
               ))}
             </span>
           )}

@@ -1,0 +1,105 @@
+/* Vista de planta (solo lectura): cabecera + lienzo del diagrama en vivo + panel lateral con alarmas y
+   lecturas. Mismo reparto que la pantalla equivalente de plant-portal-client, para que un técnico que use
+   las dos apps no tenga que reaprender dónde está cada cosa. */
+
+.vista-planta__top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.vista-planta__ident {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vista-planta__nombre {
+  font-weight: 650;
+  font-size: 1.05rem;
+}
+
+.vista-planta__tipo {
+  font-size: 0.78rem;
+  color: var(--texto-tenue);
+}
+
+/* Empuja el estado y el acceso al editor al extremo derecho. */
+.vista-planta__acciones {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.vista-planta__cuerpo {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+/* A partir de tablet, el lienzo manda y el lateral acompaña. */
+@media (min-width: 900px) {
+  .vista-planta__cuerpo {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.vista-planta__lienzo {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 10px;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.vista-planta__lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.vista-planta__alarmas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.vista-planta__lecturas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.vista-planta__lectura {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.vista-planta__lectura-etq {
+  font-size: 0.8rem;
+  color: var(--texto-tenue);
+  min-width: 0;
+}
+
+.vista-planta__lectura-valor {
+  font-family: var(--fuente-datos);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.vista-planta__lectura-unidad {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--texto-tenue);
+  margin-left: 0.15rem;
+}

@@ -7,6 +7,7 @@ import { RecuperarStaff } from './pages/RecuperarStaff';
 import { Dashboard } from './pages/Dashboard';
 import { Filtros } from './pages/Filtros';
 import { EditorPerfil } from './pages/EditorPerfil';
+import { VistaPlanta } from './pages/VistaPlanta';
 import { TerminalSSH } from './pages/TerminalSSH';
 import { TransferenciaArchivos } from './pages/TransferenciaArchivos';
 import { Auditoria } from './pages/Auditoria';
@@ -34,6 +35,8 @@ export function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/filtros" element={<RutaProtegida perm="canConectarVpn"><Filtros /></RutaProtegida>} />
         <Route path="/editor-perfil" element={<RutaProtegida perm="canEditorPerfil"><EditorPerfil /></RutaProtegida>} />
+        {/* Vista de planta: SOLO LECTURA, así que basta con poder ver equipos (todos los roles). */}
+        <Route path="/vista-planta" element={<VistaPlanta />} />
         <Route path="/terminal-ssh" element={<RutaProtegida perm="canSsh"><TerminalSSH /></RutaProtegida>} />
         <Route path="/transferencia-archivos" element={<RutaProtegida perm="canTransferirArchivos"><TransferenciaArchivos /></RutaProtegida>} />
         <Route path="/auditoria" element={<RutaProtegida perm="canAuditoria"><Auditoria /></RutaProtegida>} />

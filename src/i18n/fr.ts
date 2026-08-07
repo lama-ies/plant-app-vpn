@@ -245,6 +245,8 @@ export const fr = {
         fallas_other: '{{count}} pannes',
         advertencias_one: '{{count}} avertissement',
         advertencias_other: '{{count}} avertissements',
+        editarPerfil: 'Modifier le profil',
+        verPlanta: "Voir l'installation",
         actualizado: 'Mis à jour il y a {{t}}',
       },
     },
@@ -432,6 +434,12 @@ export const fr = {
         flotadorOnOff: 'Flotteur On/Off', alarmaNivel: 'Alarme de niveau', onOffEquipo: 'On/Off',
         rpm: 'RPM', hz: 'Hz', falla: 'Défaut', porcentajeFuncionamiento: '% de fonctionnement',
       },
+    },
+    vistaPlanta: {
+      sinEquipo: "Sélectionnez un équipement depuis le tableau de bord pour voir son installation.",
+      sinDiagrama: "Cet équipement n'a pas encore de schéma d'installation configuré dans son profil.",
+      alarmas: 'État',
+      lecturas: 'Mesures',
     },
     tipoPlanta: {
       osmosis: 'Osmose inverse',

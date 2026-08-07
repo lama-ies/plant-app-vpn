@@ -246,6 +246,8 @@ export const es = {
         fallas_other: '{{count}} fallas',
         advertencias_one: '{{count}} advertencia',
         advertencias_other: '{{count}} advertencias',
+        editarPerfil: 'Editar perfil',
+        verPlanta: 'Ver planta',
         actualizado: 'Actualizado hace {{t}}',
       },
     },
@@ -433,6 +435,12 @@ export const es = {
         flotadorOnOff: 'Flotador On/Off', alarmaNivel: 'Alarma de nivel', onOffEquipo: 'On/Off',
         rpm: 'RPM', hz: 'Hz', falla: 'Falla', porcentajeFuncionamiento: '% de funcionamiento',
       },
+    },
+    vistaPlanta: {
+      sinEquipo: 'Selecciona un equipo desde el tablero para ver su planta.',
+      sinDiagrama: 'Este equipo aún no tiene un diagrama de planta configurado en su perfil.',
+      alarmas: 'Estado',
+      lecturas: 'Lecturas',
     },
     tipoPlanta: {
       osmosis: 'Ósmosis inversa',

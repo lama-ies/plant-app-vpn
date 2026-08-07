@@ -185,3 +185,19 @@
   outline: 2px solid var(--agua-oscuro);
   outline-offset: 1px;
 }
+
+/* Animación de flujo del modo VISTA EN VIVO (2026-08-07): las flechas de las tuberías laten mientras el
+   equipo esté reportando. Mismo criterio y tiempos que plant-portal-client, para que las dos apps se vean
+   igual ante el mismo dato. En el editor no se aplica (no hay `enLinea`). */
+.motor-diagrama__flujo .tuberia-iso__flecha {
+  animation: pulso-flujo 1.6s ease-in-out infinite;
+}
+@keyframes pulso-flujo {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .motor-diagrama__flujo .tuberia-iso__flecha {
+    animation: none;
+  }
+}

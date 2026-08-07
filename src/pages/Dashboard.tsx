@@ -5,7 +5,7 @@
 // Filtros.tsx; estas tarjetas llevan al Editor de perfil de cada equipo.
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, Archive, CircleCheck, Factory, FileCog, Filter, MapPin, OctagonAlert, TriangleAlert, WifiOff } from 'lucide-react';
+import { AlertTriangle, Archive, CircleCheck, Factory, FileCog, Filter, LayoutPanelTop, MapPin, OctagonAlert, TriangleAlert, WifiOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../auth/contexto';
 import { usePermissions } from '../hooks/usePermissions';
@@ -269,10 +269,19 @@ export function Dashboard() {
                 {/* Acciones explícitas al pie (2026-08-07). Antes la tarjeta ENTERA era un <Link> al editor
                     de perfil; meter aquí un botón habría sido un interactivo anidado. */}
                 <div className="tarjeta-equipo__pie">
-                  <Link to={`/editor-perfil?equipoId=${e.equipoId}`} className="tarjeta-equipo__accion">
-                    <FileCog size={14} aria-hidden />
-                    {t('dashboard.equipos.editarPerfil')}
+                  {/* Ver planta: SOLO LECTURA del diagrama en vivo, por eso va primero y sin permiso —
+                      es la acción que cualquier rol quiere al abrir el tablero. Editar perfil sí se
+                      condiciona: antes se ofrecía a todos y /editor-perfil los rebotaba por permiso. */}
+                  <Link to={`/vista-planta?equipoId=${e.equipoId}`} className="tarjeta-equipo__accion">
+                    <LayoutPanelTop size={14} aria-hidden />
+                    {t('dashboard.equipos.verPlanta')}
                   </Link>
+                  {permisos.canEditorPerfil && (
+                    <Link to={`/editor-perfil?equipoId=${e.equipoId}`} className="tarjeta-equipo__accion">
+                      <FileCog size={14} aria-hidden />
+                      {t('dashboard.equipos.editarPerfil')}
+                    </Link>
+                  )}
                   {permisos.canRespaldos && (
                     <button
                       type="button"
