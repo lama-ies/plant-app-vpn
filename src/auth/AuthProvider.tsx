@@ -2,6 +2,7 @@
 // iniciar/cerrar sesión. Sesión persistente (Amplify + localStorage), sin expiración por inactividad.
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { cerrarSesion as authCerrar, iniciarSesion as authIniciar, sesionActual } from './cognito';
+import { limpiarSesionNucleo, sincronizarSesionNucleo } from './nucleo';
 import { ContextoAuth, type EstadoAuth } from './contexto';
 import type { Identidad } from './tipos';
 
@@ -11,7 +12,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let activo = true;
-    void sesionActual().then((id) => {
+    void sesionActual().then(async (id) => {
+      if (!activo) return;
+      // Sesión recuperada al arrancar (persistente): el núcleo Rust también necesita el token para poder
+      // autorizar SSH/SFTP por su cuenta. Ver auth/nucleo.ts.
+      if (id) await sincronizarSesionNucleo();
       if (!activo) return;
       setIdentidad(id);
       setCargando(false);
@@ -22,11 +27,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const iniciarSesion = useCallback(async (correo: string, contrasena: string) => {
-    setIdentidad(await authIniciar(correo, contrasena));
+    const id = await authIniciar(correo, contrasena);
+    await sincronizarSesionNucleo();
+    setIdentidad(id);
   }, []);
 
   const cerrarSesion = useCallback(() => {
     void authCerrar();
+    void limpiarSesionNucleo();
     setIdentidad(null);
   }, []);
 

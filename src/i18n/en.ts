@@ -214,6 +214,16 @@ export const en = {
     comun: {
       cerrar: 'Close',
       cancelar: 'Cancel',
+      listo: 'Done',
+    },
+    respaldos: {
+      titulo: 'Backups for {{equipo}}',
+      cargar: 'Upload backup',
+      subiendo: 'Uploading...',
+      version: 'Version {{n}}',
+      descargar: 'Download',
+      sinRespaldos: 'No backups recorded.',
+      nota: "The system assigns the version on upload.",
     },
     dashboard: {
       bienvenida: 'Hi, {{nombre}}',

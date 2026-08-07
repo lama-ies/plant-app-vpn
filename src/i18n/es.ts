@@ -215,6 +215,16 @@ export const es = {
     comun: {
       cerrar: 'Cerrar',
       cancelar: 'Cancelar',
+      listo: 'Listo',
+    },
+    respaldos: {
+      titulo: 'Respaldos de {{equipo}}',
+      cargar: 'Cargar respaldo',
+      subiendo: 'Subiendo...',
+      version: 'Versión {{n}}',
+      descargar: 'Descargar',
+      sinRespaldos: 'No hay respaldos registrados.',
+      nota: "La versión la asigna el sistema al subir.",
     },
     dashboard: {
       bienvenida: 'Hola, {{nombre}}',

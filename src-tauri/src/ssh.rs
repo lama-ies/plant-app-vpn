@@ -102,8 +102,12 @@ pub struct ParametrosConexionSsh {
 pub async fn ssh_conectar(
     app: AppHandle,
     estado: State<'_, EstadoSsh>,
+    sesion: State<'_, crate::sesion::EstadoSesion>,
     params: ParametrosConexionSsh,
 ) -> Result<(), String> {
+    // Terminal SSH: exclusiva de Administrador (07-app-vpn.md). Se verifica ANTES de abrir nada, contra el
+    // backend y no contra lo que diga el frontend -- ver la nota de cabecera de sesion.rs.
+    crate::sesion::exigir_administrador(&sesion).await?;
     // Sin huella de host conocida no hay nada que pinear: en vez de aceptar cualquier llave (el bug de
     // seguridad que tenía `check_server_key`), se corta aquí con un mensaje claro para el técnico. La
     // huella se registra una sola vez, en el onboarding de la PC (Plant_PCs.sshHostKeyFingerprint,

@@ -214,6 +214,16 @@ export const fr = {
     comun: {
       cerrar: 'Fermer',
       cancelar: 'Annuler',
+      listo: 'Terminé',
+    },
+    respaldos: {
+      titulo: 'Sauvegardes de {{equipo}}',
+      cargar: 'Charger une sauvegarde',
+      subiendo: 'Envoi...',
+      version: 'Version {{n}}',
+      descargar: 'Télécharger',
+      sinRespaldos: 'Aucune sauvegarde enregistrée.',
+      nota: "Le système attribue la version lors de l'envoi.",
     },
     dashboard: {
       bienvenida: 'Bonjour, {{nombre}}',

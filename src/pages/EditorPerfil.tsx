@@ -100,13 +100,22 @@ export function EditorPerfil() {
     setErrorCarga(null);
     setCargando(true);
     try {
-      if (origenTipo === 'base') {
-        const r = await obtenerPerfilBase(tipoPlantaSel);
-        setPerfil(r.perfil ?? perfilVacio(tipoPlantaSel, true));
-      } else {
-        const r = await obtenerPerfilEquipo(equipoIdSel.trim());
-        setPerfil(r.perfil ?? { ...perfilVacio(tipoPlantaSel, false), equipoId: equipoIdSel.trim() });
-      }
+      const cargado =
+        origenTipo === 'base'
+          ? (await obtenerPerfilBase(tipoPlantaSel)).perfil ?? perfilVacio(tipoPlantaSel, true)
+          : (await obtenerPerfilEquipo(equipoIdSel.trim())).perfil ?? {
+              ...perfilVacio(tipoPlantaSel, false),
+              equipoId: equipoIdSel.trim(),
+            };
+      setPerfil(cargado);
+      // Si el perfil YA trae un diagrama armado, se entra directo al paso de sensores (hallazgo de la
+      // auditoría 2026-08-07). `pasoDiagrama` arrancaba SIEMPRE en 'topologia', y `SelectorTopologia` no
+      // recibe el diagrama existente: sus estados nacen en los valores por defecto (A1, 1 pozo, N1, sin
+      // complemento...). Como el único camino al paso 2 es el botón "Continuar a sensores", que ejecuta
+      // `ensamblar(secuencia)`, abrir un equipo ya configurado solo para corregir UNA variable de un sensor
+      // reensamblaba un diagrama genérico ENCIMA del real y borraba todos los enlaces ya hechos. Al guardar,
+      // se perdía todo el trabajo del diagrama.
+      setPasoDiagrama((cargado.diagrama?.nodos?.length ?? 0) > 0 ? 'sensores' : 'topologia');
     } catch (e) {
       setErrorCarga(codigoAMensaje(t, e));
     } finally {

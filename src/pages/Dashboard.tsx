@@ -5,7 +5,7 @@
 // Filtros.tsx; estas tarjetas llevan al Editor de perfil de cada equipo.
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, Factory, FileCog, Filter, MapPin, OctagonAlert, TriangleAlert, WifiOff, CircleCheck } from 'lucide-react';
+import { AlertTriangle, Archive, CircleCheck, Factory, FileCog, Filter, MapPin, OctagonAlert, TriangleAlert, WifiOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../auth/contexto';
 import { usePermissions } from '../hooks/usePermissions';
@@ -22,6 +22,7 @@ import { codigoAMensaje } from '../lib/mensajesError';
 import { GotaCargando } from '../components/GotaCargando';
 import './lista.css';
 import './dashboard.css';
+import { ModalRespaldos } from '../components/ModalRespaldos';
 
 // Umbral de "en línea": si la última telemetría es más vieja que esto, se considera fuera de línea (mismo
 // criterio y valor que plant-portal-client/datos/resumenEquipo.ts).
@@ -79,6 +80,8 @@ export function Dashboard() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [texto, setTexto] = useState('');
+  // Equipo cuyo modal de respaldos está abierto (null = cerrado).
+  const [respaldosDe, setRespaldosDe] = useState<{ equipoId: string; nombre: string } | null>(null);
 
   useEffect(() => {
     let activo = true;
@@ -219,7 +222,7 @@ export function Dashboard() {
                     : t('dashboard.equipos.sinAlarmas');
 
             return (
-              <Link key={e.equipoId} to={`/editor-perfil?equipoId=${e.equipoId}`} className="fila-lista tarjeta-equipo-link">
+              <article key={e.equipoId} className="fila-lista tarjeta-equipo">
                 <span className="tarjeta-equipo__cliente">{e.clienteNombre}</span>
                 <div className="fila-lista__cab">
                   <span className="fila-lista__principal">
@@ -262,10 +265,37 @@ export function Dashboard() {
                     {t('dashboard.equipos.actualizado', { t: tiempoRelativo(e.actualizadoHaceSeg) })}
                   </span>
                 </div>
-              </Link>
+
+                {/* Acciones explícitas al pie (2026-08-07). Antes la tarjeta ENTERA era un <Link> al editor
+                    de perfil; meter aquí un botón habría sido un interactivo anidado. */}
+                <div className="tarjeta-equipo__pie">
+                  <Link to={`/editor-perfil?equipoId=${e.equipoId}`} className="tarjeta-equipo__accion">
+                    <FileCog size={14} aria-hidden />
+                    {t('dashboard.equipos.editarPerfil')}
+                  </Link>
+                  {permisos.canRespaldos && (
+                    <button
+                      type="button"
+                      className="tarjeta-equipo__accion"
+                      onClick={() => setRespaldosDe({ equipoId: e.equipoId, nombre: e.nombre })}
+                    >
+                      <Archive size={14} aria-hidden />
+                      {t('respaldos.cargar')}
+                    </button>
+                  )}
+                </div>
+              </article>
             );
           })}
         </div>
+      )}
+
+      {respaldosDe && (
+        <ModalRespaldos
+          equipoId={respaldosDe.equipoId}
+          nombreEquipo={respaldosDe.nombre}
+          onCerrar={() => setRespaldosDe(null)}
+        />
       )}
     </div>
   );

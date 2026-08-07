@@ -214,6 +214,16 @@ export const pt = {
     comun: {
       cerrar: 'Fechar',
       cancelar: 'Cancelar',
+      listo: 'Pronto',
+    },
+    respaldos: {
+      titulo: 'Backups de {{equipo}}',
+      cargar: 'Carregar backup',
+      subiendo: 'Enviando...',
+      version: 'Versão {{n}}',
+      descargar: 'Baixar',
+      sinRespaldos: 'Nenhum backup registrado.',
+      nota: "O sistema atribui a versão ao enviar.",
     },
     dashboard: {
       bienvenida: 'Olá, {{nombre}}',

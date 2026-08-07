@@ -67,12 +67,51 @@ fn ruta_wireguard_exe() -> PathBuf {
     PathBuf::from(r"C:\Program Files\WireGuard\wireguard.exe")
 }
 
-/// Construye el contenido del `.conf` del túnel (PURO — no toca disco ni procesos).
-fn construir_conf(cfg: &ConfiguracionPeer) -> String {
-    format!(
+/// Valida el nombre del túnel antes de usarlo como NOMBRE DE ARCHIVO (hallazgo de la auditoría
+/// 2026-08-07). Llega del frontend (`conexion.ts` manda el `sesionId`) y se interpolaba directo en
+/// `temp_dir().join(...)`: `Path::join` resuelve `..` y, ante una ruta ABSOLUTA, descarta el prefijo por
+/// completo — así que un nombre como `..\..\Windows\System32\algo` o `C:\ruta\absoluta` escribía contenido
+/// controlado fuera del temporal, con una app que tiene privilegios para instalar servicios de Windows.
+/// El juego de caracteres permitido es además el que WireGuard acepta como nombre de servicio.
+fn validar_nombre_tunel(nombre: &str) -> Result<(), String> {
+    let valido = !nombre.is_empty()
+        && nombre.len() <= 32
+        && nombre
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_');
+    if valido {
+        Ok(())
+    } else {
+        Err("nombre de túnel inválido (solo A-Z, a-z, 0-9, '-' y '_', máx. 32)".to_string())
+    }
+}
+
+/// Rechaza cualquier valor que pueda inyectar líneas nuevas en el `.conf` (hallazgo de la auditoría
+/// 2026-08-07). El archivo es un INI y se construía interpolando sin filtrar: un salto de línea en
+/// cualquier campo permitía añadir directivas propias — y `AllowedIPs = 0.0.0.0/0` daría acceso a toda la
+/// LAN del sitio en vez de al único equipo autorizado, anulando el aislamiento que define 05-vpn.md.
+fn validar_campo_conf(etiqueta: &str, valor: &str) -> Result<(), String> {
+    if valor.contains('\n') || valor.contains('\r') {
+        return Err(format!("valor inválido en {etiqueta}: no puede contener saltos de línea"));
+    }
+    if valor.trim().is_empty() {
+        return Err(format!("valor inválido en {etiqueta}: vacío"));
+    }
+    Ok(())
+}
+
+/// Construye el contenido del `.conf` del túnel (PURO — no toca disco ni procesos). Valida cada campo
+/// antes de interpolarlo; ver `validar_campo_conf`.
+fn construir_conf(cfg: &ConfiguracionPeer) -> Result<String, String> {
+    validar_campo_conf("PrivateKey", &cfg.private_key)?;
+    validar_campo_conf("Address", &cfg.direccion_local)?;
+    validar_campo_conf("PublicKey", &cfg.servidor_public_key)?;
+    validar_campo_conf("Endpoint", &cfg.endpoint)?;
+    validar_campo_conf("AllowedIPs", &cfg.allowed_ips)?;
+    Ok(format!(
         "[Interface]\nPrivateKey = {}\nAddress = {}/32\n\n[Peer]\nPublicKey = {}\nEndpoint = {}\nAllowedIPs = {}\nPersistentKeepalive = 25\n",
         cfg.private_key, cfg.direccion_local, cfg.servidor_public_key, cfg.endpoint, cfg.allowed_ips
-    )
+    ))
 }
 
 /// Levanta el túnel: escribe un `.conf` temporal e instala el servicio de WireGuard. Borra el `.conf`
@@ -81,8 +120,10 @@ fn construir_conf(cfg: &ConfiguracionPeer) -> String {
 #[tauri::command]
 pub async fn vpn_conectar(cfg: ConfiguracionPeer) -> Result<EstadoTunel, String> {
     tokio::task::spawn_blocking(move || {
+        validar_nombre_tunel(&cfg.nombre_tunel)?;
+        let contenido = construir_conf(&cfg)?;
         let ruta = std::env::temp_dir().join(format!("{}.conf", cfg.nombre_tunel));
-        std::fs::write(&ruta, construir_conf(&cfg))
+        std::fs::write(&ruta, contenido)
             .map_err(|e| format!("no se pudo escribir la configuración temporal: {e}"))?;
 
         let resultado = Command::new(ruta_wireguard_exe())

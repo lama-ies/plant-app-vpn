@@ -24,6 +24,9 @@ export interface Permisos {
   canEditorPerfil: boolean;
   canGestionPlantillas: boolean;
   canGestionZonas: boolean;
+  // Permiso propio (2026-08-07): el nav filtraba Gerentes con `canGestionZonas`. Hoy ambos son
+  // Administrador, pero acoplarlos significaba que aflojar el de zonas expondria Gerentes por accidente.
+  canGestionGerentes: boolean;
   canGestionStaff: boolean;
   canPanelErrores: boolean;
   // Auditoría: Gerente/Coordinador/Administrador (no Técnico).
@@ -47,6 +50,7 @@ export function usePermissions(): Permisos {
       canEditorPerfil: esAdministrador,
       canGestionPlantillas: esAdministrador,
       canGestionZonas: esAdministrador,
+      canGestionGerentes: esAdministrador,
       canGestionStaff: esAdministrador,
       canPanelErrores: esAdministrador,
       canAuditoria: rol ? VE_AUDITORIA.has(rol) : false,

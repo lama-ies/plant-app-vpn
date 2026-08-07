@@ -105,7 +105,13 @@ async fn abrir_sftp(params: &ParametrosSftp) -> Result<SftpSession, String> {
 
 /// Lista el contenido de un directorio remoto.
 #[tauri::command]
-pub async fn sftp_listar(params: ParametrosSftp, ruta: String) -> Result<Vec<EntradaRemota>, String> {
+pub async fn sftp_listar(
+    sesion: tauri::State<'_, crate::sesion::EstadoSesion>,
+    params: ParametrosSftp,
+    ruta: String,
+) -> Result<Vec<EntradaRemota>, String> {
+    // Transferencia de archivos: exclusiva de Administrador (07-app-vpn.md). Ver sesion.rs.
+    crate::sesion::exigir_administrador(&sesion).await?;
     let sftp = abrir_sftp(&params).await?;
     let entradas = sftp
         .read_dir(ruta)
@@ -122,7 +128,13 @@ pub async fn sftp_listar(params: ParametrosSftp, ruta: String) -> Result<Vec<Ent
 
 /// Sube un archivo local a una ruta remota (crea/trunca).
 #[tauri::command]
-pub async fn sftp_subir(params: ParametrosSftp, ruta_local: String, ruta_remota: String) -> Result<(), String> {
+pub async fn sftp_subir(
+    sesion: tauri::State<'_, crate::sesion::EstadoSesion>,
+    params: ParametrosSftp,
+    ruta_local: String,
+    ruta_remota: String,
+) -> Result<(), String> {
+    crate::sesion::exigir_administrador(&sesion).await?;
     let sftp = abrir_sftp(&params).await?;
     let contenido = tokio::fs::read(&ruta_local)
         .await
@@ -140,7 +152,13 @@ pub async fn sftp_subir(params: ParametrosSftp, ruta_local: String, ruta_remota:
 
 /// Descarga un archivo remoto a una ruta local.
 #[tauri::command]
-pub async fn sftp_descargar(params: ParametrosSftp, ruta_remota: String, ruta_local: String) -> Result<(), String> {
+pub async fn sftp_descargar(
+    sesion: tauri::State<'_, crate::sesion::EstadoSesion>,
+    params: ParametrosSftp,
+    ruta_remota: String,
+    ruta_local: String,
+) -> Result<(), String> {
+    crate::sesion::exigir_administrador(&sesion).await?;
     let sftp = abrir_sftp(&params).await?;
     let mut archivo = sftp
         .open(ruta_remota)

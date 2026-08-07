@@ -18,6 +18,7 @@ import { GestionGerentes } from './pages/GestionGerentes';
 import { GestionStaff } from './pages/GestionStaff';
 import { GestionPlantillas } from './pages/GestionPlantillas';
 import { AppShell } from './components/layout/AppShell';
+import { RutaProtegida } from './components/RutaProtegida';
 
 export function App() {
   return (
@@ -29,19 +30,20 @@ export function App() {
 
       {/* Privadas: cuelgan del marco autenticado (gate de sesión + topbar). */}
       <Route element={<AppShell />}>
+        {/* El tablero es el destino común de todos los roles: sin permiso propio. */}
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/filtros" element={<Filtros />} />
-        <Route path="/editor-perfil" element={<EditorPerfil />} />
-        <Route path="/terminal-ssh" element={<TerminalSSH />} />
-        <Route path="/transferencia-archivos" element={<TransferenciaArchivos />} />
-        <Route path="/auditoria" element={<Auditoria />} />
-        <Route path="/panel-errores" element={<PanelErrores />} />
-        <Route path="/alta-cliente" element={<AltaCliente />} />
-        <Route path="/alta-equipo" element={<AltaEquipo />} />
-        <Route path="/gestion-zonas" element={<GestionZonas />} />
-        <Route path="/gestion-gerentes" element={<GestionGerentes />} />
-        <Route path="/gestion-staff" element={<GestionStaff />} />
-        <Route path="/gestion-plantillas" element={<GestionPlantillas />} />
+        <Route path="/filtros" element={<RutaProtegida perm="canConectarVpn"><Filtros /></RutaProtegida>} />
+        <Route path="/editor-perfil" element={<RutaProtegida perm="canEditorPerfil"><EditorPerfil /></RutaProtegida>} />
+        <Route path="/terminal-ssh" element={<RutaProtegida perm="canSsh"><TerminalSSH /></RutaProtegida>} />
+        <Route path="/transferencia-archivos" element={<RutaProtegida perm="canTransferirArchivos"><TransferenciaArchivos /></RutaProtegida>} />
+        <Route path="/auditoria" element={<RutaProtegida perm="canAuditoria"><Auditoria /></RutaProtegida>} />
+        <Route path="/panel-errores" element={<RutaProtegida perm="canPanelErrores"><PanelErrores /></RutaProtegida>} />
+        <Route path="/alta-cliente" element={<RutaProtegida perm="canAltaCliente"><AltaCliente /></RutaProtegida>} />
+        <Route path="/alta-equipo" element={<RutaProtegida perm="canAltaEquipo"><AltaEquipo /></RutaProtegida>} />
+        <Route path="/gestion-zonas" element={<RutaProtegida perm="canGestionZonas"><GestionZonas /></RutaProtegida>} />
+        <Route path="/gestion-gerentes" element={<RutaProtegida perm="canGestionGerentes"><GestionGerentes /></RutaProtegida>} />
+        <Route path="/gestion-staff" element={<RutaProtegida perm="canGestionStaff"><GestionStaff /></RutaProtegida>} />
+        <Route path="/gestion-plantillas" element={<RutaProtegida perm="canGestionPlantillas"><GestionPlantillas /></RutaProtegida>} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Route>
     </Routes>

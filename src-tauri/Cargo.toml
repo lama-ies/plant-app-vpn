@@ -1,6 +1,6 @@
 [package]
 name = "plant-app-vpn"
-version = "0.1.1"
+version = "0.24.0"
 description = "IES Monitor Plant - App VPN (nucleo Rust)"
 authors = ["IES Internacional"]
 license = "UNLICENSED"
@@ -35,3 +35,6 @@ russh-sftp = "2.0"
 # Generación del par de llaves WireGuard del cliente (Curve25519) — el frontend nunca ve la privada.
 x25519-dalek = { version = "2", features = ["static_secrets", "getrandom"] }
 base64 = "0.22"
+# Cliente HTTP del NÚCLEO (no del frontend): `sesion.rs` verifica el rol real contra el backend antes de
+# permitir SSH/SFTP. Va con rustls (TLS en Rust puro) para no arrastrar OpenSSL nativo en Windows.
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }

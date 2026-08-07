@@ -41,21 +41,51 @@
   gap: 0.6rem;
 }
 
-/* Tarjeta de equipo del tablero (2026-08-06): reusa `.fila-lista`, pero es un <Link> directo (no un botón
-   dentro de una lista) -> se le quita el subrayado/color de enlace por defecto y se le da el mismo hover
-   que las filas clicables normales. */
-.tarjeta-equipo-link {
+/* Tarjeta de equipo del tablero: reusa `.fila-lista` y agrega el hover de las filas clicables. Hasta el
+   2026-08-07 la tarjeta ENTERA era un <Link> al editor de perfil; al necesitar un botón de respaldos pasó a
+   ser un <article> con acciones explícitas al pie (un <button> dentro de un <a> es interactivo anidado:
+   HTML inválido, y con foco y clic ambiguos). */
+.tarjeta-equipo {
   display: block;
-  color: inherit;
-  text-decoration: none;
   transition: border-color 0.15s ease;
 }
-.tarjeta-equipo-link:hover {
+.tarjeta-equipo:hover {
   border-color: var(--agua-oscuro);
 }
-.tarjeta-equipo-link:focus-visible {
+
+/* Acciones al pie: la tarjeta dejó de ser un <Link> completo (2026-08-07) para poder llevar botones sin
+   anidar interactivos. */
+.tarjeta-equipo__pie {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.7rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--linea);
+}
+
+.tarjeta-equipo__accion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: none;
+  padding: 0.2rem 0;
+  color: var(--agua-oscuro);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tarjeta-equipo__accion:hover {
+  text-decoration: underline;
+}
+
+.tarjeta-equipo__accion:focus-visible {
   outline: 2px solid var(--agua-oscuro);
-  outline-offset: 1px;
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* Nombre de cliente: referencia principal de la tarjeta (pedido 2026-08-07 — antes solo salía como texto

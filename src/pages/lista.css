@@ -152,3 +152,65 @@
   border-color: color-mix(in srgb, var(--falla) 40%, transparent);
   background: color-mix(in srgb, var(--falla) 12%, transparent);
 }
+
+/* --- Respaldos versionados de equipo (ModalRespaldos) -------------------------------------------- */
+.respaldos__acciones {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+/* El <input type="file"> nativo no se puede estilar: se oculta y actúa el <label> como botón. Oculto
+   accesible (no `display:none`), para que siga siendo alcanzable por teclado y lectores de pantalla. */
+.respaldos__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.respaldos__input:focus-visible + label {
+  outline: 2px solid var(--agua-oscuro);
+  outline-offset: 2px;
+}
+
+.respaldos__acciones label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+.auth-boton--ocupado {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.respaldos__nota {
+  font-size: 0.76rem;
+  color: var(--texto-tenue);
+}
+
+.girando {
+  animation: girar 0.9s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .girando {
+    animation: none;
+  }
+}

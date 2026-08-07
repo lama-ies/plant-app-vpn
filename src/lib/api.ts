@@ -570,3 +570,58 @@ export async function importarPerfilExcel(archivo: File): Promise<PerfilDisposit
   }
   return datos.perfil as PerfilDispositivo;
 }
+
+// --- Respaldos versionados de equipo (Plant_Respaldos) ------------------------------------------------
+//
+// `07-app-vpn.md` los especifica por tarjeta de equipo: descargar el último, elegir una versión anterior y
+// cargar uno nuevo con versionado automático (v1, v2, v3...). El backend, las rutas y el bucket estaban
+// completos desde hacía tiempo, pero no había ni una llamada aquí: el permiso `canRespaldos` era un flag
+// muerto y la función no existía para el usuario (hallazgo de la auditoría 2026-08-07).
+
+/** Una versión de respaldo registrada para un equipo. */
+export interface RespaldoApi {
+  equipoId: string;
+  version: number;
+  s3Key: string;
+  nombreArchivo: string;
+  subidoPor: string;
+  timestamp: string;
+}
+
+/** Versiones registradas de un equipo, de la más reciente a la más antigua. */
+export function listarRespaldos(equipoId: string) {
+  return peticion<{ versiones: RespaldoApi[] }>('GET', '/respaldos', {
+    query: { equipoId, accion: 'versiones' },
+  });
+}
+
+/** URL prefirmada de descarga. Sin `version`, la última. */
+export function urlDescargaRespaldo(equipoId: string, version?: number) {
+  return peticion<{ version: number; url: string }>('GET', '/respaldos', {
+    query: { equipoId, accion: 'descargar', version },
+  });
+}
+
+/** Pide una URL prefirmada de subida; el backend asigna la versión siguiente. */
+export function urlSubidaRespaldo(equipoId: string, nombreArchivo: string) {
+  return peticion<{ version: number; s3Key: string; url: string }>('POST', '/respaldos', {
+    cuerpo: { accion: 'urlSubida', equipoId, nombreArchivo },
+  });
+}
+
+/**
+ * Registra la metadata TRAS subir el archivo a S3. `subidoPor` NO se manda: el backend lo toma de la
+ * identidad del token (corrección 2026-08-07 — antes se aceptaba del cuerpo y era falsificable, siendo la
+ * única traza de quién subió el respaldo de un PLC).
+ */
+export function confirmarRespaldo(equipoId: string, version: number, nombreArchivo: string) {
+  return peticion<{ registrado: RespaldoApi }>('POST', '/respaldos', {
+    cuerpo: { accion: 'confirmar', equipoId, version, nombreArchivo },
+  });
+}
+
+/** Sube el archivo a la URL prefirmada de S3 (PUT directo, fuera de la API). */
+export async function subirArchivoRespaldo(url: string, archivo: File): Promise<void> {
+  const resp = await fetch(url, { method: 'PUT', body: archivo });
+  if (!resp.ok) throw new ErrorApi(resp.status, 'S3_UPLOAD_FAILED', 'No se pudo subir el respaldo');
+}

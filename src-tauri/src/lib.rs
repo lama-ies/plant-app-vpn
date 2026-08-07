@@ -6,6 +6,7 @@
 // NOTA DE VERIFICACIÓN: sin toolchain Rust en el equipo de desarrollo, este módulo no se compiló en esta
 // sesión. Se valida con `cargo check`/`cargo build` en Fase 9.
 
+mod sesion;
 mod sftp;
 mod ssh;
 mod wireguard;
@@ -22,8 +23,13 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .manage(ssh::EstadoSsh::default())
+        // Identidad del núcleo: guarda el ID token para poder verificar el rol REAL contra el backend
+        // antes de abrir SSH/SFTP, sin creerle al frontend (ver sesion.rs).
+        .manage(sesion::EstadoSesion::default())
         .invoke_handler(tauri::generate_handler![
             ping,
+            sesion::sesion_establecer,
+            sesion::sesion_cerrar,
             wireguard::vpn_generar_par,
             wireguard::vpn_conectar,
             wireguard::vpn_desconectar,
