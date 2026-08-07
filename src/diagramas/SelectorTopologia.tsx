@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next';
 import type { TipoPlanta } from '../perfiles/tipos';
 import type { SegmentoDiagrama } from './tipos';
 import type { SegmentoElegido } from './ensamblador';
-import { SEGMENTO_A1, SEGMENTO_A2, SEGMENTO_A3, SEGMENTO_A4, SEGMENTO_A5, SEGMENTO_C8 } from './catalogo/alimentacion';
+import {
+  SEGMENTO_A1, SEGMENTO_A2, SEGMENTO_A3, SEGMENTO_A4, SEGMENTO_A5, SEGMENTO_A6, SEGMENTO_A7, SEGMENTO_A8,
+  SEGMENTO_C8,
+} from './catalogo/alimentacion';
 import { SEGMENTO_N1, SEGMENTO_N2, SEGMENTO_N3 } from './catalogo/nucleos';
 import { SEGMENTO_COMPLEMENTO_NINGUNO, SEGMENTO_C1, SEGMENTO_C2, SEGMENTO_UV, SEGMENTO_CISTERNA_FINAL } from './catalogo/complementos';
 import { SEGMENTO_CISTERNA_HIDRO, SEGMENTO_LINEA_SUMINISTRO } from './catalogo/hidroneumatico';
@@ -36,6 +39,11 @@ function SelectorOsmosis({ onListo }: { onListo: Props['onListo'] }) {
   const { t } = useTranslation();
   const [alimentacion, setAlimentacion] = useState('A1');
   const [numPozos, setNumPozos] = useState(1);
+  // A6 ("pozos -> cisterna compartida -> bombas de presión -> filtro"): el grupo de bombas va ANTES del
+  // filtro y forma parte de esta alimentación, no del checkbox general de abajo (que sigue existiendo para
+  // A1/A2/A3, donde el grupo de bombas va DESPUÉS del filtro, entre alimentación y núcleo).
+  const [numPozosA6, setNumPozosA6] = useState(3);
+  const [numBombasA6, setNumBombasA6] = useState(2);
   const [pretratamiento, setPretratamiento] = useState('ninguno');
   const [usaC8, setUsaC8] = useState(false);
   const [numBombasC8, setNumBombasC8] = useState(1);
@@ -46,17 +54,29 @@ function SelectorOsmosis({ onListo }: { onListo: Props['onListo'] }) {
 
   const secuencia = useMemo((): SegmentoElegido[] => {
     const pasos: SegmentoElegido[] = [];
-    const segAlimentacion = ALIMENTACIONES[alimentacion];
-    pasos.push({ segmento: segAlimentacion, copias: alimentacion === 'A1' ? numPozos : undefined });
+    if (alimentacion === 'A6') {
+      // Pozos repetibles -> cisterna compartida (fan-in) -> grupo de bombas de presión -> filtro multimedia.
+      // Siempre que hay un grupo de bombas tipo hidroneumático/realce hay una cisterna real de la que
+      // aspira (regla física, no solo de UI) — ver cabecera de A6/A7/A8 en catalogo/alimentacion.ts.
+      pasos.push({ segmento: SEGMENTO_A6, copias: numPozosA6 });
+      pasos.push({ segmento: SEGMENTO_A7 });
+      pasos.push({ segmento: SEGMENTO_C8, copias: numBombasA6 });
+      pasos.push({ segmento: SEGMENTO_A8 });
+    } else {
+      const segAlimentacion = ALIMENTACIONES[alimentacion];
+      pasos.push({ segmento: segAlimentacion, copias: alimentacion === 'A1' ? numPozos : undefined });
+    }
     const segPretratamiento = PRETRATAMIENTOS[pretratamiento];
     if (segPretratamiento) pasos.push({ segmento: segPretratamiento });
-    if (usaC8) pasos.push({ segmento: SEGMENTO_C8, copias: numBombasC8 });
+    // El checkbox de grupo de bombas (DESPUÉS del filtro) no aplica a A6: ese ya trae su propio grupo,
+    // posicionado ANTES del filtro.
+    if (usaC8 && alimentacion !== 'A6') pasos.push({ segmento: SEGMENTO_C8, copias: numBombasC8 });
     pasos.push({ segmento: NUCLEOS[nucleo] });
     pasos.push({ segmento: COMPLEMENTOS[complemento] });
     if (usaUV) pasos.push({ segmento: SEGMENTO_UV });
     pasos.push({ segmento: SEGMENTO_CISTERNA_FINAL });
     return pasos;
-  }, [alimentacion, numPozos, pretratamiento, usaC8, numBombasC8, nucleo, complemento, usaUV]);
+  }, [alimentacion, numPozos, numPozosA6, numBombasA6, pretratamiento, usaC8, numBombasC8, nucleo, complemento, usaUV]);
 
   return (
     <div className="selector-topologia">
@@ -66,6 +86,7 @@ function SelectorOsmosis({ onListo }: { onListo: Props['onListo'] }) {
           <option value="A1">{t('diagramaEditor.alimentacionA1')}</option>
           <option value="A2">{t('diagramaEditor.alimentacionA2')}</option>
           <option value="A3">{t('diagramaEditor.alimentacionA3')}</option>
+          <option value="A6">{t('diagramaEditor.alimentacionA6')}</option>
         </select>
       </label>
       {alimentacion === 'A1' && (
@@ -77,6 +98,24 @@ function SelectorOsmosis({ onListo }: { onListo: Props['onListo'] }) {
           />
         </label>
       )}
+      {alimentacion === 'A6' && (
+        <>
+          <label>
+            {t('diagramaEditor.numPozos')}
+            <input
+              type="number" min={1} max={5} value={numPozosA6}
+              onChange={(e) => setNumPozosA6(Math.min(5, Math.max(1, Number(e.target.value))))}
+            />
+          </label>
+          <label>
+            {t('diagramaEditor.numBombas')}
+            <input
+              type="number" min={1} max={5} value={numBombasA6}
+              onChange={(e) => setNumBombasA6(Math.min(5, Math.max(1, Number(e.target.value))))}
+            />
+          </label>
+        </>
+      )}
 
       <label>
         {t('diagramaEditor.pretratamiento')}
@@ -87,18 +126,22 @@ function SelectorOsmosis({ onListo }: { onListo: Props['onListo'] }) {
         </select>
       </label>
 
-      <label>
-        <input type="checkbox" checked={usaC8} onChange={(e) => setUsaC8(e.target.checked)} />
-        {t('diagramaEditor.grupoBombasPresion')}
-      </label>
-      {usaC8 && (
-        <label>
-          {t('diagramaEditor.numBombas')}
-          <input
-            type="number" min={1} max={5} value={numBombasC8}
-            onChange={(e) => setNumBombasC8(Math.min(5, Math.max(1, Number(e.target.value))))}
-          />
-        </label>
+      {alimentacion !== 'A6' && (
+        <>
+          <label>
+            <input type="checkbox" checked={usaC8} onChange={(e) => setUsaC8(e.target.checked)} />
+            {t('diagramaEditor.grupoBombasPresion')}
+          </label>
+          {usaC8 && (
+            <label>
+              {t('diagramaEditor.numBombas')}
+              <input
+                type="number" min={1} max={5} value={numBombasC8}
+                onChange={(e) => setNumBombasC8(Math.min(5, Math.max(1, Number(e.target.value))))}
+              />
+            </label>
+          )}
+        </>
       )}
 
       <label>

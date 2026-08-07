@@ -149,6 +149,10 @@
   overflow: hidden;
   touch-action: none;
   cursor: grab;
+  /* Sin esto, arrastrar para desplazar el diagrama selecciona el texto de las etiquetas de los nodos a
+     cada movimiento (molesto real reportado 2026-08-07) — el lienzo se arrastra, no se lee como texto. */
+  user-select: none;
+  -webkit-user-select: none;
 }
 .lienzo-zoomable:active {
   cursor: grabbing;

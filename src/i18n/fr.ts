@@ -390,6 +390,7 @@ export const fr = {
       alimentacionA1: 'Puits + pompe submersible',
       alimentacionA2: 'Citerne + pompe de surpression',
       alimentacionA3: 'Combinée (puits + citerne + filtre multimédia)',
+      alimentacionA6: 'Puits + citerne + groupe de pompes + filtre',
       numPozos: 'Nombre de puits (1-5)',
       pretratamiento: 'Prétraitement',
       pretratamientoNinguno: 'Aucun',

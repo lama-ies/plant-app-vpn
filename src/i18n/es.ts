@@ -391,6 +391,7 @@ export const es = {
       alimentacionA1: 'Pozo + bomba sumergible',
       alimentacionA2: 'Cisterna + bomba de realce',
       alimentacionA3: 'Combinada (pozo + cisterna + filtro multimedia)',
+      alimentacionA6: 'Pozos + cisterna + grupo de bombas + filtro',
       numPozos: 'Número de pozos (1-5)',
       pretratamiento: 'Pretratamiento',
       pretratamientoNinguno: 'Ninguno',

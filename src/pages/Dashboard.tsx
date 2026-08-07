@@ -220,6 +220,7 @@ export function Dashboard() {
 
             return (
               <Link key={e.equipoId} to={`/editor-perfil?equipoId=${e.equipoId}`} className="fila-lista tarjeta-equipo-link">
+                <span className="tarjeta-equipo__cliente">{e.clienteNombre}</span>
                 <div className="fila-lista__cab">
                   <span className="fila-lista__principal">
                     <Factory size={14} aria-hidden /> {e.nombre}
@@ -229,7 +230,7 @@ export function Dashboard() {
                   </span>
                 </div>
                 <p className="fila-lista__detalle">
-                  {t(`tipoPlanta.${e.tipoPlanta}`)} · {e.clienteNombre} · {e.clienteNumero}
+                  {t(`tipoPlanta.${e.tipoPlanta}`)} · {e.clienteNumero}
                   {e.zonaNombre && (
                     <>
                       {' · '}

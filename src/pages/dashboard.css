@@ -58,6 +58,17 @@
   outline-offset: 1px;
 }
 
+/* Nombre de cliente: referencia principal de la tarjeta (pedido 2026-08-07 — antes solo salía como texto
+   chico junto al número de cliente, y por número nadie identifica la planta). Va arriba del nombre de
+   equipo, mismo criterio que plant-portal-client (.tarjeta__cliente). */
+.tarjeta-equipo__cliente {
+  display: block;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--agua-oscuro);
+  letter-spacing: 0.01em;
+}
+
 /* Lecturas clave de la tarjeta de equipo (hasta 6, del dashboard del perfil) — mismo dato que ya pinta
    plant-portal-client, formato compacto valor+unidad / etiqueta debajo. */
 .tarjeta-equipo__lecturas {

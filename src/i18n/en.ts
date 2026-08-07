@@ -390,6 +390,7 @@ export const en = {
       alimentacionA1: 'Well + submersible pump',
       alimentacionA2: 'Cistern + booster pump',
       alimentacionA3: 'Combined (well + cistern + multimedia filter)',
+      alimentacionA6: 'Wells + cistern + pump group + filter',
       numPozos: 'Number of wells (1-5)',
       pretratamiento: 'Pretreatment',
       pretratamientoNinguno: 'None',
