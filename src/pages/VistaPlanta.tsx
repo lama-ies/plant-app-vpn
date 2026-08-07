@@ -11,7 +11,7 @@
 // Ruta: /vista-planta?equipoId=<uuid>. SOLO LECTURA — para editar el diagrama está /editor-perfil, y el
 // control remoto (arranque/paro, setpoints) es del portal del cliente, no de aquí.
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   CircleCheck,
@@ -60,6 +60,7 @@ const ORDEN_FICHA_TECNICA: (keyof FichaTecnica)[] = [
 
 export function VistaPlanta() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [params] = useSearchParams();
   const permisos = usePermissions();
   const equipoId = params.get('equipoId') ?? '';
@@ -216,7 +217,14 @@ export function VistaPlanta() {
             <section className="vista-planta__lienzo" aria-label={t('vistaPlanta.proceso')}>
               <h2 className="vista-planta__titulo">{t('vistaPlanta.proceso')}</h2>
               {hayDiagrama ? (
-                <MotorDiagrama diagrama={perfil.diagrama} lecturas={lecturas} enLinea={enLinea} />
+                <MotorDiagrama
+                  diagrama={perfil.diagrama}
+                  lecturas={lecturas}
+                  enLinea={enLinea}
+                  // Navegación interna, no pestaña nueva: esto es una app de escritorio. La pantalla
+                  // completa tiene su propio botón "Regresar" y vuelve acá con `navigate(-1)`.
+                  onPantallaCompleta={() => navigate(`/vista-planta-completa?equipoId=${equipoId}`)}
+                />
               ) : (
                 <p className="vacio">{t('vistaPlanta.sinDiagrama')}</p>
               )}

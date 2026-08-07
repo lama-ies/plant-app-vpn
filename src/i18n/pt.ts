@@ -424,7 +424,7 @@ export const pt = {
       resumenTitulo: 'Resumo dos sensores vinculados',
       volverATopologia: 'Voltar a escolher a topologia',
       sensorNinguno: 'Não vinculado',
-      zoom: { acercar: 'Aproximar', alejar: 'Afastar', centrar: 'Centralizar' },
+      zoom: { acercar: 'Aproximar', alejar: 'Afastar', centrar: 'Centralizar', pantallaCompleta: 'Tela cheia' },
       editarEtiqueta: 'Editar nome',
       leyenda: { alimentacion: 'Alimentação', permeado: 'Permeado', rechazo: 'Rejeito' },
       sensor: {
@@ -436,6 +436,7 @@ export const pt = {
       },
     },
     vistaPlanta: {
+      regresar: 'Voltar',
       proceso: 'Processo',
       graficas: 'Gráficos',
       sinVariables: 'Este equipamento não tem variáveis de leitura configuradas no seu perfil.',

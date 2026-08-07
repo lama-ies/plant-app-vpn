@@ -1,0 +1,76 @@
+/* Pantalla completa del diagrama dentro de la app: sin topbar (ruta fuera de AppShell), cabecera mínima
+   con el botón de regreso + lienzo ocupando TODO el alto restante del viewport. */
+
+.planta-completa {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--fondo);
+}
+
+.planta-completa__cab {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1.1rem;
+  background: var(--fondo-2);
+  border-bottom: 1px solid var(--linea);
+}
+
+.planta-completa__ident {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.planta-completa__nombre {
+  font-weight: 650;
+  font-size: 1.05rem;
+}
+
+.planta-completa__tipo {
+  font-size: 0.78rem;
+  color: var(--texto-tenue);
+}
+
+/* Empuja el estado al extremo derecho. */
+.planta-completa__cab .estado-pill {
+  margin-left: auto;
+}
+
+.planta-completa__lienzo {
+  flex: 1;
+  min-height: 0;
+  padding: 0.9rem 1.1rem 1.1rem;
+  display: flex;
+}
+
+/* El lienzo se estira por FLEX en toda la cadena, NO con `height: 100%` (2026-08-07, medido en el
+   navegador sobre la pantalla equivalente del portal). El porcentaje no resuelve: `.planta-completa__lienzo`
+   es un flex item cuyo alto sale de `flex-grow`, y contra un padre sin alto propio definido el
+   `height: 100%` del hijo cae a `auto` — el contenedor se quedaba en el alto natural del SVG y el resto de
+   la pantalla quedaba vacío, que es justo lo que se reportó.
+   `min-height: 0` en cada nivel porque el mínimo automático de un flex item es su contenido: sin eso
+   ninguno puede encogerse por debajo del alto natural del SVG. */
+.planta-completa__lienzo .motor-diagrama__contenedor,
+.planta-completa__lienzo .lienzo-zoomable {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.planta-completa__lienzo .lienzo-zoomable {
+  border: 1px solid var(--linea);
+  border-radius: var(--r-card);
+  background: var(--superficie);
+}
+
+/* Con `preserveAspectRatio` por defecto el dibujo mantiene su proporción y se centra: el alto extra no lo
+   agranda, pero da espacio real para desplazarse al acercar, que es el sentido de esta pantalla. */
+.planta-completa__lienzo .motor-diagrama {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+}

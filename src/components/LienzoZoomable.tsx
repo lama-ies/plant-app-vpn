@@ -3,7 +3,7 @@
 // 2026-07-30-diagrama-isometrico-design.md §4.3.
 import { useEffect, useRef, useState, type ReactElement, type PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Minus, Scan } from 'lucide-react';
+import { Plus, Minus, Scan, Maximize2 } from 'lucide-react';
 import {
   parsearViewBox, formatearViewBox, zoomCentradoEn, desplazar, pixelesAUnidadesViewBox, limitar, type CajaVista,
 } from '../diagramas/zoomIso';
@@ -14,9 +14,13 @@ const FACTOR_RUEDA = 1.001;
 interface Props {
   viewBoxBase: string;
   children: (viewBoxActual: string) => ReactElement;
+  /** Si se pasa, se muestra un 4° botón "Pantalla completa". Cada página decide a dónde lleva — este
+   * componente es genérico y no conoce rutas. Sin esto el botón no aparece (el editor de topología no lo
+   * necesita: ahí el diagrama se edita, no se supervisa). */
+  onPantallaCompleta?: () => void;
 }
 
-export function LienzoZoomable({ viewBoxBase, children }: Props) {
+export function LienzoZoomable({ viewBoxBase, children, onPantallaCompleta }: Props) {
   const { t } = useTranslation();
   const [caja, setCaja] = useState<CajaVista>(() => parsearViewBox(viewBoxBase));
   const arrastre = useRef<{ x: number; y: number } | null>(null);
@@ -98,6 +102,11 @@ export function LienzoZoomable({ viewBoxBase, children }: Props) {
         <button type="button" onClick={centrar} aria-label={t('diagramaEditor.zoom.centrar')}>
           <Scan size={16} aria-hidden />
         </button>
+        {onPantallaCompleta && (
+          <button type="button" onClick={onPantallaCompleta} aria-label={t('diagramaEditor.zoom.pantallaCompleta')}>
+            <Maximize2 size={16} aria-hidden />
+          </button>
+        )}
       </div>
     </div>
   );

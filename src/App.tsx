@@ -8,6 +8,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Filtros } from './pages/Filtros';
 import { EditorPerfil } from './pages/EditorPerfil';
 import { VistaPlanta } from './pages/VistaPlanta';
+import { VistaPlantaCompleta } from './pages/VistaPlantaCompleta';
 import { TerminalSSH } from './pages/TerminalSSH';
 import { TransferenciaArchivos } from './pages/TransferenciaArchivos';
 import { Auditoria } from './pages/Auditoria';
@@ -28,6 +29,11 @@ export function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/activar-staff" element={<ActivarStaff />} />
       <Route path="/recuperar-staff" element={<RecuperarStaff />} />
+
+      {/* Pantalla completa del diagrama: privada pero FUERA de <AppShell> a propósito — sin topbar el
+          lienzo se queda con todo el alto del viewport, que es el sentido de esta pantalla. Su única
+          salida es su propio botón "Regresar". */}
+      <Route path="/vista-planta-completa" element={<VistaPlantaCompleta />} />
 
       {/* Privadas: cuelgan del marco autenticado (gate de sesión + topbar). */}
       <Route element={<AppShell />}>

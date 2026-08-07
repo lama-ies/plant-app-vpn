@@ -425,7 +425,7 @@ export const es = {
       resumenTitulo: 'Resumen de sensores enlazados',
       volverATopologia: 'Volver a elegir la topología',
       sensorNinguno: 'Sin enlazar',
-      zoom: { acercar: 'Acercar', alejar: 'Alejar', centrar: 'Centrar vista' },
+      zoom: { acercar: 'Acercar', alejar: 'Alejar', centrar: 'Centrar vista', pantallaCompleta: 'Pantalla completa' },
       editarEtiqueta: 'Editar nombre',
       leyenda: { alimentacion: 'Alimentación', permeado: 'Permeado', rechazo: 'Rechazo' },
       sensor: {
@@ -437,6 +437,7 @@ export const es = {
       },
     },
     vistaPlanta: {
+      regresar: 'Regresar',
       proceso: 'Proceso',
       graficas: 'Gráficas',
       sinVariables: 'Este equipo no tiene variables de lectura configuradas en su perfil.',

@@ -424,7 +424,7 @@ export const en = {
       resumenTitulo: 'Linked sensors summary',
       volverATopologia: 'Back to choosing the layout',
       sensorNinguno: 'Not linked',
-      zoom: { acercar: 'Zoom in', alejar: 'Zoom out', centrar: 'Reset view' },
+      zoom: { acercar: 'Zoom in', alejar: 'Zoom out', centrar: 'Reset view', pantallaCompleta: 'Full screen' },
       editarEtiqueta: 'Edit name',
       leyenda: { alimentacion: 'Feed', permeado: 'Permeate', rechazo: 'Reject' },
       sensor: {
@@ -436,6 +436,7 @@ export const en = {
       },
     },
     vistaPlanta: {
+      regresar: 'Back',
       proceso: 'Process',
       graficas: 'Charts',
       sinVariables: 'This unit has no read variables configured in its profile.',

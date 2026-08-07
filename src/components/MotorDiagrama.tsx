@@ -46,6 +46,8 @@ interface Props {
   lecturas?: Lectura[];
   /** Solo en modo vivo: anima el flujo de las tuberías cuando el equipo está reportando. */
   enLinea?: boolean;
+  /** Si se pasa, LienzoZoomable muestra el botón "Pantalla completa" y lo invoca. Ver LienzoZoomable. */
+  onPantallaCompleta?: () => void;
 }
 
 /** Qué se pinta en el badge de un sensor: el valor en vivo si lo hay, si no el nombre de la variable. */
@@ -56,7 +58,7 @@ function textoSensor(sensor: { variable?: string | null; tipo: string }, lectura
   return `${l.valor}${l.unidad ?? ''}`;
 }
 
-export function MotorDiagrama({ diagrama, onEditarEtiqueta, onCambiar, lecturas, enLinea }: Props) {
+export function MotorDiagrama({ diagrama, onEditarEtiqueta, onCambiar, lecturas, enLinea, onPantallaCompleta }: Props) {
   const { t } = useTranslation();
   const porId = new Map(diagrama.nodos.map((n) => [n.id, n]));
   const svgRef = useRef<SVGSVGElement>(null);
@@ -76,7 +78,7 @@ export function MotorDiagrama({ diagrama, onEditarEtiqueta, onCambiar, lecturas,
 
   return (
     <div className="motor-diagrama__contenedor">
-      <LienzoZoomable viewBoxBase={diagrama.viewBox}>
+      <LienzoZoomable viewBoxBase={diagrama.viewBox} onPantallaCompleta={onPantallaCompleta}>
         {(viewBoxActual) => (
           <svg ref={svgRef} viewBox={viewBoxActual} className="motor-diagrama">
             <g aria-hidden className={enLinea ? 'motor-diagrama__flujo' : undefined}>

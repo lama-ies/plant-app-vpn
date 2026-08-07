@@ -424,7 +424,7 @@ export const fr = {
       resumenTitulo: 'Résumé des capteurs associés',
       volverATopologia: 'Retour au choix de la topologie',
       sensorNinguno: 'Non lié',
-      zoom: { acercar: 'Zoomer', alejar: 'Dézoomer', centrar: 'Recentrer' },
+      zoom: { acercar: 'Zoomer', alejar: 'Dézoomer', centrar: 'Recentrer', pantallaCompleta: 'Plein écran' },
       editarEtiqueta: 'Modifier le nom',
       leyenda: { alimentacion: 'Alimentation', permeado: 'Perméat', rechazo: 'Concentrat' },
       sensor: {
@@ -436,6 +436,7 @@ export const fr = {
       },
     },
     vistaPlanta: {
+      regresar: 'Retour',
       proceso: 'Procédé',
       graficas: 'Graphiques',
       sinVariables: "Cet équipement n'a aucune variable de lecture configurée dans son profil.",
