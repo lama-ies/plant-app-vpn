@@ -2,12 +2,13 @@
 // vista previa del editor. Dibuja CUALQUIER DiagramaEquipo ya ensamblado: no conoce el catálogo de
 // segmentos ni el ensamblador. Este editor NUNCA tiene telemetría real: cada sensor muestra el TAG
 // (variable asignada) para confirmar el enlace visualmente, no un valor en vivo.
-import { useLayoutEffect, useRef, useState, type PointerEvent, type RefObject } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent, type RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ConexionDiagrama, DiagramaEquipo, NodoDiagrama } from '../diagramas/tipos';
 import { medioDeTuberia, TuberiaIso } from './TuberiaIso';
 import { LienzoZoomable } from './LienzoZoomable';
 import { pixelesAUnidadesViewBox } from '../diagramas/zoomIso';
+import { reencaminarRetornos } from '../diagramas/rutaRetorno';
 import type { Punto } from '../diagramas/tuberiaIsoGeometria';
 import { ICONO_PROCESO } from './iconosProceso';
 import './motor-diagrama.css';
@@ -60,6 +61,11 @@ export function MotorDiagrama({ diagrama, onEditarEtiqueta, onCambiar, lecturas,
   const porId = new Map(diagrama.nodos.map((n) => [n.id, n]));
   const svgRef = useRef<SVGSVGElement>(null);
 
+  // Lo que se DIBUJA lleva las tuberías de retorno desviadas por arriba, para que no tapen a la de ida
+  // (ver rutaRetorno.ts). Es una copia derivada: `diagrama` —el que se guarda— NO se toca, así que abrir el
+  // editor y mover un badge no persiste el desvío como si el usuario lo hubiera dibujado.
+  const dibujo = useMemo(() => reencaminarRetornos(diagrama), [diagrama]);
+
   function moverEtiquetaConexion(conexionId: string, offsetEtiqueta: { dx: number; dy: number }) {
     if (!onCambiar) return;
     onCambiar({
@@ -74,7 +80,7 @@ export function MotorDiagrama({ diagrama, onEditarEtiqueta, onCambiar, lecturas,
         {(viewBoxActual) => (
           <svg ref={svgRef} viewBox={viewBoxActual} className="motor-diagrama">
             <g aria-hidden className={enLinea ? 'motor-diagrama__flujo' : undefined}>
-              {diagrama.conexiones.map((c) => {
+              {dibujo.conexiones.map((c) => {
                 const a = porId.get(c.desde);
                 const b = porId.get(c.hasta);
                 if (!a || !b) return null;

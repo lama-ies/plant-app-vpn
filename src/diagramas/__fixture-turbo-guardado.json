@@ -1,0 +1,223 @@
+{
+  "viewBox": "-100 -100 1400 310",
+  "nodos": [
+    {
+      "id": "osmosis.alimentacion.A1#0#pozo",
+      "tipo": "pozo",
+      "etiqueta": "Pozo",
+      "x": 0,
+      "y": 0,
+      "sensores": []
+    },
+    {
+      "id": "osmosis.alimentacion.A1#0#bombaSumergible",
+      "tipo": "bombaSumergible",
+      "etiqueta": "Bomba sumergible",
+      "x": 150,
+      "y": 0,
+      "sensores": [
+        {
+          "variable": "onOffBombaSumergible1",
+          "tipo": "onOffEquipo"
+        }
+      ]
+    },
+    {
+      "id": "osmosis.alimentacion.A1#0#filtroMultimedia",
+      "tipo": "filtroMultimedia",
+      "etiqueta": "Filtro multimedia",
+      "x": 300,
+      "y": 0,
+      "sensores": []
+    },
+    {
+      "id": "osmosis.nucleo.N2#0#valvulaActuadora",
+      "tipo": "valvulaActuadora",
+      "etiqueta": "Válvula actuadora",
+      "x": 450,
+      "y": 0,
+      "sensores": []
+    },
+    {
+      "id": "osmosis.nucleo.N2#0#filtroCanasta",
+      "tipo": "filtroCanasta",
+      "etiqueta": "Filtro Canasta 5µ",
+      "x": 600,
+      "y": 0,
+      "sensores": [
+        {
+          "variable": "presionAlimentacion",
+          "tipo": "presion"
+        },
+        {
+          "variable": "flujoAlimentacion",
+          "tipo": "flujo"
+        }
+      ]
+    },
+    {
+      "id": "osmosis.nucleo.N2#0#bombaAltaPresion",
+      "tipo": "bombaAltaPresion",
+      "etiqueta": "Bomba Alta Presión",
+      "x": 750,
+      "y": 0,
+      "sensores": [
+        {
+          "variable": "rpmBombaAltaPresion",
+          "tipo": "rpm"
+        },
+        {
+          "variable": "onOffBombaAltaPresion",
+          "tipo": "onOffEquipo"
+        },
+        {
+          "variable": "fallaBombaAltaPresion",
+          "tipo": "falla"
+        }
+      ]
+    },
+    {
+      "id": "osmosis.nucleo.N2#0#turbocharger",
+      "tipo": "turbocharger",
+      "etiqueta": "TurboCharger",
+      "x": 900,
+      "y": 0,
+      "sensores": [
+        {
+          "variable": "onOffTurbocharger",
+          "tipo": "onOffEquipo"
+        },
+        {
+          "variable": "presionRecuperada",
+          "tipo": "presion"
+        }
+      ]
+    },
+    {
+      "id": "osmosis.nucleo.N2#0#membranaRO",
+      "tipo": "membranaRO",
+      "etiqueta": "Membranas RO",
+      "x": 1050,
+      "y": 0,
+      "sensores": [
+        {
+          "variable": "conductividadPermeado",
+          "tipo": "conductividad"
+        },
+        {
+          "variable": "phPermeado",
+          "tipo": "ph"
+        },
+        {
+          "variable": "flujoPermeado",
+          "tipo": "flujo"
+        }
+      ]
+    },
+    {
+      "id": "osmosis.nucleo.N2#0#drenaje",
+      "tipo": "salidaDrenaje",
+      "etiqueta": "Drenaje",
+      "x": 900,
+      "y": 110,
+      "sensores": [],
+      "rotacion": 90
+    },
+    {
+      "id": "osmosis.cisternaFinal#0#cisternaFinal",
+      "tipo": "tanque",
+      "etiqueta": "Cisterna agua permeada",
+      "x": 1200,
+      "y": 0,
+      "sensores": [
+        {
+          "variable": "nivelCisternaFinal",
+          "tipo": "nivelOnOff"
+        }
+      ]
+    }
+  ],
+  "conexiones": [
+    {
+      "id": "c0",
+      "desde": "osmosis.alimentacion.A1#0#pozo",
+      "hasta": "osmosis.alimentacion.A1#0#bombaSumergible",
+      "sensores": [],
+      "tipo": "alimentacion",
+      "ruta": []
+    },
+    {
+      "id": "c1",
+      "desde": "osmosis.alimentacion.A1#0#bombaSumergible",
+      "hasta": "osmosis.alimentacion.A1#0#filtroMultimedia",
+      "sensores": [],
+      "tipo": "alimentacion",
+      "ruta": []
+    },
+    {
+      "id": "c2",
+      "desde": "osmosis.nucleo.N2#0#valvulaActuadora",
+      "hasta": "osmosis.nucleo.N2#0#filtroCanasta",
+      "sensores": [],
+      "tipo": "alimentacion",
+      "ruta": []
+    },
+    {
+      "id": "c3",
+      "desde": "osmosis.nucleo.N2#0#filtroCanasta",
+      "hasta": "osmosis.nucleo.N2#0#bombaAltaPresion",
+      "sensores": [],
+      "tipo": "alimentacion",
+      "ruta": []
+    },
+    {
+      "id": "c4",
+      "desde": "osmosis.nucleo.N2#0#bombaAltaPresion",
+      "hasta": "osmosis.nucleo.N2#0#turbocharger",
+      "sensores": [],
+      "tipo": "alimentacion",
+      "ruta": []
+    },
+    {
+      "id": "c5",
+      "desde": "osmosis.nucleo.N2#0#turbocharger",
+      "hasta": "osmosis.nucleo.N2#0#membranaRO",
+      "sensores": [],
+      "tipo": "alimentacion",
+      "ruta": []
+    },
+    {
+      "id": "c6",
+      "desde": "osmosis.nucleo.N2#0#membranaRO",
+      "hasta": "osmosis.nucleo.N2#0#turbocharger",
+      "etiqueta": "Rechazo",
+      "sensores": [],
+      "tipo": "rechazo",
+      "ruta": []
+    },
+    {
+      "id": "c7",
+      "desde": "osmosis.nucleo.N2#0#turbocharger",
+      "hasta": "osmosis.nucleo.N2#0#drenaje",
+      "sensores": [],
+      "tipo": "rechazo",
+      "ruta": []
+    },
+    {
+      "id": "c8",
+      "desde": "osmosis.alimentacion.A1#0#filtroMultimedia",
+      "hasta": "osmosis.nucleo.N2#0#valvulaActuadora",
+      "sensores": [],
+      "tipo": "alimentacion",
+      "ruta": []
+    },
+    {
+      "id": "c9",
+      "desde": "osmosis.nucleo.N2#0#membranaRO",
+      "hasta": "osmosis.cisternaFinal#0#cisternaFinal",
+      "sensores": [],
+      "tipo": "permeado",
+      "ruta": []
+    }
+  ]
+}
